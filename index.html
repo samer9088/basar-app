@@ -729,7 +729,10 @@ textarea.fi{resize:vertical;min-height:70px;font-family:'Tajawal',sans-serif;fon
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
       <button class="btn btn-wa btn-sm" id="rxDetailWA" onclick="">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        واتساب
+        مشاركة النص
+      </button>
+      <button class="btn btn-sm" id="rxDetailImg" style="background:linear-gradient(135deg,#28b060,#1a7840);color:#fff;box-shadow:0 4px 14px rgba(40,176,96,.20);display:none">
+        📷 مشاركة الصورة
       </button>
       <button class="btn btn-pdf btn-sm" id="rxDetailPDF">📄 PDF</button>
       <button class="btn btn-o btn-sm" onclick="closeModal('rxDetailModal')">إغلاق</button>
@@ -1886,6 +1889,10 @@ function viewRx(id){
   document.getElementById('rxDetailContent').innerHTML = html;
   document.getElementById('rxDetailWA').onclick = () => { closeModal('rxDetailModal'); shareWAMember(id); };
   document.getElementById('rxDetailPDF').onclick = () => { closeModal('rxDetailModal'); exportPDFMember(id); };
+  // show/hide image share button based on whether member has image
+  const imgBtn = document.getElementById('rxDetailImg');
+  if(m.image){ imgBtn.style.display='inline-flex'; imgBtn.onclick = () => { closeModal('rxDetailModal'); shareImageMember(id); }; }
+  else { imgBtn.style.display='none'; }
   openModal('rxDetailModal');
 }
 
@@ -1951,6 +1958,39 @@ function shareWAMember(id){
   if(m.notes) msg += `\n📝 *ملاحظات:* ${m.notes}\n`;
   msg += DISCLAIMER_WA;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══════════════════════════════════════════
+// SHARE IMAGE
+// ══════════════════════════════════════════
+function shareImageMember(id){
+  const m = getMembers().find(x=>x.id===id);
+  if(!m || !m.image){ showToast('⚠️ لا توجد صورة لهذا الفرد'); return; }
+  // Open image in new tab so user can share from there
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <!DOCTYPE html><html dir="rtl" lang="ar">
+    <head>
+      <meta charset="UTF-8"/>
+      <meta name="viewport" content="width=device-width,initial-scale=1"/>
+      <title>صورة وصفة ${m.name}</title>
+      <style>
+        body{margin:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Cairo',sans-serif;gap:16px;padding:20px;box-sizing:border-box}
+        img{max-width:100%;max-height:80vh;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+        .info{color:#fff;font-size:.9rem;text-align:center;opacity:.8;line-height:1.6}
+        .name{color:#62cccc;font-size:1.1rem;font-weight:800;margin-bottom:4px}
+        .tip{background:rgba(40,176,96,.15);border:1px solid rgba(40,176,96,.3);border-radius:10px;padding:12px 18px;color:#7de8a8;font-size:.82rem;text-align:center;max-width:400px;line-height:1.7}
+        .disclaimer{color:#c8a060;font-size:.75rem;text-align:center;max-width:400px;opacity:.85;line-height:1.6;margin-top:4px}
+      </style>
+    </head>
+    <body>
+      <div class="name">👁️ صورة وصفة ${m.name} (${m.rel})</div>
+      <img src="${m.image}" alt="وصفة ${m.name}"/>
+      <div class="tip">💡 لمشاركة الصورة عبر واتساب:<br/>اضغط مطولاً على الصورة ← مشاركة ← واتساب</div>
+      <div class="disclaimer">⚕️ تطبيق بصر لحفظ الوصفات الطبية، لا يغني عن استشارة الطبيب المختص</div>
+    </body></html>
+  `);
+  win.document.close();
 }
 
 // ══════════════════════════════════════════
