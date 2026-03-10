@@ -3,7 +3,23 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>بصر | الملف الشخصي</title>
+<title>بصر | Basar App</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#2a9090"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="بصر"/>
+<meta name="application-name" content="بصر"/>
+<meta name="description" content="تطبيق بصر لحفظ الوصفات الطبية للعائلة"/>
+
+<!-- Open Graph -->
+<meta property="og:title" content="بصر | Basar App"/>
+<meta property="og:description" content="تطبيق لحفظ وصفات العيون الطبية لكامل العائلة"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://basar-app.vercel.app"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -783,12 +799,26 @@ textarea.fi{resize:vertical;min-height:70px;font-family:'Tajawal',sans-serif;fon
     <span class="tname">بصر</span>
   </div>
   <div class="tnav">
-    <button class="navbtn active" id="nb_profile" onclick="showPage('profile')">👤 <span>الملف</span></button>
-    <button class="navbtn" id="nb_family" onclick="showPage('family')">👨‍👩‍👧‍👦 <span>الأسرة</span></button>
-    <button class="navbtn" id="nb_stores" onclick="showPage('stores')">🏪 <span>المعارض</span></button>
+    <button class="navbtn active" id="nb_profile" onclick="showPage('profile')">👤 <span data-i18n="nav_profile">الملف</span></button>
+    <button class="navbtn" id="nb_family" onclick="showPage('family')">👨‍👩‍👧‍👦 <span data-i18n="nav_family">الأسرة</span></button>
+    <button class="navbtn" id="nb_stores" onclick="showPage('stores')">🏪 <span data-i18n="nav_stores">المعارض</span></button>
   </div>
   <div class="tnav">
     <button class="ibtn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    <!-- Language Switcher -->
+    <div style="position:relative" id="langMenuWrap">
+      <button class="ibtn" onclick="toggleLangMenu()" id="langBtn" style="width:auto;padding:0 10px;gap:4px;font-size:.75rem;font-weight:700">
+        🌐 <span id="langLabel">AR</span>
+      </button>
+      <div id="langMenu" style="display:none;position:absolute;top:42px;left:0;background:var(--card);border:1.5px solid var(--bdr);border-radius:12px;box-shadow:0 8px 24px var(--shd);z-index:300;min-width:160px;overflow:hidden">
+        <div onclick="setLang('ar')" class="lang-opt" data-l="ar">🇸🇦 العربية</div>
+        <div onclick="setLang('en')" class="lang-opt" data-l="en">🇬🇧 English</div>
+        <div onclick="setLang('fr')" class="lang-opt" data-l="fr">🇫🇷 Français</div>
+        <div onclick="setLang('ur')" class="lang-opt" data-l="ur">🇵🇰 اردو</div>
+        <div onclick="setLang('fa')" class="lang-opt" data-l="fa">🇮🇷 فارسی</div>
+        <div onclick="setLang('tr')" class="lang-opt" data-l="tr">🇹🇷 Türkçe</div>
+      </div>
+    </div>
     <div class="user-chip" id="userChip" onclick="confirmLogout()" title="تسجيل الخروج">
       <div class="user-chip-av" id="userChipAv">👤</div>
       <span class="user-chip-name" id="userChipName">—</span>
@@ -815,9 +845,9 @@ textarea.fi{resize:vertical;min-height:70px;font-family:'Tajawal',sans-serif;fon
             <span>📧 —</span><span>📱 —</span><span>🏙️ —</span>
           </div>
           <div class="profile-stats">
-            <div class="stat-box"><div class="stat-num" id="statFamily">0</div><div class="stat-lbl">فرد عائلة</div></div>
-            <div class="stat-box"><div class="stat-num" id="statGlasses">0</div><div class="stat-lbl">وصفة نظارات</div></div>
-            <div class="stat-box"><div class="stat-num" id="statContacts">0</div><div class="stat-lbl">وصفة عدسات</div></div>
+            <div class="stat-box"><div class="stat-num" id="statFamily">0</div><div class="stat-lbl" data-i18n="stat_family">فرد عائلة</div></div>
+            <div class="stat-box"><div class="stat-num" id="statGlasses">0</div><div class="stat-lbl" data-i18n="stat_glasses">وصفة نظارات</div></div>
+            <div class="stat-box"><div class="stat-num" id="statContacts">0</div><div class="stat-lbl" data-i18n="stat_contacts">وصفة عدسات</div></div>
           </div>
           <div class="profile-actions">
             <button class="btn btn-p btn-sm" onclick="openEditProfile()">✏️ تعديل الملف</button>
@@ -833,7 +863,7 @@ textarea.fi{resize:vertical;min-height:70px;font-family:'Tajawal',sans-serif;fon
         <div class="section-title"><span>📋</span> آخر الوصفات لأفراد الأسرة</div>
         <button class="btn btn-o btn-sm" onclick="showPage('family')">عرض الكل</button>
       </div>
-      <div id="recentRxList"><div class="empty"><div class="empty-icon">📋</div><p>أضف أفراد الأسرة لعرض وصفاتهم هنا</p></div></div>
+      <div id="recentRxList"><div class="empty"><div class="empty-icon">📋</div><p>${t('empty_rx')}</p></div></div>
     </div>
   </div>
 
@@ -841,7 +871,7 @@ textarea.fi{resize:vertical;min-height:70px;font-family:'Tajawal',sans-serif;fon
   <div class="page" id="pageFamily">
     <div style="background:var(--card);border:1.5px solid var(--bdr);border-radius:22px;padding:22px;box-shadow:0 16px 50px var(--shd)">
       <div class="section-header">
-        <div class="section-title"><span>👨‍👩‍👧‍👦</span> أفراد الأسرة</div>
+        <div class="section-title"><span>👨‍👩‍👧‍👦</span> <span data-i18n="family_title">أفراد الأسرة</span></div>
         <button class="btn btn-p btn-sm" onclick="openAddMember()">➕ إضافة فرد</button>
       </div>
       <div class="family-grid" id="familyGrid">
@@ -1164,7 +1194,7 @@ function saveSupabaseConfig(){
   localStorage.setItem('basarSB_url', url);
   localStorage.setItem('basarSB_key', key);
   initSupabase();
-  showToast('✅ تم حفظ إعداد Supabase');
+  showToast(t('toast_sb_saved'));
 }
 
 function initSupabase(){
@@ -1300,7 +1330,7 @@ async function doLogout(){
   currentUser = null;
   showLoading(false);
   showAuthScreen();
-  showToast('👋 تم تسجيل الخروج بنجاح');
+  showToast(t('toast_logout'));
 }
 
 function confirmLogout(){
@@ -1315,7 +1345,7 @@ async function onLoginSuccess(user){
   renderProfile();
   renderFamily();
   checkAlerts();
-  showToast('👋 أهلاً بك في بصر!');
+  showToast(t('toast_welcome'));
 }
 
 // ── Update topbar user chip ──
@@ -1582,7 +1612,7 @@ function handleAvatarUpload(){
     await setProfile(p);
     updateUserChip();
     renderProfile();
-    showToast('✅ تم تحديث الصورة وحفظها في السحابة ☁️');
+    showToast(t('toast_avatar'));
   };
   reader.readAsDataURL(file);
 }
@@ -1617,7 +1647,7 @@ async function saveProfile(){
   updateUserChip();
   renderProfile();
   closeModal('editProfileModal');
-  showToast('✅ تم حفظ الملف الشخصي في السحابة ☁️');
+  showToast(t('toast_saved'));
 }
 
 function renderProfile(){
@@ -1650,7 +1680,7 @@ function renderRecentRx(){
   const container = document.getElementById('recentRxList');
   const withRx = members.filter(m => hasGlassesRx(m) || hasContactsRx(m));
   if(!withRx.length){
-    container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p style="font-family:'Tajawal',sans-serif;font-size:.88rem">أضف أفراد الأسرة مع وصفاتهم لعرضها هنا</p></div>`;
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p style="font-family:'Tajawal',sans-serif;font-size:.88rem">${t('empty_family')}</p></div>`;
     return;
   }
   container.innerHTML = withRx.slice(0,5).map(m => `
@@ -1797,7 +1827,7 @@ async function saveMember(){
   renderFamily();
   renderProfile();
   closeModal('memberModal');
-  showToast(isEdit ? '✅ تم تحديث البيانات في السحابة ☁️' : '✅ تم إضافة الفرد وحفظه في السحابة ☁️');
+  showToast(isEdit ? t('toast_member_updated') : t('toast_member_added'));
 
   if(grx.alert || crx.alert){ scheduleAlert(member); }
 }
@@ -1915,7 +1945,7 @@ async function deleteMember(id){
   setMembers(members);
   renderFamily();
   renderProfile();
-  showToast('🗑️ تم الحذف من السحابة ☁️');
+  showToast(t('toast_deleted'));
 }
 
 // ══════════════════════════════════════════
@@ -1965,29 +1995,28 @@ function shareWAMember(id){
 // ══════════════════════════════════════════
 function shareImageMember(id){
   const m = getMembers().find(x=>x.id===id);
-  if(!m || !m.image){ showToast('⚠️ لا توجد صورة لهذا الفرد'); return; }
+  if(!m || !m.image){ showToast(t('toast_no_img')); return; }
   // Open image in new tab so user can share from there
   const win = window.open('', '_blank');
   win.document.write(`
-    <!DOCTYPE html><html dir="rtl" lang="ar">
+    <!DOCTYPE html><html dir="${RTL_LANGS.includes(currentLang)?'rtl':'ltr'}" lang="${currentLang}">
     <head>
       <meta charset="UTF-8"/>
       <meta name="viewport" content="width=device-width,initial-scale=1"/>
-      <title>صورة وصفة ${m.name}</title>
+      <title>${t('img_label')} ${m.name}</title>
       <style>
         body{margin:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Cairo',sans-serif;gap:16px;padding:20px;box-sizing:border-box}
         img{max-width:100%;max-height:80vh;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
-        .info{color:#fff;font-size:.9rem;text-align:center;opacity:.8;line-height:1.6}
         .name{color:#62cccc;font-size:1.1rem;font-weight:800;margin-bottom:4px}
         .tip{background:rgba(40,176,96,.15);border:1px solid rgba(40,176,96,.3);border-radius:10px;padding:12px 18px;color:#7de8a8;font-size:.82rem;text-align:center;max-width:400px;line-height:1.7}
         .disclaimer{color:#c8a060;font-size:.75rem;text-align:center;max-width:400px;opacity:.85;line-height:1.6;margin-top:4px}
       </style>
     </head>
     <body>
-      <div class="name">👁️ صورة وصفة ${m.name} (${m.rel})</div>
-      <img src="${m.image}" alt="وصفة ${m.name}"/>
-      <div class="tip">💡 لمشاركة الصورة عبر واتساب:<br/>اضغط مطولاً على الصورة ← مشاركة ← واتساب</div>
-      <div class="disclaimer">⚕️ تطبيق بصر لحفظ الوصفات الطبية، لا يغني عن استشارة الطبيب المختص</div>
+      <div class="name">👁️ ${t('img_label')} ${m.name} (${m.rel})</div>
+      <img src="${m.image}" alt="${m.name}"/>
+      <div class="tip">${t('img_share_tip')}</div>
+      <div class="disclaimer">${t('img_share_disclaimer')}</div>
     </body></html>
   `);
   win.document.close();
@@ -2125,7 +2154,7 @@ function exportPDFMember(id){
   doc.text('This document is for reference only. Always consult your ophthalmologist.', W/2, 293, {align:'center'});
 
   doc.save(`basar-${m.name}-rx-${new Date().toISOString().split('T')[0]}.pdf`);
-  showToast('📄 تم تصدير PDF بنجاح');
+  showToast(t('toast_pdf'));
 }
 
 // ══════════════════════════════════════════
@@ -2233,6 +2262,7 @@ function handleMemberImg(){
 // ══════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async ()=>{
   applyTheme();
+  applyLang();
 
   // Init Supabase
   const ready = initSupabase();
@@ -2348,10 +2378,785 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   42%{transform:scale(1.18)}
   56%{transform:scale(1)}
 }
+.lang-opt{padding:10px 16px;font-family:'Cairo',sans-serif;font-size:.83rem;font-weight:600;color:var(--tx);cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:8px}
+.lang-opt:hover{background:var(--gp);color:var(--g2)}
+.lang-opt.active{background:var(--gp);color:var(--g2);font-weight:800}
 </style>
 
 <script>
 document.getElementById('footerYear').textContent = new Date().getFullYear();
+</script>
+
+<script>
+// ══════════════════════════════════════════
+//  BASAR APP — i18n Multi-Language System
+//  نظام الترجمة متعدد اللغات
+// ══════════════════════════════════════════
+
+const TRANSLATIONS = {
+  ar: {
+    // Nav
+    nav_profile: 'الملف', nav_family: 'الأسرة', nav_stores: 'المعارض',
+    // Auth
+    auth_login: 'تسجيل الدخول', auth_register: 'حساب جديد',
+    auth_email: 'البريد الإلكتروني', auth_password: 'كلمة المرور',
+    auth_confirm_pass: 'تأكيد كلمة المرور', auth_forgot: 'نسيت كلمة المرور؟',
+    auth_login_btn: '🔑 تسجيل الدخول', auth_register_btn: '✨ إنشاء الحساب',
+    auth_first: 'الاسم الأول', auth_last: 'اسم العائلة',
+    auth_country: 'الدولة', auth_city: 'المدينة', auth_phone: 'رقم الجوال',
+    auth_select_country: 'اختر الدولة', auth_select_city: 'اختر المدينة',
+    auth_city_placeholder: 'اكتب مدينتك',
+    auth_pass_hint: '8 أحرف على الأقل',
+    auth_forgot_hint: 'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور',
+    auth_send_reset: '📧 إرسال رابط الاسترداد', auth_back: '← رجوع',
+    auth_tagline: 'حفظ الوصفات الطبية للعائلة',
+    auth_footer: 'تطبيق بصر لحفظ الوصفات الطبية · لا يغني عن استشارة الطبيب المختص',
+    auth_made: 'صُنع بحب في المملكة العربية السعودية',
+    sb_setup: '🔧 إعداد Supabase', sb_once: '(لمرة واحدة فقط)',
+    sb_url_label: 'Project URL', sb_key_label: 'Anon Key',
+    sb_save: '💾 حفظ الإعداد والمتابعة',
+    sb_hint: 'احصل على هذه البيانات من',
+    sb_config_warn: '⚙️ إعداد مطلوب: يرجى إدخال بيانات Supabase أدناه لتفعيل الحفظ السحابي.',
+    // Profile
+    profile_edit: '✏️ تعديل الملف', profile_manage: '👨‍👩‍👧‍👦 إدارة الأسرة',
+    profile_recent: '📋 آخر الوصفات لأفراد الأسرة', profile_view_all: 'عرض الكل',
+    stat_family: 'فرد عائلة', stat_glasses: 'وصفة نظارات', stat_contacts: 'وصفة عدسات',
+    edit_profile_title: '✏️ تعديل الملف الشخصي',
+    field_first: 'الاسم الأول', field_last: 'اسم العائلة',
+    field_dob: 'تاريخ الميلاد', field_gender: 'الجنس',
+    field_phone: 'رقم الهاتف', field_email: 'البريد الإلكتروني',
+    field_city: 'المدينة', field_select: 'اختر',
+    gender_male: 'ذكر', gender_female: 'أنثى',
+    btn_cancel: 'إلغاء', btn_save: '💾 حفظ',
+    // Family
+    family_title: '👨‍👩‍👧‍👦 أفراد الأسرة', family_add: '➕ إضافة فرد',
+    family_add_card: 'إضافة فرد جديد',
+    member_add_title: '👤 إضافة فرد جديد',
+    field_name: 'الاسم', field_rel: 'صلة القرابة', field_age: 'العمر',
+    field_notes: 'ملاحظات', field_notes_ph: 'توصيات الطبيب، حساسية خاصة...',
+    rel_wife:'الزوجة',rel_husband:'الزوج',rel_son:'الابن',rel_daughter:'الابنة',
+    rel_father:'الأب',rel_mother:'الأم',rel_brother:'الأخ',rel_sister:'الأخت',
+    rel_grandfather:'الجد',rel_grandmother:'الجدة',rel_other:'أخرى',
+    glasses_rx: '🕶️ وصفة النظارات (اختياري)',
+    contacts_rx: '👁️ وصفة العدسات اللاصقة (اختياري)',
+    field_rx_date: 'تاريخ وصفة النظارات', field_rx_doc: 'الطبيب / العيادة',
+    field_cl_date: 'تاريخ وصفة العدسات',
+    field_lens_type: 'نوع العدسات',
+    field_glasses_alert: 'تذكير تجديد النظارة',
+    field_cl_alert: 'تذكير تغيير العدسات',
+    alert_3m:'3 أشهر',alert_6m:'6 أشهر',alert_12m:'12 شهر',
+    alert_daily:'☀️ يومي',alert_weekly:'📅 أسبوعي',alert_monthly:'🗓️ شهري',alert_yearly:'📆 سنوي',
+    lens_daily:'💧 يومي',lens_weekly:'🔵 أسبوعي',lens_monthly:'🟢 شهري',
+    lens_toric:'⭕ توريك',lens_rigid:'🔲 صلبة',lens_cosm_daily:'🌈 ملونة يومي',
+    lens_cosm_monthly:'🌟 ملونة شهري',lens_cosm:'🎨 ملونة تجميلي',
+    upload_title:'صورة الوصفة (اختياري)',
+    upload_hint:'انقر لرفع صورة الوصفة — JPG, PNG',
+    sound_title:'نوع التنبيه',
+    sound_bell:'🔔 جرس',sound_chime:'🎵 نغمة',sound_alert:'🚨 تنبيه',sound_silent:'🔕 صامت',
+    btn_save_member:'💾 حفظ الفرد',
+    // Actions
+    btn_view:'👁️ عرض', btn_edit:'✏️ تعديل', btn_wa:'واتس', btn_pdf:'📄 PDF', btn_delete:'🗑️',
+    btn_wa_text:'مشاركة النص', btn_img:'📷 مشاركة الصورة', btn_close:'إغلاق',
+    // RX Detail
+    medical_disclaimer:'تنبيه طبي: تطبيق بصر لحفظ الوصفات الطبية والعدسات اللاصقة، ولا يغني عن استشارة الطبيب المختص. يُرجى مراجعة طبيب العيون بانتظام للحصول على أفضل رعاية لعيونك.',
+    no_rx:'لا توجد وصفة مسجّلة لهذا الفرد',
+    notes_label:'📝 ملاحظات:',
+    img_label:'📷 صورة الوصفة:',
+    eye_right:'👁️ يمنى (OD)', eye_left:'👁️ يسرى (OS)',
+    glasses_title:'🕶️ وصفة النظارات', contacts_title:'👁️ وصفة العدسات اللاصقة',
+    // Delete confirm
+    delete_title:'تأكيد الحذف', delete_confirm:'حذف',
+    // Logout
+    logout_title:'تسجيل الخروج', logout_msg:'هل تريد تسجيل الخروج من حسابك؟', logout_btn:'تسجيل الخروج',
+    // Stores
+    stores_title:'معارض البصريات وعيادات العيون',
+    stores_subtitle:'دليلك الشامل لأفضل معارض البصريات وعيادات العيون المتخصصة في منطقتك',
+    coming_soon:'قريباً — Coming Soon',
+    stores_working:'نعمل بجد لإطلاق هذه الخاصية في أقرب وقت 🚀',
+    notify_title:'كن أول من يعلم عند الإطلاق!',
+    notify_subtitle:'سجّل بريدك الإلكتروني وسنخبرك فور إطلاق قسم المعارض والعيادات',
+    notify_btn:'أبلغني عند الإطلاق 🚀',
+    notify_success:'✅ شكراً! سنخبرك فور الإطلاق 🎉',
+    // Toasts
+    toast_saved:'✅ تم حفظ الملف الشخصي في السحابة ☁️',
+    toast_member_added:'✅ تم إضافة الفرد وحفظه في السحابة ☁️',
+    toast_member_updated:'✅ تم تحديث البيانات في السحابة ☁️',
+    toast_deleted:'🗑️ تم الحذف من السحابة ☁️',
+    toast_avatar:'✅ تم تحديث الصورة وحفظها في السحابة ☁️',
+    toast_welcome:'👋 أهلاً بك في بصر!',
+    toast_logout:'👋 تم تسجيل الخروج بنجاح',
+    toast_pdf:'📄 تم تصدير PDF بنجاح',
+    toast_sb_saved:'✅ تم حفظ إعداد Supabase',
+    toast_no_img:'⚠️ لا توجد صورة لهذا الفرد',
+    // Footer
+    footer_rights:'جميع الحقوق محفوظة ©',
+    footer_site:'— موقع بصر',
+    footer_disclaimer:'تطبيق بصر لحفظ الوصفات الطبية والعدسات اللاصقة · لا يغني عن استشارة الطبيب المختص',
+    footer_made:'صُنع بـ ❤️ في المملكة العربية السعودية 🇸🇦',
+    // PWA
+    pwa_install:'👁️ ثبّت تطبيق بصر على جهازك!', pwa_btn:'تثبيت',
+    pwa_success:'✅ تم تثبيت بصر على جهازك! 🎉',
+    // Empty
+    empty_rx:'${t('empty_rx')}',
+    empty_family:'${t('empty_family')}',
+    // image share page
+    img_share_tip:'💡 لمشاركة الصورة عبر واتساب:<br/>اضغط مطولاً على الصورة ← مشاركة ← واتساب',
+    img_share_disclaimer:'⚕️ تطبيق بصر لحفظ الوصفات الطبية، لا يغني عن استشارة الطبيب المختص',
+  },
+  en: {
+    nav_profile:'Profile', nav_family:'Family', nav_stores:'Stores',
+    auth_login:'Sign In', auth_register:'New Account',
+    auth_email:'Email', auth_password:'Password',
+    auth_confirm_pass:'Confirm Password', auth_forgot:'Forgot password?',
+    auth_login_btn:'🔑 Sign In', auth_register_btn:'✨ Create Account',
+    auth_first:'First Name', auth_last:'Last Name',
+    auth_country:'Country', auth_city:'City', auth_phone:'Phone Number',
+    auth_select_country:'Select Country', auth_select_city:'Select City',
+    auth_city_placeholder:'Type your city',
+    auth_pass_hint:'At least 8 characters',
+    auth_forgot_hint:'Enter your email and we will send you a password reset link',
+    auth_send_reset:'📧 Send Reset Link', auth_back:'← Back',
+    auth_tagline:'Family Eye Prescription Manager',
+    auth_footer:'Basar App for medical eye prescriptions · Not a substitute for specialist consultation',
+    auth_made:'Made with love in Saudi Arabia 🇸🇦',
+    sb_setup:'🔧 Supabase Setup', sb_once:'(one time only)',
+    sb_url_label:'Project URL', sb_key_label:'Anon Key',
+    sb_save:'💾 Save & Continue',
+    sb_hint:'Get these from',
+    sb_config_warn:'⚙️ Setup required: Please enter your Supabase credentials to enable cloud sync.',
+    profile_edit:'✏️ Edit Profile', profile_manage:'👨‍👩‍👧‍👦 Manage Family',
+    profile_recent:'📋 Recent Prescriptions', profile_view_all:'View All',
+    stat_family:'Family Members', stat_glasses:'Glasses Rx', stat_contacts:'Contacts Rx',
+    edit_profile_title:'✏️ Edit Profile',
+    field_first:'First Name', field_last:'Last Name',
+    field_dob:'Date of Birth', field_gender:'Gender',
+    field_phone:'Phone', field_email:'Email',
+    field_city:'City', field_select:'Select',
+    gender_male:'Male', gender_female:'Female',
+    btn_cancel:'Cancel', btn_save:'💾 Save',
+    family_title:'👨‍👩‍👧‍👦 Family Members', family_add:'➕ Add Member',
+    family_add_card:'Add New Member',
+    member_add_title:'👤 Add New Member',
+    field_name:'Name', field_rel:'Relationship', field_age:'Age',
+    field_notes:'Notes', field_notes_ph:'Doctor recommendations, allergies...',
+    rel_wife:'Wife',rel_husband:'Husband',rel_son:'Son',rel_daughter:'Daughter',
+    rel_father:'Father',rel_mother:'Mother',rel_brother:'Brother',rel_sister:'Sister',
+    rel_grandfather:'Grandfather',rel_grandmother:'Grandmother',rel_other:'Other',
+    glasses_rx:'🕶️ Glasses Prescription (optional)',
+    contacts_rx:'👁️ Contact Lens Prescription (optional)',
+    field_rx_date:'Glasses Prescription Date', field_rx_doc:'Doctor / Clinic',
+    field_cl_date:'Contacts Prescription Date',
+    field_lens_type:'Lens Type',
+    field_glasses_alert:'Glasses Renewal Reminder',
+    field_cl_alert:'Lens Change Reminder',
+    alert_3m:'3 Months',alert_6m:'6 Months',alert_12m:'12 Months',
+    alert_daily:'☀️ Daily',alert_weekly:'📅 Weekly',alert_monthly:'🗓️ Monthly',alert_yearly:'📆 Yearly',
+    lens_daily:'💧 Daily',lens_weekly:'🔵 Weekly',lens_monthly:'🟢 Monthly',
+    lens_toric:'⭕ Toric',lens_rigid:'🔲 Rigid',lens_cosm_daily:'🌈 Colored Daily',
+    lens_cosm_monthly:'🌟 Colored Monthly',lens_cosm:'🎨 Cosmetic',
+    upload_title:'Prescription Image (optional)',
+    upload_hint:'Click to upload prescription image — JPG, PNG',
+    sound_title:'Alert Sound',
+    sound_bell:'🔔 Bell',sound_chime:'🎵 Chime',sound_alert:'🚨 Alert',sound_silent:'🔕 Silent',
+    btn_save_member:'💾 Save Member',
+    btn_view:'👁️ View', btn_edit:'✏️ Edit', btn_wa:'WhatsApp', btn_pdf:'📄 PDF', btn_delete:'🗑️',
+    btn_wa_text:'Share Text', btn_img:'📷 Share Image', btn_close:'Close',
+    medical_disclaimer:'Medical Notice: Basar App is for storing eye prescriptions only and does not replace specialist consultation. Please see your ophthalmologist regularly.',
+    no_rx:'No prescription recorded for this member',
+    notes_label:'📝 Notes:',
+    img_label:'📷 Prescription Image:',
+    eye_right:'👁️ Right (OD)', eye_left:'👁️ Left (OS)',
+    glasses_title:'🕶️ Glasses Prescription', contacts_title:'👁️ Contact Lens Prescription',
+    delete_title:'Confirm Delete', delete_confirm:'Delete',
+    logout_title:'Sign Out', logout_msg:'Are you sure you want to sign out?', logout_btn:'Sign Out',
+    stores_title:'Optical Stores & Eye Clinics',
+    stores_subtitle:'Your comprehensive guide to the best optical stores and eye clinics near you',
+    coming_soon:'Coming Soon — قريباً',
+    stores_working:'Working hard to launch this feature soon 🚀',
+    notify_title:'Be the first to know at launch!',
+    notify_subtitle:'Register your email and we\'ll notify you when stores & clinics launches',
+    notify_btn:'Notify Me 🚀',
+    notify_success:'✅ Thank you! We\'ll notify you at launch 🎉',
+    toast_saved:'✅ Profile saved to cloud ☁️',
+    toast_member_added:'✅ Member added & saved to cloud ☁️',
+    toast_member_updated:'✅ Data updated in cloud ☁️',
+    toast_deleted:'🗑️ Deleted from cloud ☁️',
+    toast_avatar:'✅ Photo updated & saved to cloud ☁️',
+    toast_welcome:'👋 Welcome to Basar!',
+    toast_logout:'👋 Signed out successfully',
+    toast_pdf:'📄 PDF exported successfully',
+    toast_sb_saved:'✅ Supabase setup saved',
+    toast_no_img:'⚠️ No image for this member',
+    footer_rights:'All rights reserved ©',
+    footer_site:'— Basar App',
+    footer_disclaimer:'Basar App for eye prescriptions · Not a substitute for specialist consultation',
+    footer_made:'Made with ❤️ in Saudi Arabia 🇸🇦',
+    pwa_install:'👁️ Install Basar App on your device!', pwa_btn:'Install',
+    pwa_success:'✅ Basar installed on your device! 🎉',
+    empty_rx:'Add family members to view their prescriptions here',
+    empty_family:'Add family members with prescriptions to display them here',
+    img_share_tip:'💡 To share image via WhatsApp:<br/>Long press the image → Share → WhatsApp',
+    img_share_disclaimer:'⚕️ Basar App for storing medical prescriptions, not a substitute for specialist consultation',
+  },
+  fr: {
+    nav_profile:'Profil', nav_family:'Famille', nav_stores:'Magasins',
+    auth_login:'Connexion', auth_register:'Nouveau Compte',
+    auth_email:'Email', auth_password:'Mot de passe',
+    auth_confirm_pass:'Confirmer le mot de passe', auth_forgot:'Mot de passe oublié?',
+    auth_login_btn:'🔑 Se connecter', auth_register_btn:'✨ Créer un compte',
+    auth_first:'Prénom', auth_last:'Nom de famille',
+    auth_country:'Pays', auth_city:'Ville', auth_phone:'Téléphone',
+    auth_select_country:'Sélectionner le pays', auth_select_city:'Sélectionner la ville',
+    auth_city_placeholder:'Entrez votre ville',
+    auth_pass_hint:'Au moins 8 caractères',
+    auth_forgot_hint:'Entrez votre email et nous vous enverrons un lien de réinitialisation',
+    auth_send_reset:'📧 Envoyer le lien', auth_back:'← Retour',
+    auth_tagline:'Gestionnaire d\'ordonnances oculaires familiales',
+    auth_footer:'Application Basar · Ne remplace pas la consultation d\'un spécialiste',
+    auth_made:'Fait avec amour en Arabie Saoudite 🇸🇦',
+    sb_setup:'🔧 Configuration Supabase', sb_once:'(une seule fois)',
+    sb_url_label:'Project URL', sb_key_label:'Anon Key',
+    sb_save:'💾 Enregistrer & Continuer',
+    sb_hint:'Obtenez ces données depuis',
+    sb_config_warn:'⚙️ Configuration requise: Veuillez entrer vos identifiants Supabase.',
+    profile_edit:'✏️ Modifier le profil', profile_manage:'👨‍👩‍👧‍👦 Gérer la famille',
+    profile_recent:'📋 Ordonnances récentes', profile_view_all:'Voir tout',
+    stat_family:'Membres', stat_glasses:'Ordonnances lunettes', stat_contacts:'Ordonnances lentilles',
+    edit_profile_title:'✏️ Modifier le profil',
+    field_first:'Prénom', field_last:'Nom',
+    field_dob:'Date de naissance', field_gender:'Genre',
+    field_phone:'Téléphone', field_email:'Email',
+    field_city:'Ville', field_select:'Sélectionner',
+    gender_male:'Homme', gender_female:'Femme',
+    btn_cancel:'Annuler', btn_save:'💾 Enregistrer',
+    family_title:'👨‍👩‍👧‍👦 Membres de la famille', family_add:'➕ Ajouter',
+    family_add_card:'Ajouter un membre',
+    member_add_title:'👤 Ajouter un membre',
+    field_name:'Nom', field_rel:'Relation', field_age:'Âge',
+    field_notes:'Notes', field_notes_ph:'Recommandations médicales...',
+    rel_wife:'Femme',rel_husband:'Mari',rel_son:'Fils',rel_daughter:'Fille',
+    rel_father:'Père',rel_mother:'Mère',rel_brother:'Frère',rel_sister:'Sœur',
+    rel_grandfather:'Grand-père',rel_grandmother:'Grand-mère',rel_other:'Autre',
+    glasses_rx:'🕶️ Ordonnance lunettes (optionnel)',
+    contacts_rx:'👁️ Ordonnance lentilles (optionnel)',
+    field_rx_date:'Date ordonnance lunettes', field_rx_doc:'Médecin / Clinique',
+    field_cl_date:'Date ordonnance lentilles',
+    field_lens_type:'Type de lentilles',
+    field_glasses_alert:'Rappel renouvellement lunettes',
+    field_cl_alert:'Rappel changement lentilles',
+    alert_3m:'3 Mois',alert_6m:'6 Mois',alert_12m:'12 Mois',
+    alert_daily:'☀️ Quotidien',alert_weekly:'📅 Hebdo',alert_monthly:'🗓️ Mensuel',alert_yearly:'📆 Annuel',
+    lens_daily:'💧 Journalier',lens_weekly:'🔵 Hebdo',lens_monthly:'🟢 Mensuel',
+    lens_toric:'⭕ Torique',lens_rigid:'🔲 Rigide',lens_cosm_daily:'🌈 Coloré journalier',
+    lens_cosm_monthly:'🌟 Coloré mensuel',lens_cosm:'🎨 Cosmétique',
+    upload_title:'Image de l\'ordonnance (optionnel)',
+    upload_hint:'Cliquez pour télécharger — JPG, PNG',
+    sound_title:'Son d\'alerte',
+    sound_bell:'🔔 Sonnette',sound_chime:'🎵 Carillon',sound_alert:'🚨 Alerte',sound_silent:'🔕 Silencieux',
+    btn_save_member:'💾 Enregistrer',
+    btn_view:'👁️ Voir', btn_edit:'✏️ Modifier', btn_wa:'WhatsApp', btn_pdf:'📄 PDF', btn_delete:'🗑️',
+    btn_wa_text:'Partager texte', btn_img:'📷 Partager image', btn_close:'Fermer',
+    medical_disclaimer:'Avis médical: Basar App est uniquement pour stocker les ordonnances et ne remplace pas la consultation d\'un ophtalmologiste.',
+    no_rx:'Aucune ordonnance enregistrée',
+    notes_label:'📝 Notes:', img_label:'📷 Image ordonnance:',
+    eye_right:'👁️ Droit (OD)', eye_left:'👁️ Gauche (OS)',
+    glasses_title:'🕶️ Ordonnance lunettes', contacts_title:'👁️ Ordonnance lentilles',
+    delete_title:'Confirmer la suppression', delete_confirm:'Supprimer',
+    logout_title:'Déconnexion', logout_msg:'Voulez-vous vous déconnecter?', logout_btn:'Déconnexion',
+    stores_title:'Opticiens & Cliniques oculaires',
+    stores_subtitle:'Votre guide complet des meilleurs opticiens et cliniques spécialisées près de chez vous',
+    coming_soon:'Bientôt disponible — قريباً',
+    stores_working:'Nous travaillons dur pour lancer cette fonctionnalité bientôt 🚀',
+    notify_title:'Soyez le premier informé!',
+    notify_subtitle:'Inscrivez votre email et nous vous notifierons au lancement',
+    notify_btn:'Me notifier 🚀',
+    notify_success:'✅ Merci! Nous vous notifierons au lancement 🎉',
+    toast_saved:'✅ Profil enregistré ☁️',toast_member_added:'✅ Membre ajouté ☁️',
+    toast_member_updated:'✅ Données mises à jour ☁️',toast_deleted:'🗑️ Supprimé ☁️',
+    toast_avatar:'✅ Photo mise à jour ☁️',toast_welcome:'👋 Bienvenue sur Basar!',
+    toast_logout:'👋 Déconnecté avec succès',toast_pdf:'📄 PDF exporté',
+    toast_sb_saved:'✅ Configuration Supabase enregistrée',toast_no_img:'⚠️ Pas d\'image',
+    footer_rights:'Tous droits réservés ©',footer_site:'— Basar App',
+    footer_disclaimer:'Application Basar · Ne remplace pas la consultation médicale',
+    footer_made:'Fait avec ❤️ en Arabie Saoudite 🇸🇦',
+    pwa_install:'👁️ Installez Basar sur votre appareil!', pwa_btn:'Installer',
+    pwa_success:'✅ Basar installé! 🎉',
+    empty_rx:'Ajoutez des membres pour voir leurs ordonnances',
+    empty_family:'Ajoutez des membres avec des ordonnances pour les afficher',
+    img_share_tip:'💡 Pour partager via WhatsApp:<br/>Appui long sur l\'image → Partager → WhatsApp',
+    img_share_disclaimer:'⚕️ Application Basar · Ne remplace pas la consultation médicale',
+  },
+  ur: {
+    nav_profile:'پروفائل', nav_family:'خاندان', nav_stores:'دکانیں',
+    auth_login:'سائن ان', auth_register:'نیا اکاؤنٹ',
+    auth_email:'ای میل', auth_password:'پاس ورڈ',
+    auth_confirm_pass:'پاس ورڈ کی تصدیق', auth_forgot:'پاس ورڈ بھول گئے؟',
+    auth_login_btn:'🔑 سائن ان', auth_register_btn:'✨ اکاؤنٹ بنائیں',
+    auth_first:'پہلا نام', auth_last:'خاندانی نام',
+    auth_country:'ملک', auth_city:'شہر', auth_phone:'فون نمبر',
+    auth_select_country:'ملک منتخب کریں', auth_select_city:'شہر منتخب کریں',
+    auth_city_placeholder:'اپنا شہر لکھیں',
+    auth_pass_hint:'کم از کم 8 حروف',
+    auth_forgot_hint:'اپنا ای میل درج کریں، ہم آپ کو لنک بھیجیں گے',
+    auth_send_reset:'📧 لنک بھیجیں', auth_back:'← واپس',
+    auth_tagline:'خاندانی آنکھوں کے نسخے محفوظ کریں',
+    auth_footer:'بصر ایپ · ماہر ڈاکٹر سے مشورے کا متبادل نہیں',
+    auth_made:'سعودی عرب میں محبت سے بنایا گیا 🇸🇦',
+    sb_setup:'🔧 Supabase سیٹ اپ', sb_once:'(صرف ایک بار)',
+    sb_url_label:'Project URL', sb_key_label:'Anon Key',
+    sb_save:'💾 محفوظ کریں اور جاری رکھیں',
+    sb_hint:'یہ ڈیٹا یہاں سے حاصل کریں',
+    sb_config_warn:'⚙️ سیٹ اپ درکار ہے: کلاؤڈ سنک کے لیے Supabase معلومات درج کریں۔',
+    profile_edit:'✏️ پروفائل ترمیم', profile_manage:'👨‍👩‍👧‍👦 خاندان',
+    profile_recent:'📋 حالیہ نسخے', profile_view_all:'سب دیکھیں',
+    stat_family:'خاندان کے افراد', stat_glasses:'عینک نسخے', stat_contacts:'لینز نسخے',
+    edit_profile_title:'✏️ پروفائل ترمیم',
+    field_first:'پہلا نام', field_last:'خاندانی نام',
+    field_dob:'تاریخ پیدائش', field_gender:'جنس',
+    field_phone:'فون', field_email:'ای میل',
+    field_city:'شہر', field_select:'منتخب کریں',
+    gender_male:'مرد', gender_female:'عورت',
+    btn_cancel:'منسوخ', btn_save:'💾 محفوظ',
+    family_title:'👨‍👩‍👧‍👦 خاندان کے افراد', family_add:'➕ رکن شامل کریں',
+    family_add_card:'نیا رکن شامل کریں',
+    member_add_title:'👤 نیا رکن شامل کریں',
+    field_name:'نام', field_rel:'رشتہ', field_age:'عمر',
+    field_notes:'نوٹس', field_notes_ph:'ڈاکٹر کی سفارشات...',
+    rel_wife:'بیوی',rel_husband:'شوہر',rel_son:'بیٹا',rel_daughter:'بیٹی',
+    rel_father:'والد',rel_mother:'والدہ',rel_brother:'بھائی',rel_sister:'بہن',
+    rel_grandfather:'دادا',rel_grandmother:'دادی',rel_other:'دیگر',
+    glasses_rx:'🕶️ عینک نسخہ (اختیاری)',
+    contacts_rx:'👁️ کانٹیکٹ لینز نسخہ (اختیاری)',
+    field_rx_date:'عینک نسخے کی تاریخ', field_rx_doc:'ڈاکٹر / کلینک',
+    field_cl_date:'لینز نسخے کی تاریخ',
+    field_lens_type:'لینز کی قسم',
+    field_glasses_alert:'عینک تجدید یاددہانی',
+    field_cl_alert:'لینز تبدیلی یاددہانی',
+    alert_3m:'3 ماہ',alert_6m:'6 ماہ',alert_12m:'12 ماہ',
+    alert_daily:'☀️ روزانہ',alert_weekly:'📅 ہفتہ وار',alert_monthly:'🗓️ ماہانہ',alert_yearly:'📆 سالانہ',
+    lens_daily:'💧 روزانہ',lens_weekly:'🔵 ہفتہ وار',lens_monthly:'🟢 ماہانہ',
+    lens_toric:'⭕ ٹورک',lens_rigid:'🔲 سخت',lens_cosm_daily:'🌈 رنگین روزانہ',
+    lens_cosm_monthly:'🌟 رنگین ماہانہ',lens_cosm:'🎨 کاسمیٹک',
+    upload_title:'نسخے کی تصویر (اختیاری)',
+    upload_hint:'تصویر اپلوڈ کرنے کے لیے کلک کریں — JPG, PNG',
+    sound_title:'الرٹ آواز',
+    sound_bell:'🔔 گھنٹی',sound_chime:'🎵 سریلی',sound_alert:'🚨 الرٹ',sound_silent:'🔕 خاموش',
+    btn_save_member:'💾 رکن محفوظ کریں',
+    btn_view:'👁️ دیکھیں', btn_edit:'✏️ ترمیم', btn_wa:'واٹس ایپ', btn_pdf:'📄 PDF', btn_delete:'🗑️',
+    btn_wa_text:'متن شیئر کریں', btn_img:'📷 تصویر شیئر', btn_close:'بند کریں',
+    medical_disclaimer:'طبی نوٹس: بصر ایپ صرف نسخے محفوظ کرنے کے لیے ہے، ماہر ڈاکٹر کا متبادل نہیں۔',
+    no_rx:'اس رکن کا کوئی نسخہ درج نہیں',
+    notes_label:'📝 نوٹس:', img_label:'📷 نسخے کی تصویر:',
+    eye_right:'👁️ دایاں (OD)', eye_left:'👁️ بایاں (OS)',
+    glasses_title:'🕶️ عینک نسخہ', contacts_title:'👁️ کانٹیکٹ لینز نسخہ',
+    delete_title:'حذف کی تصدیق', delete_confirm:'حذف',
+    logout_title:'سائن آؤٹ', logout_msg:'کیا آپ سائن آؤٹ کرنا چاہتے ہیں؟', logout_btn:'سائن آؤٹ',
+    stores_title:'آپٹیکل اسٹورز اور آنکھوں کے کلینک',
+    stores_subtitle:'آپ کے قریب بہترین آپٹیکل اسٹورز اور ماہر کلینک کی جامع گائیڈ',
+    coming_soon:'جلد آ رہا ہے — Coming Soon',
+    stores_working:'جلد لانچ کے لیے محنت جاری ہے 🚀',
+    notify_title:'لانچ پر سب سے پہلے جانیں!',
+    notify_subtitle:'اپنا ای میل درج کریں، لانچ پر اطلاع دیں گے',
+    notify_btn:'مجھے بتائیں 🚀',
+    notify_success:'✅ شکریہ! لانچ پر اطلاع دیں گے 🎉',
+    toast_saved:'✅ پروفائل کلاؤڈ میں محفوظ ☁️',toast_member_added:'✅ رکن شامل اور محفوظ ☁️',
+    toast_member_updated:'✅ ڈیٹا اپڈیٹ ☁️',toast_deleted:'🗑️ حذف ☁️',
+    toast_avatar:'✅ تصویر اپڈیٹ ☁️',toast_welcome:'👋 بصر میں خوش آمدید!',
+    toast_logout:'👋 سائن آؤٹ کامیاب',toast_pdf:'📄 PDF برآمد',
+    toast_sb_saved:'✅ Supabase سیٹ اپ محفوظ',toast_no_img:'⚠️ کوئی تصویر نہیں',
+    footer_rights:'جملہ حقوق محفوظ ©',footer_site:'— بصر ایپ',
+    footer_disclaimer:'بصر ایپ · ماہر ڈاکٹر کا متبادل نہیں',
+    footer_made:'سعودی عرب میں ❤️ سے بنایا 🇸🇦',
+    pwa_install:'👁️ بصر ایپ انسٹال کریں!', pwa_btn:'انسٹال',
+    pwa_success:'✅ بصر انسٹال ہو گئی! 🎉',
+    empty_rx:'نسخے دیکھنے کے لیے خاندان شامل کریں',
+    empty_family:'خاندان کے افراد شامل کریں',
+    img_share_tip:'💡 واٹس ایپ پر تصویر شیئر کرنے کے لیے:<br/>تصویر پر دیر تک دبائیں → شیئر → واٹس ایپ',
+    img_share_disclaimer:'⚕️ بصر ایپ · ماہر ڈاکٹر کا متبادل نہیں',
+  },
+  fa: {
+    nav_profile:'پروفایل', nav_family:'خانواده', nav_stores:'فروشگاه‌ها',
+    auth_login:'ورود', auth_register:'حساب جدید',
+    auth_email:'ایمیل', auth_password:'رمز عبور',
+    auth_confirm_pass:'تأیید رمز عبور', auth_forgot:'رمز عبور را فراموش کردید؟',
+    auth_login_btn:'🔑 ورود', auth_register_btn:'✨ ایجاد حساب',
+    auth_first:'نام', auth_last:'نام خانوادگی',
+    auth_country:'کشور', auth_city:'شهر', auth_phone:'شماره تلفن',
+    auth_select_country:'کشور را انتخاب کنید', auth_select_city:'شهر را انتخاب کنید',
+    auth_city_placeholder:'شهر خود را بنویسید',
+    auth_pass_hint:'حداقل ۸ کاراکتر',
+    auth_forgot_hint:'ایمیل خود را وارد کنید تا لینک بازیابی برایتان ارسال شود',
+    auth_send_reset:'📧 ارسال لینک بازیابی', auth_back:'← برگشت',
+    auth_tagline:'مدیریت نسخه‌های چشم خانواده',
+    auth_footer:'اپلیکیشن بصر · جایگزین مشاوره پزشک متخصص نیست',
+    auth_made:'ساخته شده با عشق در عربستان سعودی 🇸🇦',
+    sb_setup:'🔧 راه‌اندازی Supabase', sb_once:'(فقط یک بار)',
+    sb_url_label:'Project URL', sb_key_label:'Anon Key',
+    sb_save:'💾 ذخیره و ادامه',
+    sb_hint:'این اطلاعات را از اینجا دریافت کنید',
+    sb_config_warn:'⚙️ راه‌اندازی لازم است: اطلاعات Supabase را وارد کنید.',
+    profile_edit:'✏️ ویرایش پروفایل', profile_manage:'👨‍👩‍👧‍👦 مدیریت خانواده',
+    profile_recent:'📋 نسخه‌های اخیر', profile_view_all:'مشاهده همه',
+    stat_family:'اعضای خانواده', stat_glasses:'نسخه عینک', stat_contacts:'نسخه لنز',
+    edit_profile_title:'✏️ ویرایش پروفایل',
+    field_first:'نام', field_last:'نام خانوادگی',
+    field_dob:'تاریخ تولد', field_gender:'جنسیت',
+    field_phone:'تلفن', field_email:'ایمیل',
+    field_city:'شهر', field_select:'انتخاب کنید',
+    gender_male:'مرد', gender_female:'زن',
+    btn_cancel:'لغو', btn_save:'💾 ذخیره',
+    family_title:'👨‍👩‍👧‍👦 اعضای خانواده', family_add:'➕ افزودن عضو',
+    family_add_card:'افزودن عضو جدید',
+    member_add_title:'👤 افزودن عضو جدید',
+    field_name:'نام', field_rel:'نسبت', field_age:'سن',
+    field_notes:'یادداشت‌ها', field_notes_ph:'توصیه‌های پزشک...',
+    rel_wife:'همسر (زن)',rel_husband:'همسر (مرد)',rel_son:'پسر',rel_daughter:'دختر',
+    rel_father:'پدر',rel_mother:'مادر',rel_brother:'برادر',rel_sister:'خواهر',
+    rel_grandfather:'پدربزرگ',rel_grandmother:'مادربزرگ',rel_other:'دیگر',
+    glasses_rx:'🕶️ نسخه عینک (اختیاری)',
+    contacts_rx:'👁️ نسخه لنز تماسی (اختیاری)',
+    field_rx_date:'تاریخ نسخه عینک', field_rx_doc:'پزشک / کلینیک',
+    field_cl_date:'تاریخ نسخه لنز',
+    field_lens_type:'نوع لنز',
+    field_glasses_alert:'یادآور تجدید عینک',
+    field_cl_alert:'یادآور تعویض لنز',
+    alert_3m:'۳ ماه',alert_6m:'۶ ماه',alert_12m:'۱۲ ماه',
+    alert_daily:'☀️ روزانه',alert_weekly:'📅 هفتگی',alert_monthly:'🗓️ ماهانه',alert_yearly:'📆 سالانه',
+    lens_daily:'💧 روزانه',lens_weekly:'🔵 هفتگی',lens_monthly:'🟢 ماهانه',
+    lens_toric:'⭕ توریک',lens_rigid:'🔲 سخت',lens_cosm_daily:'🌈 رنگی روزانه',
+    lens_cosm_monthly:'🌟 رنگی ماهانه',lens_cosm:'🎨 آرایشی',
+    upload_title:'تصویر نسخه (اختیاری)',
+    upload_hint:'برای آپلود کلیک کنید — JPG, PNG',
+    sound_title:'صدای هشدار',
+    sound_bell:'🔔 زنگ',sound_chime:'🎵 ملودی',sound_alert:'🚨 هشدار',sound_silent:'🔕 بی‌صدا',
+    btn_save_member:'💾 ذخیره عضو',
+    btn_view:'👁️ مشاهده', btn_edit:'✏️ ویرایش', btn_wa:'واتساپ', btn_pdf:'📄 PDF', btn_delete:'🗑️',
+    btn_wa_text:'اشتراک‌گذاری متن', btn_img:'📷 اشتراک‌گذاری تصویر', btn_close:'بستن',
+    medical_disclaimer:'هشدار پزشکی: اپلیکیشن بصر فقط برای ذخیره نسخه‌های چشم است و جایگزین متخصص نیست.',
+    no_rx:'هیچ نسخه‌ای برای این عضو ثبت نشده',
+    notes_label:'📝 یادداشت‌ها:', img_label:'📷 تصویر نسخه:',
+    eye_right:'👁️ راست (OD)', eye_left:'👁️ چپ (OS)',
+    glasses_title:'🕶️ نسخه عینک', contacts_title:'👁️ نسخه لنز تماسی',
+    delete_title:'تأیید حذف', delete_confirm:'حذف',
+    logout_title:'خروج', logout_msg:'آیا می‌خواهید خارج شوید؟', logout_btn:'خروج',
+    stores_title:'فروشگاه‌های عینک و کلینیک‌های چشم',
+    stores_subtitle:'راهنمای جامع بهترین فروشگاه‌های عینک و کلینیک‌های تخصصی نزدیک شما',
+    coming_soon:'به زودی — Coming Soon',
+    stores_working:'در حال کار برای راه‌اندازی این ویژگی 🚀',
+    notify_title:'اولین نفری باشید که می‌داند!',
+    notify_subtitle:'ایمیل خود را وارد کنید تا هنگام راه‌اندازی اطلاع دهیم',
+    notify_btn:'به من اطلاع دهید 🚀',
+    notify_success:'✅ ممنون! هنگام راه‌اندازی اطلاع می‌دهیم 🎉',
+    toast_saved:'✅ پروفایل در فضای ابری ذخیره شد ☁️',toast_member_added:'✅ عضو اضافه شد ☁️',
+    toast_member_updated:'✅ داده‌ها به‌روز شد ☁️',toast_deleted:'🗑️ حذف شد ☁️',
+    toast_avatar:'✅ عکس به‌روز شد ☁️',toast_welcome:'👋 به بصر خوش آمدید!',
+    toast_logout:'👋 با موفقیت خارج شدید',toast_pdf:'📄 PDF صادر شد',
+    toast_sb_saved:'✅ تنظیمات Supabase ذخیره شد',toast_no_img:'⚠️ تصویری وجود ندارد',
+    footer_rights:'تمام حقوق محفوظ است ©',footer_site:'— اپلیکیشن بصر',
+    footer_disclaimer:'اپلیکیشن بصر · جایگزین مشاوره پزشک نیست',
+    footer_made:'ساخته شده با ❤️ در عربستان سعودی 🇸🇦',
+    pwa_install:'👁️ بصر را روی دستگاه نصب کنید!', pwa_btn:'نصب',
+    pwa_success:'✅ بصر نصب شد! 🎉',
+    empty_rx:'اعضای خانواده را اضافه کنید تا نسخه‌هایشان را ببینید',
+    empty_family:'اعضا را با نسخه‌هایشان اضافه کنید',
+    img_share_tip:'💡 برای اشتراک‌گذاری از طریق واتساپ:<br/>روی تصویر نگه دارید → اشتراک‌گذاری → واتساپ',
+    img_share_disclaimer:'⚕️ اپلیکیشن بصر · جایگزین مشاوره پزشک نیست',
+  },
+  tr: {
+    nav_profile:'Profil', nav_family:'Aile', nav_stores:'Mağazalar',
+    auth_login:'Giriş Yap', auth_register:'Yeni Hesap',
+    auth_email:'E-posta', auth_password:'Şifre',
+    auth_confirm_pass:'Şifreyi Onayla', auth_forgot:'Şifremi Unuttum?',
+    auth_login_btn:'🔑 Giriş Yap', auth_register_btn:'✨ Hesap Oluştur',
+    auth_first:'Ad', auth_last:'Soyad',
+    auth_country:'Ülke', auth_city:'Şehir', auth_phone:'Telefon',
+    auth_select_country:'Ülke Seçin', auth_select_city:'Şehir Seçin',
+    auth_city_placeholder:'Şehrinizi yazın',
+    auth_pass_hint:'En az 8 karakter',
+    auth_forgot_hint:'E-postanızı girin, sıfırlama bağlantısı göndereceğiz',
+    auth_send_reset:'📧 Bağlantı Gönder', auth_back:'← Geri',
+    auth_tagline:'Aile Göz Reçetesi Yöneticisi',
+    auth_footer:'Basar Uygulaması · Uzman muayenesinin yerini tutmaz',
+    auth_made:'Suudi Arabistan\'da ❤️ ile yapıldı 🇸🇦',
+    sb_setup:'🔧 Supabase Kurulumu', sb_once:'(yalnızca bir kez)',
+    sb_url_label:'Project URL', sb_key_label:'Anon Key',
+    sb_save:'💾 Kaydet & Devam Et',
+    sb_hint:'Bu verileri şuradan alın',
+    sb_config_warn:'⚙️ Kurulum gerekli: Bulut senkronizasyonu için Supabase bilgilerini girin.',
+    profile_edit:'✏️ Profili Düzenle', profile_manage:'👨‍👩‍👧‍👦 Aileyi Yönet',
+    profile_recent:'📋 Son Reçeteler', profile_view_all:'Tümünü Gör',
+    stat_family:'Aile Üyeleri', stat_glasses:'Gözlük Reçetesi', stat_contacts:'Lens Reçetesi',
+    edit_profile_title:'✏️ Profili Düzenle',
+    field_first:'Ad', field_last:'Soyad',
+    field_dob:'Doğum Tarihi', field_gender:'Cinsiyet',
+    field_phone:'Telefon', field_email:'E-posta',
+    field_city:'Şehir', field_select:'Seçin',
+    gender_male:'Erkek', gender_female:'Kadın',
+    btn_cancel:'İptal', btn_save:'💾 Kaydet',
+    family_title:'👨‍👩‍👧‍👦 Aile Üyeleri', family_add:'➕ Üye Ekle',
+    family_add_card:'Yeni Üye Ekle',
+    member_add_title:'👤 Yeni Üye Ekle',
+    field_name:'İsim', field_rel:'İlişki', field_age:'Yaş',
+    field_notes:'Notlar', field_notes_ph:'Doktor tavsiyeleri...',
+    rel_wife:'Eş (Kadın)',rel_husband:'Eş (Erkek)',rel_son:'Oğul',rel_daughter:'Kız',
+    rel_father:'Baba',rel_mother:'Anne',rel_brother:'Erkek Kardeş',rel_sister:'Kız Kardeş',
+    rel_grandfather:'Büyükbaba',rel_grandmother:'Büyükanne',rel_other:'Diğer',
+    glasses_rx:'🕶️ Gözlük Reçetesi (isteğe bağlı)',
+    contacts_rx:'👁️ Kontakt Lens Reçetesi (isteğe bağlı)',
+    field_rx_date:'Gözlük Reçete Tarihi', field_rx_doc:'Doktor / Klinik',
+    field_cl_date:'Lens Reçete Tarihi',
+    field_lens_type:'Lens Türü',
+    field_glasses_alert:'Gözlük Yenileme Hatırlatıcı',
+    field_cl_alert:'Lens Değişim Hatırlatıcı',
+    alert_3m:'3 Ay',alert_6m:'6 Ay',alert_12m:'12 Ay',
+    alert_daily:'☀️ Günlük',alert_weekly:'📅 Haftalık',alert_monthly:'🗓️ Aylık',alert_yearly:'📆 Yıllık',
+    lens_daily:'💧 Günlük',lens_weekly:'🔵 Haftalık',lens_monthly:'🟢 Aylık',
+    lens_toric:'⭕ Torik',lens_rigid:'🔲 Sert',lens_cosm_daily:'🌈 Renkli Günlük',
+    lens_cosm_monthly:'🌟 Renkli Aylık',lens_cosm:'🎨 Kozmetik',
+    upload_title:'Reçete Görüntüsü (isteğe bağlı)',
+    upload_hint:'Görüntü yüklemek için tıklayın — JPG, PNG',
+    sound_title:'Uyarı Sesi',
+    sound_bell:'🔔 Zil',sound_chime:'🎵 Melodi',sound_alert:'🚨 Uyarı',sound_silent:'🔕 Sessiz',
+    btn_save_member:'💾 Üyeyi Kaydet',
+    btn_view:'👁️ Görüntüle', btn_edit:'✏️ Düzenle', btn_wa:'WhatsApp', btn_pdf:'📄 PDF', btn_delete:'🗑️',
+    btn_wa_text:'Metni Paylaş', btn_img:'📷 Görüntü Paylaş', btn_close:'Kapat',
+    medical_disclaimer:'Tıbbi Uyarı: Basar Uygulaması yalnızca reçeteleri saklamak içindir, uzman muayenesinin yerini tutmaz.',
+    no_rx:'Bu üye için kayıtlı reçete yok',
+    notes_label:'📝 Notlar:', img_label:'📷 Reçete Görüntüsü:',
+    eye_right:'👁️ Sağ (OD)', eye_left:'👁️ Sol (OS)',
+    glasses_title:'🕶️ Gözlük Reçetesi', contacts_title:'👁️ Kontakt Lens Reçetesi',
+    delete_title:'Silmeyi Onayla', delete_confirm:'Sil',
+    logout_title:'Çıkış Yap', logout_msg:'Çıkış yapmak istiyor musunuz?', logout_btn:'Çıkış Yap',
+    stores_title:'Optik Mağazalar & Göz Klinikleri',
+    stores_subtitle:'Size en yakın optik mağazalar ve göz klinikleri rehberi',
+    coming_soon:'Yakında — Coming Soon',
+    stores_working:'Bu özelliği yakında hayata geçirmek için çalışıyoruz 🚀',
+    notify_title:'Lansmanda ilk siz haberdar olun!',
+    notify_subtitle:'E-postanızı kaydedin, lansmanda size haber verelim',
+    notify_btn:'Beni Haberdar Et 🚀',
+    notify_success:'✅ Teşekkürler! Lansmanda size haber vereceğiz 🎉',
+    toast_saved:'✅ Profil buluta kaydedildi ☁️',toast_member_added:'✅ Üye eklendi ☁️',
+    toast_member_updated:'✅ Veriler güncellendi ☁️',toast_deleted:'🗑️ Silindi ☁️',
+    toast_avatar:'✅ Fotoğraf güncellendi ☁️',toast_welcome:'👋 Basar\'a Hoş Geldiniz!',
+    toast_logout:'👋 Başarıyla çıkış yapıldı',toast_pdf:'📄 PDF dışa aktarıldı',
+    toast_sb_saved:'✅ Supabase yapılandırması kaydedildi',toast_no_img:'⚠️ Görüntü yok',
+    footer_rights:'Tüm hakları saklıdır ©',footer_site:'— Basar App',
+    footer_disclaimer:'Basar Uygulaması · Uzman muayenesinin yerini tutmaz',
+    footer_made:'Suudi Arabistan\'da ❤️ ile yapıldı 🇸🇦',
+    pwa_install:'👁️ Basar\'ı cihazınıza yükleyin!', pwa_btn:'Yükle',
+    pwa_success:'✅ Basar yüklendi! 🎉',
+    empty_rx:'Reçeteleri görmek için aile üyesi ekleyin',
+    empty_family:'Reçetelerle birlikte aile üyesi ekleyin',
+    img_share_tip:'💡 WhatsApp ile görüntü paylaşmak için:<br/>Görüntüye uzun basın → Paylaş → WhatsApp',
+    img_share_disclaimer:'⚕️ Basar Uygulaması · Uzman muayenesinin yerini tutmaz',
+  }
+};
+
+// ── RTL languages ──
+const RTL_LANGS = ['ar','ur','fa'];
+
+// ── Current language ──
+let currentLang = localStorage.getItem('basarLang') || 'ar';
+
+// ── Get translation ──
+function t(key){ return (TRANSLATIONS[currentLang] || TRANSLATIONS.ar)[key] || TRANSLATIONS.ar[key] || key; }
+
+// ── Apply language to whole page ──
+function applyLang(){
+  const lang = currentLang;
+  const isRTL = RTL_LANGS.includes(lang);
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+
+  // Update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+
+  // Update lang label in button
+  const labels = {ar:'AR',en:'EN',fr:'FR',ur:'UR',fa:'FA',tr:'TR'};
+  document.getElementById('langLabel').textContent = labels[lang] || lang.toUpperCase();
+
+  // Mark active lang option
+  document.querySelectorAll('.lang-opt').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('data-l') === lang);
+  });
+
+  // Re-render dynamic content with new language
+  renderProfile();
+  renderFamily();
+  applyLangToForms();
+}
+
+// ── Apply translations to form labels and placeholders ──
+function applyLangToForms(){
+  // Auth screen
+  const authTitle = document.querySelector('.auth-logo p');
+  if(authTitle) authTitle.textContent = t('auth_tagline');
+
+  // Auth tabs
+  const tabLogin = document.getElementById('tab_login');
+  const tabReg   = document.getElementById('tab_register');
+  if(tabLogin) tabLogin.textContent = t('auth_login');
+  if(tabReg)   tabReg.textContent   = t('auth_register');
+
+  // Login form
+  _setLabel('login_email',  t('auth_email'));
+  _setLabel('login_pass',   t('auth_password'));
+  _setPlaceholder('login_pass', '••••••••');
+  const loginBtn = document.querySelector('#formLogin .btn-p');
+  if(loginBtn) loginBtn.textContent = t('auth_login_btn');
+  const forgotLink = document.querySelector('#formLogin span[onclick]');
+  if(forgotLink) forgotLink.textContent = t('auth_forgot');
+
+  // Register form
+  _setLabel('reg_first',  t('auth_first'));
+  _setLabel('reg_last',   t('auth_last'));
+  _setLabel('reg_country',t('auth_country'));
+  _setLabel('reg_phone',  t('auth_phone'));
+  _setLabel('reg_email',  t('auth_email'));
+  _setLabel('reg_pass',   t('auth_password'));
+  _setLabel('reg_pass2',  t('auth_confirm_pass'));
+  _setPlaceholder('reg_phone', '+966 5X XXX XXXX');
+  _setPlaceholder('reg_pass',  t('auth_pass_hint'));
+  _setOptionFirst('reg_country', t('auth_select_country'));
+  _setOptionFirst('reg_city_select', t('auth_select_city'));
+  _setPlaceholder('reg_city_input', t('auth_city_placeholder'));
+  const regBtn = document.querySelector('#formRegister .btn-p');
+  if(regBtn) regBtn.textContent = t('auth_register_btn');
+
+  // Forgot form
+  const forgotHint = document.querySelector('#formForgot div');
+  if(forgotHint) forgotHint.textContent = t('auth_forgot_hint');
+  _setLabel('forgot_email', t('auth_email'));
+  const resetBtn = document.querySelector('#formForgot .btn-p');
+  if(resetBtn) resetBtn.textContent = t('auth_send_reset');
+  const backBtn = document.querySelector('#formForgot .btn-o');
+  if(backBtn) backBtn.textContent = t('auth_back');
+
+  // Edit profile modal
+  _setLabel('ep_first',  t('field_first'));
+  _setLabel('ep_last',   t('field_last'));
+  _setLabel('ep_dob',    t('field_dob'));
+  _setLabel('ep_gender', t('field_gender'));
+  _setLabel('ep_phone',  t('field_phone'));
+  _setLabel('ep_email',  t('field_email'));
+  _setLabel('ep_city',   t('field_city'));
+  _setOptionVal('ep_gender','','select', t('field_select'));
+  _setOptionVal('ep_gender','ذكر','male', t('gender_male'));
+  _setOptionVal('ep_gender','أنثى','female', t('gender_female'));
+
+  // Member modal
+  _setLabel('m_name',    t('field_name'));
+  _setLabel('m_rel',     t('field_rel'));
+  _setLabel('m_age',     t('field_age'));
+  _setLabel('m_notes',   t('field_notes'));
+  _setLabel('m_g_date',  t('field_rx_date'));
+  _setLabel('m_g_doc',   t('field_rx_doc'));
+  _setLabel('m_c_date',  t('field_cl_date'));
+  _setPlaceholder('m_name',  t('field_name'));
+  _setPlaceholder('m_notes', t('field_notes_ph'));
+
+  // Relationship options
+  const relSel = document.getElementById('m_rel');
+  if(relSel){
+    const relKeys = ['','wife','husband','son','daughter','father','mother','brother','sister','grandfather','grandmother','other'];
+    const relOpts = relSel.querySelectorAll('option');
+    relOpts.forEach((opt,i)=>{ if(relKeys[i]) opt.textContent = t('rel_'+relKeys[i]); });
+  }
+}
+
+function _setLabel(inputId, text){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  const lbl = inp.previousElementSibling || inp.parentElement?.querySelector('label');
+  if(lbl && lbl.tagName==='LABEL'){
+    // preserve the required star if present
+    const req = lbl.querySelector('.req');
+    lbl.textContent = text + ' ';
+    if(req) lbl.appendChild(req);
+  }
+}
+function _setPlaceholder(id, text){ const el=document.getElementById(id); if(el) el.placeholder=text; }
+function _setOptionFirst(id, text){ const el=document.getElementById(id); if(el&&el.options[0]) el.options[0].text=text; }
+function _setOptionVal(id, val, key, text){
+  const el=document.getElementById(id); if(!el) return;
+  const opt = Array.from(el.options).find(o=>o.value===val||o.value===key);
+  if(opt) opt.text=text;
+}
+
+// ── Toggle language menu ──
+function toggleLangMenu(){
+  const m = document.getElementById('langMenu');
+  m.style.display = m.style.display==='none' ? 'block' : 'none';
+}
+
+// ── Set language ──
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('basarLang', lang);
+  document.getElementById('langMenu').style.display='none';
+  applyLang();
+  showToast(t('toast_welcome').replace('👋 ','🌐 '));
+}
+
+// Close lang menu when clicking outside
+document.addEventListener('click', e=>{
+  const wrap = document.getElementById('langMenuWrap');
+  if(wrap && !wrap.contains(e.target)){
+    const m = document.getElementById('langMenu');
+    if(m) m.style.display='none';
+  }
+});
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ بصر SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// ── PWA Install Prompt ──
+let deferredPrompt = null;
+const installBanner = document.createElement('div');
+installBanner.id = 'pwaInstallBanner';
+installBanner.style.cssText = `
+  display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--g2),var(--g1));color:#fff;
+  padding:14px 20px;border-radius:14px;z-index:999;
+  font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;
+  box-shadow:0 8px 28px rgba(42,144,144,.4);
+  display:none;align-items:center;gap:10px;white-space:nowrap;
+  max-width:calc(100vw - 40px);
+`;
+installBanner.innerHTML = `
+  <span>${t('pwa_install')}</span>
+  <button onclick="installPWA()" style="background:rgba(255,255,255,.25);border:none;border-radius:8px;padding:6px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">${t('pwa_btn')}</button>
+  <button onclick="document.getElementById('pwaInstallBanner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:16px;padding:0 4px">✕</button>
+`;
+document.body.appendChild(installBanner);
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBanner.style.display = 'flex';
+});
+
+function installPWA(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(choice => {
+    if(choice.outcome === 'accepted') showToast(t('pwa_success'));
+    deferredPrompt = null;
+    installBanner.style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  showToast('🎉 أهلاً! تم تثبيت بصر بنجاح');
+  installBanner.style.display = 'none';
+});
 </script>
 </body>
 </html>
