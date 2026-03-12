@@ -1,0 +1,4118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>بصر | Basar</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+/* ═══════════════════════════════════════
+   BASAR 2026 — Design System
+   Theme: Clinical Dark / Precision Medical
+═══════════════════════════════════════ */
+:root {
+  --c0: #080c10;
+  --c1: #0d1117;
+  --c2: #161b22;
+  --c3: #1f2937;
+  --c4: #2d3748;
+  --tx: #f0f6ff;
+  --tx2: #8b9ab5;
+  --tx3: #4a5568;
+  --acc: #00d4aa;
+  --acc2: #00b894;
+  --acc3: rgba(0,212,170,.12);
+  --acc4: rgba(0,212,170,.06);
+  --gold: #f0c040;
+  --red: #ff4757;
+  --redb: rgba(255,71,87,.1);
+  --blue: #4dabf7;
+  --blueb: rgba(77,171,247,.1);
+  --bdr: rgba(255,255,255,.07);
+  --bdr2: rgba(0,212,170,.2);
+  --sh: 0 8px 32px rgba(0,0,0,.4);
+  --sh2: 0 2px 12px rgba(0,0,0,.3);
+  --r: 16px;
+  --r2: 12px;
+  --r3: 8px;
+  --tr: .2s ease;
+  --font: 'Tajawal', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+.light-mode {
+  --c0: #f0f4f8;
+  --c1: #ffffff;
+  --c2: #f8fafc;
+  --c3: #edf2f7;
+  --c4: #e2e8f0;
+  --tx: #0d1117;
+  --tx2: #4a5568;
+  --tx3: #a0aec0;
+  --bdr: rgba(0,0,0,.08);
+  --bdr2: rgba(0,180,148,.3);
+  --sh: 0 8px 32px rgba(0,0,0,.08);
+  --sh2: 0 2px 12px rgba(0,0,0,.06);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html { font-size:16px; scroll-behavior:smooth; }
+body {
+  font-family: var(--font);
+  background: var(--c0);
+  color: var(--tx);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--c4); border-radius:4px; }
+
+/* ═══════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════ */
+#authScreen {
+  position:fixed; inset:0; z-index:1000;
+  background:var(--c0);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:24px;
+  overflow-y:auto;
+  transition:opacity .3s, visibility .3s;
+}
+#authScreen.hidden {
+  opacity:0; pointer-events:none; visibility:hidden; z-index:-1;
+}
+.auth-logo {
+  text-align:center; margin-bottom:32px;
+}
+.auth-logo .logo-ring {
+  width:72px; height:72px; border-radius:20px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px; margin:0 auto 16px;
+  box-shadow:0 0 40px rgba(0,212,170,.3);
+}
+.auth-logo h1 {
+  font-size:2rem; font-weight:900; letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--acc),#7af4df);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.auth-logo p { color:var(--tx2); font-size:.85rem; margin-top:4px; }
+.auth-card {
+  width:100%; max-width:400px;
+  background:var(--c2);
+  border:1px solid var(--bdr);
+  border-radius:var(--r);
+  padding:28px 24px;
+  box-shadow:var(--sh);
+}
+.auth-tabs {
+  display:flex; gap:4px; margin-bottom:24px;
+  background:var(--c3); border-radius:var(--r3); padding:4px;
+}
+.auth-tab {
+  flex:1; padding:8px; border:none; background:none;
+  border-radius:6px; color:var(--tx2); font-family:var(--font);
+  font-size:.9rem; font-weight:600; cursor:pointer;
+  transition:var(--tr);
+}
+.auth-tab.active { background:var(--acc); color:#000; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:.8rem; font-weight:700; color:var(--tx2); margin-bottom:6px; }
+.form-group input, .form-group select {
+  width:100%; padding:12px 14px;
+  background:var(--c3); border:1px solid var(--bdr);
+  border-radius:var(--r3); color:var(--tx);
+  font-family:var(--font); font-size:.9rem;
+  transition:var(--tr); outline:none;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color:var(--acc); background:var(--c2);
+  box-shadow:0 0 0 3px var(--acc3);
+}
+.form-group input::placeholder { color:var(--tx3); }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.btn-auth {
+  width:100%; padding:14px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none; border-radius:var(--r3);
+  color:#000; font-family:var(--font); font-size:.95rem;
+  font-weight:800; cursor:pointer; margin-top:8px;
+  transition:var(--tr);
+}
+.btn-auth:hover { opacity:.9; transform:translateY(-1px); }
+.btn-auth:active { transform:translateY(0); }
+.btn-text {
+  background:none; border:none; color:var(--acc);
+  font-family:var(--font); font-size:.82rem; cursor:pointer;
+  padding:8px 0; width:100%; text-align:center; margin-top:4px;
+}
+.auth-msg {
+  padding:10px 12px; border-radius:var(--r3); font-size:.82rem;
+  margin-bottom:12px; display:none;
+}
+.auth-err { background:var(--redb); color:var(--red); border:1px solid rgba(255,71,87,.2); display:none; }
+.auth-succ { background:var(--acc3); color:var(--acc); border:1px solid var(--bdr2); display:none; }
+
+/* ═══════════════════════════════════════
+   MAIN APP LAYOUT
+═══════════════════════════════════════ */
+#mainApp {
+  display:flex; flex-direction:column;
+  min-height:100dvh;
+  padding-top:64px;
+  padding-bottom:calc(72px + var(--safe-bottom));
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position:fixed; top:0; left:0; right:0;
+  height:64px; z-index:200;
+  background:rgba(13,17,23,.85);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--bdr);
+  display:flex; align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+}
+.light-mode .topbar { background:rgba(255,255,255,.85); }
+.topbar-brand {
+  display:flex; align-items:center; gap:10px;
+}
+.topbar-icon {
+  width:36px; height:36px; border-radius:10px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; flex-shrink:0;
+}
+.topbar-name {
+  font-size:1.1rem; font-weight:900; letter-spacing:-.5px;
+  color:var(--tx);
+}
+.topbar-name span { color:var(--acc); }
+.topbar-actions { display:flex; align-items:center; gap:8px; }
+.topbar-btn {
+  width:36px; height:36px; border-radius:10px;
+  background:var(--c3); border:1px solid var(--bdr);
+  color:var(--tx2); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; transition:var(--tr);
+  position:relative;
+}
+.topbar-btn:hover { background:var(--c4); color:var(--tx); }
+.user-chip {
+  display:flex; align-items:center; gap:8px;
+  background:var(--c3); border:1px solid var(--bdr);
+  border-radius:20px; padding:4px 12px 4px 4px;
+  cursor:pointer; transition:var(--tr);
+}
+.user-chip:hover { border-color:var(--bdr2); }
+.user-av {
+  width:28px; height:28px; border-radius:50%;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; color:#000;
+  overflow:hidden; flex-shrink:0;
+}
+.user-av img { width:100%; height:100%; object-fit:cover; }
+.user-name { font-size:.8rem; font-weight:700; color:var(--tx); }
+
+/* Lang menu */
+.lang-wrap { position:relative; }
+.lang-menu {
+  position:absolute; top:calc(100% + 8px); left:0;
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r3); min-width:120px;
+  box-shadow:var(--sh); z-index:500; display:none;
+  overflow:hidden;
+}
+.lang-opt {
+  padding:10px 14px; font-size:.82rem; font-weight:600;
+  color:var(--tx2); cursor:pointer; transition:var(--tr);
+  display:flex; align-items:center; gap:8px;
+}
+.lang-opt:hover { background:var(--c3); color:var(--tx); }
+.lang-opt.active { color:var(--acc); background:var(--acc4); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:200;
+  background:rgba(13,17,23,.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--bdr);
+  display:flex; align-items:stretch;
+  padding-bottom:var(--safe-bottom);
+  height:calc(72px + var(--safe-bottom));
+}
+.light-mode .bottom-nav { background:rgba(255,255,255,.92); }
+.nav-btn {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px;
+  border:none; background:none; cursor:pointer;
+  color:var(--tx3); transition:var(--tr);
+  padding:8px 4px;
+  touch-action:manipulation;
+}
+.nav-btn .nav-icon { font-size:20px; transition:transform .2s; }
+.nav-btn .nav-label { font-size:.65rem; font-weight:700; font-family:var(--font); }
+.nav-btn.active { color:var(--acc); }
+.nav-btn.active .nav-icon { transform:scale(1.15); }
+
+/* ── PAGES ── */
+.page { display:none; padding:16px; }
+.page.active { display:block; animation:fadeIn .2s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px;
+}
+.page-title { font-size:1.4rem; font-weight:900; color:var(--tx); }
+.page-subtitle { font-size:.8rem; color:var(--tx2); margin-top:2px; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r); padding:20px;
+  box-shadow:var(--sh2);
+}
+.card + .card { margin-top:12px; }
+
+/* ═══════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════ */
+.profile-hero {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r); overflow:hidden; margin-bottom:12px;
+  position:relative;
+}
+.hero-banner {
+  height:90px;
+  background:linear-gradient(135deg,#00423a,#001f1a,#002d40);
+  position:relative; overflow:hidden;
+}
+.hero-banner::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(0,212,170,.04) 10px,rgba(0,212,170,.04) 11px);
+}
+.hero-body { padding:0 20px 20px; }
+.hero-av-wrap {
+  display:flex; align-items:flex-end; gap:14px;
+  transform:translateY(-28px); margin-bottom:-14px;
+}
+.hero-av {
+  width:64px; height:64px; border-radius:18px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:900; color:#000;
+  border:3px solid var(--c2); overflow:hidden; flex-shrink:0;
+  cursor:pointer; transition:var(--tr);
+}
+.hero-av img { width:100%; height:100%; object-fit:cover; }
+.hero-av:hover { transform:scale(1.05); }
+.hero-info { padding-bottom:4px; }
+.hero-name { font-size:1.1rem; font-weight:900; color:var(--tx); }
+.hero-email { font-size:.75rem; color:var(--tx2); margin-top:1px; }
+.hero-stats {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:var(--bdr); border-top:1px solid var(--bdr); margin-top:16px;
+}
+.stat-box {
+  background:var(--c2); padding:14px 8px; text-align:center;
+}
+.stat-val { font-size:1.4rem; font-weight:900; color:var(--acc); font-family:var(--mono); }
+.stat-lbl { font-size:.68rem; color:var(--tx2); margin-top:2px; font-weight:600; }
+
+/* Recent Rx */
+.section-title {
+  font-size:.78rem; font-weight:800; color:var(--tx3);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin-bottom:12px; margin-top:20px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-title::after {
+  content:''; flex:1; height:1px; background:var(--bdr);
+}
+.rx-preview {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); padding:14px 16px;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:8px; cursor:pointer; transition:var(--tr);
+}
+.rx-preview:hover { border-color:var(--bdr2); background:var(--c3); }
+.rx-av {
+  width:40px; height:40px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; font-weight:800; flex-shrink:0;
+}
+.rx-av-grn { background:rgba(0,212,170,.15); color:var(--acc); }
+.rx-av-blu { background:rgba(77,171,247,.15); color:var(--blue); }
+.rx-av-gold { background:rgba(240,192,64,.12); color:var(--gold); }
+.rx-av-red { background:rgba(255,71,87,.12); color:var(--red); }
+.rx-av-pur { background:rgba(187,134,252,.12); color:#bb86fc; }
+.rx-av-pink { background:rgba(255,105,135,.12); color:#ff6987; }
+.rx-av-teal { background:rgba(0,188,212,.12); color:#00bcd4; }
+.rx-av-gray { background:rgba(139,154,181,.1); color:var(--tx2); }
+.rx-info { flex:1; min-width:0; }
+.rx-name { font-size:.9rem; font-weight:800; color:var(--tx); }
+.rx-meta { font-size:.73rem; color:var(--tx2); margin-top:2px; }
+.rx-badges { display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; }
+.badge {
+  font-size:.65rem; font-weight:700; padding:2px 7px;
+  border-radius:20px; display:inline-flex; align-items:center; gap:3px;
+}
+.badge-grn { background:var(--acc3); color:var(--acc); border:1px solid var(--bdr2); }
+.badge-blu { background:var(--blueb); color:var(--blue); border:1px solid rgba(77,171,247,.2); }
+.badge-gold { background:rgba(240,192,64,.1); color:var(--gold); border:1px solid rgba(240,192,64,.2); }
+.rx-arrow { color:var(--tx3); font-size:.8rem; }
+
+/* ═══════════════════════════════════════
+   FAMILY PAGE
+═══════════════════════════════════════ */
+.add-btn {
+  width:100%; padding:14px;
+  background:var(--acc4); border:1px dashed var(--bdr2);
+  border-radius:var(--r2); color:var(--acc);
+  font-family:var(--font); font-size:.9rem; font-weight:800;
+  cursor:pointer; transition:var(--tr); margin-bottom:16px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  touch-action:manipulation;
+}
+.add-btn:hover { background:var(--acc3); border-color:var(--acc); }
+.member-card {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); overflow:hidden;
+  margin-bottom:10px; transition:var(--tr);
+}
+.member-card:hover { border-color:var(--bdr2); }
+.member-head {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px;
+}
+.member-av {
+  width:46px; height:46px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:19px; font-weight:900; flex-shrink:0;
+}
+.member-info { flex:1; min-width:0; }
+.member-name { font-size:.95rem; font-weight:800; color:var(--tx); }
+.member-rel { font-size:.75rem; color:var(--tx2); margin-top:2px; }
+.member-badges { margin-top:5px; display:flex; gap:4px; flex-wrap:wrap; }
+.member-actions {
+  display:flex; gap:6px; padding:0 16px 14px;
+  flex-wrap:wrap;
+}
+.ma-btn {
+  flex:1; min-width:calc(33% - 4px);
+  padding:8px 6px; border-radius:8px;
+  background:var(--c3); border:1px solid var(--bdr);
+  color:var(--tx2); font-family:var(--font);
+  font-size:.72rem; font-weight:700; cursor:pointer;
+  transition:var(--tr); display:flex;
+  align-items:center; justify-content:center; gap:4px;
+  touch-action:manipulation;
+}
+.ma-btn:hover { background:var(--c4); color:var(--tx); }
+.ma-btn:active { transform:scale(.97); }
+.ma-btn.view { color:var(--acc); border-color:var(--bdr2); background:var(--acc4); }
+.ma-btn.view:hover { background:var(--acc3); }
+.ma-btn.del { color:var(--red); border-color:rgba(255,71,87,.2); }
+.ma-btn.del:hover { background:var(--redb); }
+.ma-btn.wa { color:#25d366; border-color:rgba(37,211,102,.2); }
+.ma-btn.wa:hover { background:rgba(37,211,102,.08); }
+
+/* ═══════════════════════════════════════
+   SETTINGS PAGE
+═══════════════════════════════════════ */
+.sett-section { margin-bottom:20px; }
+.sett-section-title {
+  font-size:.7rem; font-weight:800; color:var(--tx3);
+  letter-spacing:.1em; text-transform:uppercase;
+  margin-bottom:8px; padding:0 4px;
+}
+.sett-card {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); overflow:hidden;
+}
+.sett-row {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--bdr);
+  cursor:pointer; transition:background var(--tr);
+  touch-action:manipulation;
+}
+.sett-row:last-child { border-bottom:none; }
+.sett-row:active { background:var(--c3); }
+.sett-row-nc { cursor:default; }
+.sett-row:not(.sett-row-nc):hover { background:var(--c3); }
+.sett-icon {
+  width:34px; height:34px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.si-grn { background:rgba(0,212,170,.12); }
+.si-blu { background:rgba(77,171,247,.1); }
+.si-gold { background:rgba(240,192,64,.1); }
+.si-red { background:rgba(255,71,87,.1); }
+.si-pur { background:rgba(187,134,252,.1); }
+.si-gray { background:var(--c3); }
+.sett-text { flex:1; }
+.sett-label { font-size:.88rem; font-weight:700; color:var(--tx); }
+.sett-sub { font-size:.73rem; color:var(--tx2); margin-top:1px; }
+.sett-arrow { color:var(--tx3); font-size:.75rem; }
+
+/* Toggle switch */
+.toggle {
+  width:44px; height:24px; border-radius:12px;
+  background:var(--c4); border:none; cursor:pointer;
+  position:relative; flex-shrink:0; transition:background .2s;
+}
+.toggle[data-on="true"] { background:var(--acc); }
+.toggle::after {
+  content:''; position:absolute;
+  width:18px; height:18px; border-radius:50%;
+  background:#fff; top:3px; left:3px;
+  transition:transform .2s;
+}
+.toggle[data-on="true"]::after { transform:translateX(20px); }
+
+/* Accent colors */
+.color-dots { display:flex; gap:6px; }
+.color-dot {
+  width:22px; height:22px; border-radius:50%;
+  cursor:pointer; transition:transform .15s;
+  border:2px solid transparent;
+}
+.color-dot:hover { transform:scale(1.2); }
+.color-dot.active { border-color:var(--tx); transform:scale(1.1); }
+
+/* Font size */
+.font-ctrl { display:flex; align-items:center; gap:10px; }
+.fz-btn {
+  width:28px; height:28px; border-radius:8px;
+  background:var(--c4); border:1px solid var(--bdr);
+  color:var(--tx); cursor:pointer; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  transition:var(--tr); touch-action:manipulation;
+}
+.fz-btn:hover { background:var(--acc3); color:var(--acc); }
+.fz-val { font-size:.8rem; font-weight:700; color:var(--tx2); min-width:36px; text-align:center; font-family:var(--mono); }
+
+/* ═══════════════════════════════════════
+   STORES PAGE
+═══════════════════════════════════════ */
+.coming-soon-page {
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  min-height:50vh; text-align:center; padding:32px 16px;
+}
+.cs-icon { font-size:56px; margin-bottom:16px; }
+.cs-title { font-size:1.2rem; font-weight:900; color:var(--tx); margin-bottom:8px; }
+.cs-sub { font-size:.85rem; color:var(--tx2); max-width:280px; line-height:1.6; }
+.notify-form { margin-top:24px; width:100%; max-width:320px; }
+.notify-input {
+  width:100%; padding:12px 14px;
+  background:var(--c3); border:1px solid var(--bdr);
+  border-radius:var(--r3); color:var(--tx);
+  font-family:var(--font); font-size:.9rem; outline:none;
+  margin-bottom:8px;
+}
+.notify-input:focus { border-color:var(--acc); box-shadow:0 0 0 3px var(--acc3); }
+.notify-btn {
+  width:100%; padding:12px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none; border-radius:var(--r3);
+  color:#000; font-family:var(--font); font-size:.9rem;
+  font-weight:800; cursor:pointer; transition:var(--tr);
+}
+.notify-btn:hover { opacity:.9; }
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.modal-overlay {
+  position:fixed; inset:0; z-index:800;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:flex; align-items:flex-end;
+  opacity:0; pointer-events:none;
+  transition:opacity .25s;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal {
+  width:100%; max-height:92dvh;
+  background:var(--c1); border-radius:24px 24px 0 0;
+  overflow-y:auto; overscroll-behavior:contain;
+  transform:translateY(100%); transition:transform .3s cubic-bezier(.32,.72,0,1);
+  padding-bottom:calc(24px + var(--safe-bottom));
+}
+.light-mode .modal { background:#fff; }
+.modal-overlay.open .modal { transform:translateY(0); }
+.modal-handle {
+  width:36px; height:4px; border-radius:2px;
+  background:var(--c4); margin:12px auto 0;
+}
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px 12px;
+  border-bottom:1px solid var(--bdr);
+  position:sticky; top:0; background:var(--c1);
+  z-index:1;
+}
+.light-mode .modal-header { background:#fff; }
+.modal-title { font-size:1rem; font-weight:900; color:var(--tx); }
+.modal-close {
+  width:32px; height:32px; border-radius:50%;
+  background:var(--c3); border:none; cursor:pointer;
+  color:var(--tx2); font-size:16px;
+  display:flex; align-items:center; justify-content:center;
+  transition:var(--tr); touch-action:manipulation;
+}
+.modal-close:hover { background:var(--c4); color:var(--tx); }
+.modal-body { padding:20px; }
+.modal-footer {
+  display:flex; gap:10px; padding:16px 20px 0;
+}
+/* Center modal variant */
+.modal-overlay.center { align-items:center; padding:16px; }
+.modal-overlay.center .modal {
+  border-radius:var(--r); max-width:400px;
+  transform:scale(.95); transition:transform .25s;
+}
+.modal-overlay.center.open .modal { transform:scale(1); }
+
+/* Form inside modal */
+.modal-body .form-group input,
+.modal-body .form-group select {
+  background:var(--c2);
+}
+.light-mode .modal-body .form-group input,
+.light-mode .modal-body .form-group select {
+  background:var(--c3);
+}
+.form-section {
+  font-size:.72rem; font-weight:800; color:var(--tx3);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:20px 0 12px;
+  display:flex; align-items:center; gap:8px;
+}
+.form-section::after { content:''; flex:1; height:1px; background:var(--bdr); }
+.alert-chips, .lens-chips, .sound-chips {
+  display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;
+}
+.chip-btn {
+  padding:6px 12px; border-radius:20px;
+  background:var(--c3); border:1px solid var(--bdr);
+  color:var(--tx2); font-family:var(--font); font-size:.75rem;
+  font-weight:700; cursor:pointer; transition:var(--tr);
+  touch-action:manipulation;
+}
+.chip-btn:hover { border-color:var(--bdr2); color:var(--acc); }
+.chip-btn.sel { background:var(--acc3); border-color:var(--bdr2); color:var(--acc); }
+.btn-primary {
+  flex:1; padding:13px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border:none; border-radius:var(--r3);
+  color:#000; font-family:var(--font); font-size:.9rem;
+  font-weight:800; cursor:pointer; transition:var(--tr);
+  touch-action:manipulation;
+}
+.btn-primary:hover { opacity:.9; }
+.btn-secondary {
+  flex:1; padding:13px;
+  background:var(--c3); border:1px solid var(--bdr);
+  border-radius:var(--r3); color:var(--tx2);
+  font-family:var(--font); font-size:.9rem;
+  font-weight:700; cursor:pointer; transition:var(--tr);
+  touch-action:manipulation;
+}
+.btn-secondary:hover { background:var(--c4); color:var(--tx); }
+.btn-danger {
+  padding:13px 20px;
+  background:var(--redb); border:1px solid rgba(255,71,87,.2);
+  border-radius:var(--r3); color:var(--red);
+  font-family:var(--font); font-size:.9rem;
+  font-weight:700; cursor:pointer; transition:var(--tr);
+  touch-action:manipulation;
+}
+.btn-danger:hover { background:rgba(255,71,87,.18); }
+
+/* RX Table */
+.rx-table {
+  width:100%; border-collapse:collapse; font-size:.78rem;
+  font-family:var(--mono);
+}
+.rx-table th {
+  padding:7px 8px; background:var(--c3);
+  color:var(--tx2); font-weight:700; text-align:center;
+  font-family:var(--font); font-size:.72rem;
+}
+.rx-table td {
+  padding:8px; text-align:center; color:var(--tx);
+  border-bottom:1px solid var(--bdr);
+}
+.rx-table tr:last-child td { border-bottom:none; }
+.rx-table .eye-td { color:var(--tx2); font-family:var(--font); text-align:right; }
+.rx-section {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r3); overflow:hidden; margin-bottom:12px;
+}
+.rx-section-head {
+  padding:10px 14px; background:var(--c3);
+  display:flex; align-items:center; gap:8px;
+  font-size:.82rem; font-weight:800; color:var(--tx);
+}
+.rx-overflow { overflow-x:auto; }
+
+/* Upload area */
+.upload-area {
+  border:2px dashed var(--bdr);
+  border-radius:var(--r3); padding:20px;
+  text-align:center; cursor:pointer; transition:var(--tr);
+}
+.upload-area:hover { border-color:var(--bdr2); background:var(--acc4); }
+.upload-area.has { border-color:var(--bdr2); background:var(--acc3); border-style:solid; }
+.upload-area img { max-width:100%; max-height:120px; border-radius:8px; margin-top:8px; display:none; }
+.upload-txt { font-size:.82rem; color:var(--tx2); margin-top:6px; }
+
+/* Toast */
+#toast {
+  position:fixed; bottom:calc(80px + var(--safe-bottom));
+  left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:20px; padding:10px 18px;
+  font-size:.82rem; font-weight:700; color:var(--tx);
+  box-shadow:var(--sh); z-index:9999;
+  opacity:0; pointer-events:none;
+  transition:opacity .25s, transform .25s;
+  white-space:nowrap; max-width:90vw;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Loading overlay */
+#loadingOverlay {
+  position:fixed; inset:0; z-index:2000;
+  background:var(--c0);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+#loadingOverlay.show { opacity:1; pointer-events:all; }
+.loader {
+  width:40px; height:40px; border-radius:50%;
+  border:3px solid var(--c3);
+  border-top-color:var(--acc);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.loader-text { font-size:.85rem; color:var(--tx2); font-weight:600; }
+
+/* PWA banner */
+#pwaBanner {
+  position:fixed; bottom:calc(80px + var(--safe-bottom) + 8px);
+  left:12px; right:12px; z-index:500;
+  background:var(--c2); border:1px solid var(--bdr2);
+  border-radius:var(--r2); padding:12px 16px;
+  display:none; align-items:center; gap:12px;
+  box-shadow:var(--sh);
+}
+.pwa-txt { flex:1; font-size:.8rem; font-weight:700; color:var(--tx); }
+.pwa-install {
+  padding:7px 14px; background:var(--acc);
+  border:none; border-radius:8px; color:#000;
+  font-family:var(--font); font-size:.8rem; font-weight:800;
+  cursor:pointer; touch-action:manipulation;
+}
+.pwa-close {
+  background:none; border:none; color:var(--tx3);
+  cursor:pointer; font-size:18px; padding:0 4px;
+  touch-action:manipulation;
+}
+
+/* Empty state */
+.empty-state {
+  text-align:center; padding:40px 20px;
+}
+.empty-icon { font-size:44px; margin-bottom:12px; opacity:.5; }
+.empty-text { font-size:.85rem; color:var(--tx2); line-height:1.6; }
+
+/* Notif dot */
+.notif-dot {
+  position:absolute; top:6px; right:6px;
+  width:8px; height:8px; border-radius:50%;
+  background:var(--red); border:2px solid var(--c1);
+  display:none;
+}
+
+/* Settings lang dropdown */
+#settLangDrop {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r3); overflow:hidden; margin-top:4px;
+  display:none;
+}
+#settLangDrop .lang-opt { border-bottom:1px solid var(--bdr); }
+#settLangDrop .lang-opt:last-child { border-bottom:none; }
+
+/* Inline confirm box */
+.confirm-box { padding:20px; }
+.confirm-msg { font-size:.9rem; color:var(--tx); margin-bottom:20px; line-height:1.6; }
+
+/* About card */
+.about-love {
+  text-align:center; padding:20px;
+  color:var(--tx2); font-size:.8rem; line-height:1.8;
+}
+.about-love strong { color:var(--acc); }
+
+/* Disclaimer */
+.disclaimer {
+  background:rgba(240,192,64,.06);
+  border:1px solid rgba(240,192,64,.15);
+  border-radius:var(--r3); padding:12px 14px;
+  font-size:.76rem; color:rgba(240,192,64,.8);
+  line-height:1.6; margin-top:12px;
+}
+
+/* What's new timeline */
+.timeline { padding:0; }
+.tl-item {
+  display:flex; gap:12px; padding:12px 0;
+  border-bottom:1px solid var(--bdr);
+}
+.tl-item:last-child { border-bottom:none; }
+.tl-dot {
+  width:10px; height:10px; border-radius:50%;
+  background:var(--acc); margin-top:5px; flex-shrink:0;
+}
+.tl-content { flex:1; }
+.tl-ver { font-size:.7rem; font-weight:700; color:var(--acc); font-family:var(--mono); }
+.tl-desc { font-size:.82rem; color:var(--tx); margin-top:2px; }
+
+/* Star rating */
+.stars { display:flex; gap:4px; justify-content:center; margin:16px 0; }
+.star {
+  font-size:32px; cursor:pointer; transition:transform .15s;
+  touch-action:manipulation;
+}
+.star:hover { transform:scale(1.2); }
+
+/* Color dot presets */
+.avatar-colors {
+  --av-grn: linear-gradient(135deg,#00d4aa,#00b894);
+  --av-blu: linear-gradient(135deg,#4dabf7,#3b82f6);
+  --av-gold: linear-gradient(135deg,#f0c040,#e67e22);
+  --av-red: linear-gradient(135deg,#ff4757,#e84393);
+  --av-pur: linear-gradient(135deg,#bb86fc,#8b5cf6);
+  --av-pink: linear-gradient(135deg,#ff6987,#f06292);
+  --av-teal: linear-gradient(135deg,#00bcd4,#0097a7);
+  --av-gray: linear-gradient(135deg,#8b9ab5,#607d8b);
+}
+.av-grn { background:var(--av-grn); color:#000; }
+.av-blu { background:var(--av-blu); color:#fff; }
+.av-gold { background:var(--av-gold); color:#000; }
+.av-red { background:var(--av-red); color:#fff; }
+.av-pur { background:var(--av-pur); color:#fff; }
+.av-pink { background:var(--av-pink); color:#fff; }
+.av-teal { background:var(--av-teal); color:#fff; }
+.av-gray { background:var(--av-gray); color:#fff; }
+
+/* Rx AV matching */
+.rx-av.av-grn { background:rgba(0,212,170,.15); color:var(--acc); }
+.rx-av.av-blu { background:rgba(77,171,247,.15); color:var(--blue); }
+.rx-av.av-gold { background:rgba(240,192,64,.15); color:var(--gold); }
+.rx-av.av-red { background:rgba(255,71,87,.15); color:var(--red); }
+.rx-av.av-pur { background:rgba(187,134,252,.15); color:#bb86fc; }
+.rx-av.av-pink { background:rgba(255,105,135,.15); color:#ff6987; }
+.rx-av.av-teal { background:rgba(0,188,212,.15); color:#00bcd4; }
+.rx-av.av-gray { background:rgba(139,154,181,.1); color:var(--tx2); }
+
+/* ═══════════════════════════════════════
+   TIMELINE PAGE — Renewal Tracking
+═══════════════════════════════════════ */
+.timeline-card {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); overflow:hidden;
+  margin-bottom:10px; transition:var(--tr);
+}
+.timeline-card:hover { border-color:var(--bdr2); }
+.tl-card-head {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px 10px;
+}
+.tl-card-body { padding:0 16px 14px; }
+.progress-bar-wrap {
+  height:6px; background:var(--c3); border-radius:3px; overflow:hidden;
+  margin:10px 0 6px;
+}
+.progress-bar {
+  height:100%; border-radius:3px;
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+}
+.progress-bar.green  { background:linear-gradient(90deg,#00d4aa,#00b894); }
+.progress-bar.yellow { background:linear-gradient(90deg,#f0c040,#e67e22); }
+.progress-bar.red    { background:linear-gradient(90deg,#ff4757,#e84393); }
+.tl-info-row {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.72rem;
+}
+.tl-days-left {
+  font-family:var(--mono); font-weight:700; font-size:.8rem;
+}
+.tl-days-left.green  { color:var(--acc); }
+.tl-days-left.yellow { color:var(--gold); }
+.tl-days-left.red    { color:var(--red); }
+.tl-rx-type {
+  font-size:.7rem; font-weight:700; padding:2px 8px;
+  border-radius:12px;
+}
+.tl-filter-tabs {
+  display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap;
+}
+.tl-filter-tab {
+  padding:6px 14px; border-radius:20px; font-size:.78rem;
+  font-weight:700; border:1px solid var(--bdr);
+  background:var(--c2); color:var(--tx2); cursor:pointer;
+  transition:var(--tr); touch-action:manipulation; font-family:var(--font);
+}
+.tl-filter-tab.active {
+  background:var(--acc); color:#000; border-color:var(--acc);
+}
+.tl-empty-rx {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 0; font-size:.78rem; color:var(--tx3);
+}
+.tl-summary {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  margin-bottom:16px;
+}
+.tl-stat {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r3); padding:12px 8px; text-align:center;
+}
+.tl-stat-val { font-size:1.3rem; font-weight:900; font-family:var(--mono); }
+.tl-stat-lbl { font-size:.65rem; color:var(--tx2); margin-top:2px; font-weight:600; }
+.tl-notif-btn {
+  width:100%; padding:12px; margin-top:10px;
+  background:var(--acc4); border:1px solid var(--bdr2);
+  border-radius:var(--r3); color:var(--acc);
+  font-family:var(--font); font-size:.85rem; font-weight:700;
+  cursor:pointer; transition:var(--tr); touch-action:manipulation;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.tl-notif-btn:hover { background:var(--acc3); }
+
+/* ═══════════════════════════════════════
+   COMPARE PAGE — Visual Comparison
+═══════════════════════════════════════ */
+.compare-select-area {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); padding:16px; margin-bottom:12px;
+}
+.compare-select-label {
+  font-size:.72rem; font-weight:800; color:var(--tx3);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px;
+}
+.compare-member-chips {
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.cmp-chip {
+  display:flex; align-items:center; gap:6px;
+  padding:7px 12px; border-radius:20px;
+  background:var(--c3); border:1px solid var(--bdr);
+  cursor:pointer; transition:var(--tr); touch-action:manipulation;
+  font-size:.78rem; font-weight:700; color:var(--tx2); font-family:var(--font);
+}
+.cmp-chip:hover { border-color:var(--bdr2); color:var(--tx); }
+.cmp-chip.selected { background:var(--acc3); border-color:var(--bdr2); color:var(--acc); }
+.cmp-chip .cmp-av {
+  width:22px; height:22px; border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:900; flex-shrink:0;
+}
+.compare-result {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); overflow:hidden;
+}
+.cmp-header-row {
+  display:grid; gap:1px; background:var(--bdr);
+  border-bottom:1px solid var(--bdr);
+}
+.cmp-header-cell {
+  background:var(--c3); padding:12px 8px; text-align:center;
+}
+.cmp-header-name { font-size:.82rem; font-weight:800; color:var(--tx); }
+.cmp-header-rel  { font-size:.68rem; color:var(--tx2); margin-top:2px; }
+.cmp-table { width:100%; border-collapse:collapse; }
+.cmp-row-label {
+  background:var(--c3);
+  font-size:.7rem; font-weight:800; color:var(--tx3);
+  padding:8px 12px; letter-spacing:.05em; text-transform:uppercase;
+}
+.cmp-cell {
+  padding:10px 8px; text-align:center;
+  border-bottom:1px solid var(--bdr);
+  font-family:var(--mono); font-size:.82rem; color:var(--tx);
+}
+.cmp-cell.highlight { color:var(--acc); font-weight:700; }
+.cmp-cell.diff { color:var(--gold); }
+.cmp-section-head {
+  background:var(--c3); padding:8px 12px;
+  font-size:.75rem; font-weight:800; color:var(--tx2);
+  border-bottom:1px solid var(--bdr); border-top:1px solid var(--bdr);
+}
+.cmp-empty {
+  text-align:center; padding:32px 16px;
+  color:var(--tx3); font-size:.85rem;
+}
+.cmp-bar-wrap {
+  display:flex; align-items:center; gap:6px;
+  padding:2px 8px;
+}
+.cmp-bar {
+  height:4px; border-radius:2px; flex:1; background:var(--c4);
+  position:relative; overflow:hidden;
+}
+.cmp-bar-fill {
+  position:absolute; top:0; left:0; height:100%;
+  border-radius:2px; transition:width .5s ease;
+}
+
+/* ═══════════════════════════════════════
+   TIMELINE PAGE — Renewal Tracker
+═══════════════════════════════════════ */
+.tl-summary {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px;
+}
+.tl-sum-box {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); padding:14px 10px; text-align:center;
+}
+.tl-sum-val { font-size:1.6rem; font-weight:900; font-family:var(--mono); }
+.tl-sum-lbl { font-size:.68rem; color:var(--tx2); margin-top:3px; font-weight:700; }
+.tl-sum-ok  { color:var(--acc); }
+.tl-sum-warn { color:var(--gold); }
+.tl-sum-over { color:var(--red); }
+
+.renewal-card {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); padding:16px;
+  margin-bottom:10px; transition:var(--tr);
+}
+.renewal-card:hover { border-color:var(--bdr2); }
+.renewal-head {
+  display:flex; align-items:center; gap:12px; margin-bottom:12px;
+}
+.renewal-info { flex:1; }
+.renewal-name { font-size:.92rem; font-weight:800; color:var(--tx); }
+.renewal-rel  { font-size:.73rem; color:var(--tx2); }
+.renewal-badge {
+  font-size:.68rem; font-weight:800; padding:3px 10px;
+  border-radius:20px; flex-shrink:0;
+}
+.rb-ok   { background:rgba(0,212,170,.12); color:var(--acc); border:1px solid var(--bdr2); }
+.rb-warn { background:rgba(240,192,64,.12); color:var(--gold); border:1px solid rgba(240,192,64,.25); }
+.rb-over { background:rgba(255,71,87,.12); color:var(--red); border:1px solid rgba(255,71,87,.25); }
+.rb-none { background:var(--c3); color:var(--tx3); border:1px solid var(--bdr); }
+
+.progress-bar-wrap {
+  background:var(--c3); border-radius:6px; height:8px; overflow:hidden; margin:8px 0;
+}
+.progress-bar-fill {
+  height:100%; border-radius:6px; transition:width .6s ease;
+}
+.pb-ok   { background:linear-gradient(90deg,var(--acc2),var(--acc)); }
+.pb-warn { background:linear-gradient(90deg,#c8a000,var(--gold)); }
+.pb-over { background:linear-gradient(90deg,#cc2030,var(--red)); }
+
+.renewal-dates {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.72rem; color:var(--tx2);
+}
+.renewal-type-row { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.renewal-type-chip {
+  font-size:.7rem; font-weight:700; padding:3px 9px;
+  border-radius:12px; background:var(--c3);
+  border:1px solid var(--bdr); color:var(--tx2);
+}
+
+/* ═══════════════════════════════════════
+   COMPARE PAGE
+═══════════════════════════════════════ */
+.compare-selector {
+  flex:1; min-width:140px;
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); padding:12px 14px;
+  display:flex; align-items:center; gap:10px;
+  cursor:pointer; transition:var(--tr);
+  position:relative;
+}
+.compare-selector.selected { border-color:var(--bdr2); background:var(--acc4); }
+.compare-selector .cs-label { font-size:.78rem; font-weight:700; color:var(--tx2); }
+.compare-selector .cs-name  { font-size:.88rem; font-weight:900; color:var(--tx); margin-top:2px; }
+.compare-selector-drop {
+  position:absolute; top:calc(100%+6px); left:0; right:0;
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r3); z-index:100;
+  box-shadow:var(--sh); max-height:200px; overflow-y:auto;
+  display:none;
+}
+.compare-selector-drop.open { display:block; }
+.compare-opt {
+  padding:10px 14px; font-size:.83rem; font-weight:700;
+  color:var(--tx); cursor:pointer; transition:var(--tr);
+  display:flex; align-items:center; gap:8px;
+  border-bottom:1px solid var(--bdr);
+}
+.compare-opt:last-child { border-bottom:none; }
+.compare-opt:hover { background:var(--c3); }
+.compare-opt.selected { color:var(--acc); background:var(--acc4); }
+
+.compare-table-wrap {
+  background:var(--c2); border:1px solid var(--bdr);
+  border-radius:var(--r2); overflow:hidden; margin-bottom:12px;
+}
+.compare-table-head {
+  display:grid; padding:12px 14px;
+  background:var(--c3); border-bottom:1px solid var(--bdr);
+  font-size:.75rem; font-weight:800; color:var(--tx2);
+}
+.compare-row {
+  display:grid; padding:11px 14px;
+  border-bottom:1px solid var(--bdr); align-items:center;
+  transition:var(--tr);
+}
+.compare-row:last-child { border-bottom:none; }
+.compare-row:hover { background:var(--c3); }
+.compare-row-label {
+  font-size:.75rem; font-weight:700; color:var(--tx3);
+  font-family:var(--mono);
+}
+.compare-val {
+  font-size:.88rem; font-weight:800; font-family:var(--mono);
+  color:var(--tx); text-align:center;
+}
+.compare-val.diff { color:var(--gold); }
+.compare-val.same { color:var(--acc); }
+.compare-val.empty { color:var(--tx3); font-weight:400; }
+.compare-section-title {
+  font-size:.72rem; font-weight:800; color:var(--tx3);
+  letter-spacing:.08em; text-transform:uppercase;
+  margin:16px 0 8px; display:flex; align-items:center; gap:8px;
+}
+.compare-section-title::after { content:''; flex:1; height:1px; background:var(--bdr); }
+.compare-empty {
+  text-align:center; padding:32px 20px;
+  color:var(--tx3); font-size:.85rem;
+}
+.compare-av-header {
+  display:flex; align-items:center; gap:8px;
+}
+.compare-av-sm {
+  width:28px; height:28px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:900; flex-shrink:0;
+}
+
+/* ═══════════════════════════════════════
+   SPECIALIST CARD
+═══════════════════════════════════════ */
+.specialist-banner {
+  background: var(--c2);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: var(--tr);
+  position: relative;
+}
+.specialist-banner:hover { border-color: var(--bdr2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,212,170,.1); }
+.spec-banner-bg {
+  height: 64px;
+  background: linear-gradient(135deg, #001a14, #002d20, #001428);
+  position: relative; overflow: hidden;
+}
+.spec-banner-bg::before {
+  content:''; position:absolute; inset:0;
+  background: repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(0,212,170,.05) 8px,rgba(0,212,170,.05) 9px);
+}
+.spec-banner-bg::after {
+  content:'👁️'; position:absolute; right:16px; top:50%;
+  transform:translateY(-50%); font-size:28px; opacity:.3;
+}
+.spec-body { padding: 0 16px 16px; }
+.spec-av-row {
+  display: flex; align-items: flex-end; gap: 14px;
+  transform: translateY(-24px); margin-bottom: -10px;
+}
+.spec-av {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: linear-gradient(135deg, #00d4aa, #00b894);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900; color: #000;
+  border: 3px solid var(--c2); flex-shrink: 0;
+}
+.spec-name-wrap { padding-bottom: 4px; }
+.spec-name { font-size: .95rem; font-weight: 900; color: var(--tx); }
+.spec-title { font-size: .72rem; color: var(--acc); font-weight: 700; margin-top: 1px; }
+.spec-badges {
+  display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0;
+}
+.spec-badge {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px;
+  font-size: .7rem; font-weight: 700;
+}
+.spec-badge-grn { background: var(--acc3); color: var(--acc); border: 1px solid var(--bdr2); }
+.spec-badge-blu { background: var(--blueb); color: var(--blue); border: 1px solid rgba(77,171,247,.2); }
+.spec-badge-gold { background: rgba(240,192,64,.1); color: var(--gold); border: 1px solid rgba(240,192,64,.2); }
+.spec-divider { height: 1px; background: var(--bdr); margin: 12px 0; }
+.spec-wa-btn {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border: none; border-radius: var(--r3);
+  color: #fff; font-family: var(--font);
+  font-size: .92rem; font-weight: 800;
+  cursor: pointer; transition: var(--tr);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  touch-action: manipulation;
+}
+.spec-wa-btn:hover { opacity: .92; transform: translateY(-1px); }
+.spec-wa-btn:active { transform: scale(.98); }
+.spec-hours {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .76rem; color: var(--tx2); margin-bottom: 12px;
+}
+.spec-hours-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--acc); flex-shrink: 0;
+  box-shadow: 0 0 6px var(--acc);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.5; transform:scale(.8); }
+}
+
+/* Modal الأخصائي */
+.spec-modal-av {
+  width: 80px; height: 80px; border-radius: 22px;
+  background: linear-gradient(135deg, #00d4aa, #00b894);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: 900; color: #000;
+  margin: 0 auto 16px; border: 3px solid var(--bdr2);
+  box-shadow: 0 0 30px rgba(0,212,170,.25);
+}
+.spec-modal-name {
+  text-align: center; font-size: 1.1rem; font-weight: 900; color: var(--tx);
+  margin-bottom: 4px;
+}
+.spec-modal-role {
+  text-align: center; font-size: .8rem; color: var(--acc);
+  font-weight: 700; margin-bottom: 16px;
+}
+.spec-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+}
+.spec-info-box {
+  background: var(--c3); border: 1px solid var(--bdr);
+  border-radius: var(--r3); padding: 12px;
+  text-align: center;
+}
+.spec-info-box .sib-icon { font-size: 18px; margin-bottom: 4px; }
+.spec-info-box .sib-val { font-size: .78rem; font-weight: 800; color: var(--tx); line-height: 1.4; }
+.spec-info-box .sib-lbl { font-size: .65rem; color: var(--tx3); margin-top: 2px; font-weight: 600; }
+.spec-cert-row {
+  background: var(--acc4); border: 1px solid var(--bdr2);
+  border-radius: var(--r3); padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.spec-cert-icon { font-size: 20px; flex-shrink: 0; }
+.spec-cert-text { font-size: .78rem; color: var(--tx); font-weight: 700; line-height: 1.5; }
+.spec-cert-sub { font-size: .68rem; color: var(--tx2); margin-top: 1px; font-weight: 400; }
+
+/* ═══════════════════════════════════════
+   SPECIALIST PAGE
+═══════════════════════════════════════ */
+.spec-page-hero {
+  background: linear-gradient(145deg, #001a14 0%, #002d20 50%, #001428 100%);
+  border-radius: var(--r);
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--bdr2);
+}
+.spec-page-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 12px,
+    rgba(0,212,170,.04) 12px, rgba(0,212,170,.04) 13px
+  );
+}
+.spec-page-hero::after {
+  content: '👁️';
+  position: absolute;
+  font-size: 120px; opacity: .04;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+.spec-hero-av {
+  width: 88px; height: 88px; border-radius: 26px;
+  background: linear-gradient(135deg, #00d4aa, #00b894);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 900; color: #000;
+  margin: 0 auto 16px;
+  border: 3px solid rgba(0,212,170,.3);
+  box-shadow: 0 0 40px rgba(0,212,170,.25), 0 0 80px rgba(0,212,170,.1);
+  position: relative; z-index: 1;
+}
+.spec-hero-name {
+  font-size: 1.2rem; font-weight: 900; color: #fff;
+  margin-bottom: 4px; position: relative; z-index: 1;
+}
+.spec-hero-role {
+  font-size: .8rem; color: var(--acc);
+  font-weight: 700; margin-bottom: 16px;
+  position: relative; z-index: 1;
+}
+.spec-hero-badges {
+  display: flex; gap: 6px; justify-content: center;
+  flex-wrap: wrap; position: relative; z-index: 1;
+}
+.spec-avail-strip {
+  background: rgba(0,212,170,.08);
+  border: 1px solid var(--bdr2);
+  border-radius: var(--r3);
+  padding: 10px 14px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.spec-avail-left {
+  display: flex; align-items: center; gap: 8px;
+}
+.spec-avail-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--acc); flex-shrink: 0;
+  box-shadow: 0 0 8px var(--acc);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+.spec-avail-text { font-size: .82rem; font-weight: 700; color: var(--tx); }
+.spec-avail-hours { font-size: .75rem; color: var(--tx2); }
+.spec-info-cards {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 16px;
+}
+.spec-info-card {
+  background: var(--c2); border: 1px solid var(--bdr);
+  border-radius: var(--r2); padding: 14px 12px;
+}
+.spec-info-card .sic-icon { font-size: 22px; margin-bottom: 8px; }
+.spec-info-card .sic-val {
+  font-size: .82rem; font-weight: 800; color: var(--tx);
+  line-height: 1.4;
+}
+.spec-info-card .sic-lbl {
+  font-size: .67rem; color: var(--tx3);
+  margin-top: 3px; font-weight: 600;
+}
+.spec-cert-card {
+  background: var(--c2); border: 1px solid var(--bdr);
+  border-radius: var(--r2); padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 10px; transition: var(--tr);
+}
+.spec-cert-card:hover { border-color: var(--bdr2); }
+.spec-cert-card .scc-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.spec-cert-card .scc-body { flex: 1; }
+.spec-cert-card .scc-title {
+  font-size: .85rem; font-weight: 800; color: var(--tx);
+  margin-bottom: 2px;
+}
+.spec-cert-card .scc-sub {
+  font-size: .73rem; color: var(--tx2); line-height: 1.5;
+}
+.spec-big-wa {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border: none; border-radius: var(--r2);
+  color: #fff; font-family: var(--font);
+  font-size: 1rem; font-weight: 900;
+  cursor: pointer; transition: var(--tr);
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  touch-action: manipulation; margin-bottom: 10px;
+  box-shadow: 0 4px 20px rgba(37,211,102,.25);
+}
+.spec-big-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,.35); }
+.spec-big-wa:active { transform: scale(.98); }
+.spec-wa-sub {
+  text-align: center; font-size: .72rem; color: var(--tx3);
+  line-height: 1.6; margin-bottom: 20px;
+}
+.spec-quick-btns {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 16px;
+}
+.spec-quick-btn {
+  padding: 12px 8px;
+  background: var(--c2); border: 1px solid var(--bdr);
+  border-radius: var(--r3); color: var(--tx2);
+  font-family: var(--font); font-size: .75rem; font-weight: 700;
+  cursor: pointer; transition: var(--tr);
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  touch-action: manipulation;
+}
+.spec-quick-btn:hover { border-color: var(--bdr2); color: var(--acc); background: var(--acc4); }
+.spec-quick-btn:active { transform: scale(.97); }
+.spec-quick-btn .sqb-icon { font-size: 20px; }
+</style>
+</head>
+<body class="avatar-colors">
+
+<!-- ══ LOADING ══ -->
+<div id="loadingOverlay">
+  <div class="loader"></div>
+  <div class="loader-text">جاري التحميل...</div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast"></div>
+
+<!-- ══ PWA BANNER ══ -->
+<div id="pwaBanner">
+  <span style="font-size:20px">👁️</span>
+  <div class="pwa-txt">ثبّت تطبيق بصر على جهازك</div>
+  <button class="pwa-install" onclick="installPWA()">تثبيت</button>
+  <button class="pwa-close" onclick="document.getElementById('pwaBanner').style.display='none'">✕</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div id="authScreen">
+  <div class="auth-logo">
+    <div class="logo-ring">👁️</div>
+    <h1>بصر</h1>
+    <p id="auth_tagline">حفظ الوصفات الطبية للعائلة</p>
+  </div>
+  <div class="auth-card">
+    <div id="authErr" class="auth-err"></div>
+    <div id="authSucc" class="auth-succ"></div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" id="authTabsWrap">
+      <button class="auth-tab active" id="tab_login" onclick="switchAuthTab('login')" data-i18n="auth_login">تسجيل الدخول</button>
+      <button class="auth-tab" id="tab_register" onclick="switchAuthTab('register')" data-i18n="auth_register">حساب جديد</button>
+    </div>
+
+    <!-- Login -->
+    <div id="formLogin">
+      <div class="form-group">
+        <label id="lbl_login_email" data-i18n="auth_email">البريد الإلكتروني</label>
+        <input type="email" id="login_email" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login_pass').focus()">
+      </div>
+      <div class="form-group">
+        <label data-i18n="auth_password">كلمة المرور</label>
+        <input type="password" id="login_pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-auth" onclick="doLogin()" data-i18n="auth_login_btn">🔑 تسجيل الدخول</button>
+      <button class="btn-text" onclick="showForgotPassword()" data-i18n="auth_forgot">نسيت كلمة المرور؟</button>
+    </div>
+
+    <!-- Register -->
+    <div id="formRegister" style="display:none">
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-i18n="auth_first">الاسم الأول</label>
+          <input type="text" id="reg_first">
+        </div>
+        <div class="form-group">
+          <label data-i18n="auth_last">اسم العائلة</label>
+          <input type="text" id="reg_last">
+        </div>
+      </div>
+      <div class="form-group">
+        <label data-i18n="auth_email">البريد الإلكتروني</label>
+        <input type="email" id="reg_email" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label data-i18n="auth_phone">رقم الجوال</label>
+        <input type="tel" id="reg_phone" placeholder="+966 5X XXX XXXX">
+      </div>
+      <div class="form-group">
+        <label data-i18n="auth_password">كلمة المرور</label>
+        <input type="password" id="reg_pass" placeholder="8 أحرف على الأقل">
+      </div>
+      <div class="form-group">
+        <label data-i18n="auth_confirm_pass">تأكيد كلمة المرور</label>
+        <input type="password" id="reg_pass2" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" onclick="doRegister()" data-i18n="auth_register_btn">✨ إنشاء الحساب</button>
+    </div>
+
+    <!-- Forgot -->
+    <div id="formForgot" style="display:none">
+      <p style="font-size:.82rem;color:var(--tx2);margin-bottom:14px;line-height:1.6" data-i18n="auth_forgot_hint">أدخل بريدك وسنرسل لك رابط الاسترداد</p>
+      <div class="form-group">
+        <label data-i18n="auth_email">البريد الإلكتروني</label>
+        <input type="email" id="forgot_email">
+      </div>
+      <button class="btn-auth" onclick="doForgot()" data-i18n="auth_send_reset">📧 إرسال رابط الاسترداد</button>
+      <button class="btn-text" onclick="switchAuthTab('login')" data-i18n="auth_back">← رجوع</button>
+    </div>
+  </div>
+  <p style="font-size:.72rem;color:var(--tx3);text-align:center;margin-top:20px;line-height:1.6" data-i18n="auth_footer">تطبيق بصر لحفظ الوصفات الطبية · لا يغني عن استشارة الطبيب</p>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="mainApp">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">👁️</div>
+      <div class="topbar-name">بصر <span>|</span> Basar</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="lang-wrap">
+        <button class="topbar-btn" onclick="toggleLangMenu()" title="اللغة">
+          <span id="langLabel">AR</span>
+        </button>
+        <div class="lang-menu" id="langMenu">
+          <div class="lang-opt active" data-l="ar" onclick="setLang('ar')">🇸🇦 العربية</div>
+          <div class="lang-opt" data-l="en" onclick="setLang('en')">🇬🇧 English</div>
+          <div class="lang-opt" data-l="fr" onclick="setLang('fr')">🇫🇷 Français</div>
+          <div class="lang-opt" data-l="ur" onclick="setLang('ur')">🇵🇰 اردو</div>
+          <div class="lang-opt" data-l="fa" onclick="setLang('fa')">🇮🇷 فارسی</div>
+          <div class="lang-opt" data-l="tr" onclick="setLang('tr')">🇹🇷 Türkçe</div>
+        </div>
+      </div>
+      <button class="topbar-btn" onclick="toggleTheme()" id="themeBtn" title="الوضع الليلي">🌙</button>
+      <div class="user-chip" onclick="openLogoutModal()">
+        <div class="user-av" id="userChipAv">س</div>
+        <span class="user-name" id="userChipName">سامر</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGES -->
+  <main>
+    <!-- PROFILE -->
+    <div class="page active" id="pageProfile">
+      <div class="page-header">
+        <div>
+          <div class="page-title" data-i18n="nav_profile">الملف الشخصي</div>
+          <div class="page-subtitle" id="profileSubtitle">مرحباً بك في بصر</div>
+        </div>
+        <button class="topbar-btn" onclick="openEditProfile()" title="تعديل">✏️</button>
+      </div>
+      <div id="profileHero"></div>
+      <!-- SPECIALIST CARD -->
+      <div class="specialist-banner" onclick="openModal('specialistModal')">
+        <div class="spec-banner-bg"></div>
+        <div class="spec-body">
+          <div class="spec-av-row">
+            <div class="spec-av">أ</div>
+            <div class="spec-name-wrap">
+              <div class="spec-name">أحمد صلاح الدين</div>
+              <div class="spec-title">أخصائي بصريات معتمد 👁️</div>
+            </div>
+          </div>
+          <div class="spec-badges">
+            <span class="spec-badge spec-badge-grn">🏅 معتمد SCFHS</span>
+            <span class="spec-badge spec-badge-blu">🎓 جامعة النيلين</span>
+            <span class="spec-badge spec-badge-gold">⭐ استشارة مجانية</span>
+          </div>
+          <div class="spec-hours">
+            <div class="spec-hours-dot"></div>
+            <span>متاح · ٤ عصراً – ١٠ مساءً</span>
+          </div>
+          <div class="spec-divider"></div>
+          <button class="spec-wa-btn" onclick="event.stopPropagation();openSpecialistWA()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            استشر أخصائي البصريات الآن
+          </button>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="profile_recent">آخر الوصفات</div>
+      <div id="recentRx"></div>
+    </div>
+
+    <!-- FAMILY -->
+    <div class="page" id="pageFamily">
+      <div class="page-header">
+        <div>
+          <div class="page-title" data-i18n="family_title">أفراد الأسرة</div>
+          <div class="page-subtitle" id="familyCount">0 أفراد</div>
+        </div>
+      </div>
+      <button class="add-btn" onclick="openAddMember()">
+        <span style="font-size:18px">＋</span>
+        <span data-i18n="family_add">إضافة فرد جديد</span>
+      </button>
+      <div id="familyGrid"></div>
+    </div>
+
+    <!-- STORES (hidden, kept for compat) -->
+    <div id="pageStores" style="display:none"></div>
+
+    <!-- TIMELINE PAGE -->
+    <div class="page" id="pageTimeline">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📅 جدول التجديد</div>
+          <div class="page-subtitle" id="timelineSubtitle">تتبع مواعيد تجديد الوصفات</div>
+        </div>
+        <button class="topbar-btn" onclick="renderTimeline()" title="تحديث">↻</button>
+      </div>
+      <div id="timelineContent"></div>
+    </div>
+
+    <!-- COMPARE PAGE -->
+    <div class="page" id="pageCompare">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 مقارنة الوصفات</div>
+          <div class="page-subtitle">قارن وصفات أفراد الأسرة</div>
+        </div>
+      </div>
+      <div id="compareSelectors" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap"></div>
+      <div id="compareContent"></div>
+    </div>
+
+
+    <!-- TIMELINE -->
+    <div class="page" id="pageTimeline">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📅 تجديد الوصفات</div>
+          <div class="page-subtitle" id="tlSubtitle">تتبع مواعيد التجديد</div>
+        </div>
+      </div>
+      <div id="timelineContent"></div>
+    </div>
+
+    <!-- COMPARE -->
+    <div class="page" id="pageCompare">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 مقارنة الوصفات</div>
+          <div class="page-subtitle">اختر فردين أو أكثر</div>
+        </div>
+      </div>
+      <div class="compare-select-area">
+        <div class="compare-select-label">اختر الأفراد للمقارنة</div>
+        <div class="compare-member-chips" id="cmpChips"></div>
+      </div>
+      <div id="compareResult"></div>
+    </div>
+
+    <!-- SPECIALIST -->
+    <div class="page" id="pageSpecialist">
+      <div class="page-header">
+        <div>
+          <div class="page-title">👨‍⚕️ أخصائي البصريات</div>
+          <div class="page-subtitle">استشارة مجانية عبر واتساب</div>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="spec-page-hero">
+        <div class="spec-hero-av">أ</div>
+        <div class="spec-hero-name">أحمد صلاح الدين أحمد سليمان</div>
+        <div class="spec-hero-role">أخصائي بصريات معتمد 👁️</div>
+        <div class="spec-hero-badges">
+          <span class="spec-badge spec-badge-grn">🏅 SCFHS معتمد</span>
+          <span class="spec-badge spec-badge-blu">🎓 جامعة النيلين</span>
+          <span class="spec-badge spec-badge-gold">💬 واتساب</span>
+        </div>
+      </div>
+
+      <!-- شريط التوفر -->
+      <div class="spec-avail-strip">
+        <div class="spec-avail-left">
+          <div class="spec-avail-dot"></div>
+          <div>
+            <div class="spec-avail-text">متاح للاستشارة</div>
+            <div class="spec-avail-hours">٤ عصراً – ١٠ مساءً يومياً</div>
+          </div>
+        </div>
+        <span class="badge badge-grn" style="font-size:.68rem">مجاناً ✓</span>
+      </div>
+
+      <!-- رسائل سريعة -->
+      <div class="section-title">استشارة سريعة</div>
+      <div class="spec-quick-btns">
+        <button class="spec-quick-btn" onclick="quickConsult('أريد الاستفسار عن وصفة نظاراتي')">
+          <span class="sqb-icon">🕶️</span>
+          <span>استفسار عن النظارة</span>
+        </button>
+        <button class="spec-quick-btn" onclick="quickConsult('أريد الاستفسار عن العدسات اللاصقة')">
+          <span class="sqb-icon">👁️</span>
+          <span>استفسار عن العدسات</span>
+        </button>
+        <button class="spec-quick-btn" onclick="quickConsult('أريد قراءة وصفتي الطبية')">
+          <span class="sqb-icon">📋</span>
+          <span>قراءة الوصفة</span>
+        </button>
+        <button class="spec-quick-btn" onclick="quickConsult('أريد نصيحة بخصوص صحة العيون')">
+          <span class="sqb-icon">💡</span>
+          <span>نصيحة طبية</span>
+        </button>
+      </div>
+
+      <!-- زر الواتساب الكبير -->
+      <div class="section-title">تواصل مباشر</div>
+      <button class="spec-big-wa" onclick="openSpecialistWA()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        ابدأ الاستشارة الآن
+      </button>
+      <div class="spec-wa-sub">سيتم فتح واتساب مباشرة مع رسالة جاهزة تحتوي اسمك ووصفتك</div>
+
+      <!-- بطاقات المؤهلات -->
+      <div class="section-title">المؤهلات والخبرة</div>
+      <div class="spec-cert-card">
+        <div class="scc-icon si-grn">🏅</div>
+        <div class="scc-body">
+          <div class="scc-title">معتمد من الهيئة السعودية للتخصصات الصحية</div>
+          <div class="scc-sub">Saudi Commission for Health Specialties — SCFHS<br>ترخيص مهني معتمد في المملكة العربية السعودية</div>
+        </div>
+      </div>
+      <div class="spec-cert-card">
+        <div class="scc-icon si-blu">🎓</div>
+        <div class="scc-body">
+          <div class="scc-title">بكالوريوس علوم البصريات</div>
+          <div class="scc-sub">جامعة النيلين — كلية علوم البصريات<br>Bachelor of Optometry Sciences</div>
+        </div>
+      </div>
+      <div class="spec-cert-card">
+        <div class="scc-icon si-gold">👁️</div>
+        <div class="scc-body">
+          <div class="scc-title">أخصائي بصريات معتمد</div>
+          <div class="scc-sub">خبرة في فحص النظر، تشخيص الوصفات،<br>وتركيب العدسات اللاصقة وإطارات النظارات</div>
+        </div>
+      </div>
+
+      <!-- معلومات الاتصال -->
+      <div class="section-title">معلومات الاتصال</div>
+      <div class="spec-info-cards">
+        <div class="spec-info-card">
+          <div class="sic-icon">📱</div>
+          <div class="sic-val" dir="ltr" style="color:var(--tx3);letter-spacing:.15em">••• •••• ••••</div>
+          <div class="sic-lbl">رقم الواتساب</div>
+        </div>
+        <div class="spec-info-card">
+          <div class="sic-icon">🕐</div>
+          <div class="sic-val">٤ عصراً – ١٠ مساءً</div>
+          <div class="sic-lbl">أوقات الاستشارة</div>
+        </div>
+        <div class="spec-info-card">
+          <div class="sic-icon">💬</div>
+          <div class="sic-val">واتساب فقط</div>
+          <div class="sic-lbl">وسيلة التواصل</div>
+        </div>
+        <div class="spec-info-card">
+          <div class="sic-icon">⭐</div>
+          <div class="sic-val">مجانية</div>
+          <div class="sic-lbl">الاستشارة</div>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        ⚕️ الاستشارة عبر واتساب تكميلية ولا تغني عن الفحص الطبي المباشر مع طبيب العيون المختص.
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="pageSettings">
+      <div class="page-header">
+        <div class="page-title" data-i18n="nav_settings">الإعدادات</div>
+      </div>
+      <div id="settingsContent"></div>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="mn_profile" onclick="showPage('profile')">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label" data-i18n="nav_profile">الملف</span>
+    </button>
+    <button class="nav-btn" id="mn_family" onclick="showPage('family')">
+      <span class="nav-icon">👨‍👩‍👧‍👦</span>
+      <span class="nav-label" data-i18n="nav_family">الأسرة</span>
+    </button>
+    <button class="nav-btn" id="mn_timeline" onclick="showPage('timeline')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">التجديد</span>
+    </button>
+    <button class="nav-btn" id="mn_compare" onclick="showPage('compare')">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">مقارنة</span>
+    </button>
+    <button class="nav-btn" id="mn_specialist" onclick="showPage('specialist')">
+      <span class="nav-icon">👨‍⚕️</span>
+      <span class="nav-label">أخصائي</span>
+    </button>
+    <button class="nav-btn" id="mn_settings" onclick="showPage('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label" data-i18n="nav_settings">الإعدادات</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- VIEW RX -->
+<div class="modal-overlay" id="rxModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="rxModalTitle">وصفة الفرد</div>
+      <button class="modal-close" onclick="closeModal('rxModal')">✕</button>
+    </div>
+    <div class="modal-body" id="rxModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="rxBtnWA">💬 واتساب</button>
+      <button class="btn-primary" id="rxBtnPDF">📄 PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MEMBER -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="memberModalTitle">إضافة فرد</div>
+      <button class="modal-close" onclick="closeModal('memberModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label data-i18n="field_name">الاسم</label>
+        <input type="text" id="m_name" placeholder="اسم الفرد">
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-i18n="field_rel">صلة القرابة</label>
+          <select id="m_rel">
+            <option value="">اختر</option>
+            <option value="الزوجة">الزوجة</option>
+            <option value="الزوج">الزوج</option>
+            <option value="الابن">الابن</option>
+            <option value="الابنة">الابنة</option>
+            <option value="الأب">الأب</option>
+            <option value="الأم">الأم</option>
+            <option value="الأخ">الأخ</option>
+            <option value="الأخت">الأخت</option>
+            <option value="الجد">الجد</option>
+            <option value="الجدة">الجدة</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-i18n="field_age">العمر</label>
+          <input type="number" id="m_age" placeholder="السن" min="1" max="120">
+        </div>
+      </div>
+
+      <div class="form-section">🕶️ وصفة النظارات</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-i18n="field_rx_date">التاريخ</label>
+          <input type="date" id="m_g_date">
+        </div>
+        <div class="form-group">
+          <label data-i18n="field_rx_doc">الطبيب/العيادة</label>
+          <input type="text" id="m_g_doc" placeholder="اختياري">
+        </div>
+      </div>
+      <!-- Glasses table -->
+      <div style="overflow-x:auto;margin-bottom:8px">
+        <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+          <tr>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">العين</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">SPH</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">CYL</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">AXIS</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">ADD</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">IPD</th>
+          </tr>
+          <tr>
+            <td style="padding:6px;color:var(--tx2);font-size:.72rem;white-space:nowrap">يمنى OD</td>
+            <td><input type="text" id="g_r_sph" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="g_r_cyl" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="g_r_ax"  class="rx-inp" placeholder="0"></td>
+            <td><input type="text" id="g_r_add" class="rx-inp" placeholder="—"></td>
+            <td><input type="text" id="g_r_ipd" class="rx-inp" placeholder="—"></td>
+          </tr>
+          <tr>
+            <td style="padding:6px;color:var(--tx2);font-size:.72rem;white-space:nowrap">يسرى OS</td>
+            <td><input type="text" id="g_l_sph" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="g_l_cyl" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="g_l_ax"  class="rx-inp" placeholder="0"></td>
+            <td><input type="text" id="g_l_add" class="rx-inp" placeholder="—"></td>
+            <td><input type="text" id="g_l_ipd" class="rx-inp" placeholder="—"></td>
+          </tr>
+        </table>
+      </div>
+      <div class="form-group">
+        <label>تذكير تجديد النظارة</label>
+        <div class="alert-chips" id="gAlertChips">
+          <button class="chip-btn" data-v="" onclick="selChip(this,'gAlert')">بدون</button>
+          <button class="chip-btn" data-v="3" onclick="selChip(this,'gAlert')">3 أشهر</button>
+          <button class="chip-btn" data-v="6" onclick="selChip(this,'gAlert')">6 أشهر</button>
+          <button class="chip-btn" data-v="12" onclick="selChip(this,'gAlert')">12 شهر</button>
+        </div>
+      </div>
+
+      <div class="form-section">👁️ وصفة العدسات اللاصقة</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-i18n="field_cl_date">التاريخ</label>
+          <input type="date" id="m_c_date">
+        </div>
+        <div class="form-group">
+          <label data-i18n="field_lens_type">نوع العدسات</label>
+          <select id="m_c_type">
+            <option value="">اختر</option>
+            <option value="يومي">💧 يومي</option>
+            <option value="أسبوعي">🔵 أسبوعي</option>
+            <option value="شهري">🟢 شهري</option>
+            <option value="توريك">⭕ توريك</option>
+            <option value="ملونة يومي">🌈 ملونة يومي</option>
+            <option value="ملونة شهري">🌟 ملونة شهري</option>
+            <option value="ملونة تجميلي">🎨 ملونة تجميلي</option>
+          </select>
+        </div>
+      </div>
+      <!-- Contacts table -->
+      <div style="overflow-x:auto;margin-bottom:8px">
+        <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+          <tr>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">العين</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">SPH</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">CYL</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">AXIS</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">BC</th>
+            <th style="padding:6px;background:var(--c3);color:var(--tx2);font-weight:700;font-size:.7rem">DIA</th>
+          </tr>
+          <tr>
+            <td style="padding:6px;color:var(--tx2);font-size:.72rem;white-space:nowrap">يمنى OD</td>
+            <td><input type="text" id="c_r_sph" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="c_r_cyl" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="c_r_ax"  class="rx-inp" placeholder="0"></td>
+            <td><input type="text" id="c_r_bc"  class="rx-inp" placeholder="—"></td>
+            <td><input type="text" id="c_r_dia" class="rx-inp" placeholder="—"></td>
+          </tr>
+          <tr>
+            <td style="padding:6px;color:var(--tx2);font-size:.72rem;white-space:nowrap">يسرى OS</td>
+            <td><input type="text" id="c_l_sph" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="c_l_cyl" class="rx-inp" placeholder="0.00"></td>
+            <td><input type="text" id="c_l_ax"  class="rx-inp" placeholder="0"></td>
+            <td><input type="text" id="c_l_bc"  class="rx-inp" placeholder="—"></td>
+            <td><input type="text" id="c_l_dia" class="rx-inp" placeholder="—"></td>
+          </tr>
+        </table>
+      </div>
+      <div class="form-group">
+        <label>تذكير تغيير العدسات</label>
+        <div class="alert-chips" id="cAlertChips">
+          <button class="chip-btn" data-v="" onclick="selChip(this,'cAlert')">بدون</button>
+          <button class="chip-btn" data-v="daily" onclick="selChip(this,'cAlert')">يومي</button>
+          <button class="chip-btn" data-v="weekly" onclick="selChip(this,'cAlert')">أسبوعي</button>
+          <button class="chip-btn" data-v="monthly" onclick="selChip(this,'cAlert')">شهري</button>
+        </div>
+      </div>
+
+      <div class="form-section">📝 ملاحظات وصورة</div>
+      <div class="form-group">
+        <label data-i18n="field_notes">ملاحظات</label>
+        <input type="text" id="m_notes" placeholder="توصيات الطبيب، حساسية...">
+      </div>
+      <div class="form-group">
+        <label>صورة الوصفة (اختياري)</label>
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('mFileInput').click()">
+          <div style="font-size:28px">📷</div>
+          <div class="upload-txt">انقر لرفع صورة الوصفة</div>
+          <img id="mPreview">
+        </div>
+        <input type="file" id="mFileInput" accept="image/*" style="display:none" onchange="handleMemberImg()">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('memberModal')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn-primary" onclick="saveMember()" data-i18n="btn_save_member">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="edit_profile_title">✏️ تعديل الملف</div>
+      <button class="modal-close" onclick="closeModal('editProfileModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label data-i18n="field_first">الاسم الأول</label><input type="text" id="ep_first"></div>
+        <div class="form-group"><label data-i18n="field_last">اسم العائلة</label><input type="text" id="ep_last"></div>
+      </div>
+      <div class="form-group"><label data-i18n="field_phone">الهاتف</label><input type="tel" id="ep_phone" placeholder="+966"></div>
+      <div class="form-group"><label data-i18n="field_city">المدينة</label><input type="text" id="ep_city"></div>
+      <div class="form-group">
+        <label data-i18n="field_gender">الجنس</label>
+        <select id="ep_gender">
+          <option value="">اختر</option>
+          <option value="ذكر">ذكر</option>
+          <option value="أنثى">أنثى</option>
+        </select>
+      </div>
+      <div class="form-group"><label data-i18n="field_dob">تاريخ الميلاد</label><input type="date" id="ep_dob"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('editProfileModal')" data-i18n="btn_cancel">إلغاء</button>
+      <button class="btn-primary" onclick="saveProfile()" data-i18n="btn_save">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="modal-overlay center" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="delete_title">تأكيد الحذف</div>
+      <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+    </div>
+    <div class="confirm-box">
+      <div class="confirm-msg" id="confirmMsg"></div>
+      <div class="modal-footer" style="padding:0">
+        <button class="btn-secondary" onclick="closeModal('confirmModal')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn-danger" id="confirmOkBtn" data-i18n="delete_confirm">حذف</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT -->
+<div class="modal-overlay center" id="logoutModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="logout_title">تسجيل الخروج</div>
+      <button class="modal-close" onclick="closeModal('logoutModal')">✕</button>
+    </div>
+    <div class="confirm-box">
+      <div class="confirm-msg" data-i18n="logout_msg">هل تريد تسجيل الخروج؟</div>
+      <div class="modal-footer" style="padding:0">
+        <button class="btn-secondary" onclick="closeModal('logoutModal')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn-danger" onclick="doLogout()" data-i18n="logout_btn">تسجيل الخروج</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="modal-overlay center" id="notifModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="notifTitle">تذكير</div>
+      <button class="modal-close" onclick="closeModal('notifModal')">✕</button>
+    </div>
+    <div class="confirm-box">
+      <div class="confirm-msg" id="notifBody"></div>
+      <div class="modal-footer" style="padding:0">
+        <button class="btn-primary" onclick="closeModal('notifModal')">حسناً</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRIVACY MODAL -->
+<div class="modal-overlay" id="privacyModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">🔒 سياسة الخصوصية</div>
+      <button class="modal-close" onclick="closeModal('privacyModal')">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:.83rem;color:var(--tx2);line-height:1.8">
+      <p><strong style="color:var(--tx)">بصر | Basar App</strong> — تطبيق لحفظ الوصفات الطبية للعائلة.</p>
+      <br>
+      <p>• بياناتك محفوظة بشكل مشفر على خوادم Supabase الآمنة.</p>
+      <p>• لا نشارك بياناتك مع أي طرف ثالث.</p>
+      <p>• يمكنك حذف حسابك وبياناتك في أي وقت.</p>
+      <p>• التطبيق لا يجمع بيانات تسويقية.</p>
+      <br>
+      <p style="color:var(--tx3);font-size:.75rem">هذا التطبيق لحفظ الوصفات الطبية ولا يُغني عن استشارة الطبيب المختص.</p>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT'S NEW -->
+<div class="modal-overlay" id="whatsNewModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">✨ ما الجديد</div>
+      <button class="modal-close" onclick="closeModal('whatsNewModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-ver">v2.0</div><div class="tl-desc">تصميم جديد كلياً — واجهة عصرية 2026</div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-ver">v1.5</div><div class="tl-desc">صفحة الإعدادات الكاملة — نسخ احتياطي وإشعارات</div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-ver">v1.4</div><div class="tl-desc">دعم 6 لغات: العربية، الإنجليزية، الفرنسية، الأردو، الفارسية، التركية</div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-ver">v1.3</div><div class="tl-desc">مشاركة الوصفات عبر واتساب وPDF</div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-ver">v1.0</div><div class="tl-desc">إطلاق التطبيق مع حفظ سحابي عبر Supabase</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SPECIALIST MODAL -->
+<div class="modal-overlay" id="specialistModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">👨‍⚕️ أخصائي البصريات</div>
+      <button class="modal-close" onclick="closeModal('specialistModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="spec-modal-av">أ</div>
+      <div class="spec-modal-name">أحمد صلاح الدين أحمد سليمان</div>
+      <div class="spec-modal-role">أخصائي بصريات معتمد 👁️</div>
+
+      <div class="spec-info-grid">
+        <div class="spec-info-box">
+          <div class="sib-icon">🎓</div>
+          <div class="sib-val">جامعة النيلين</div>
+          <div class="sib-lbl">كلية علوم البصريات</div>
+        </div>
+        <div class="spec-info-box">
+          <div class="sib-icon">🕐</div>
+          <div class="sib-val">٤ عصراً – ١٠ مساءً</div>
+          <div class="sib-lbl">أوقات العمل يومياً</div>
+        </div>
+        <div class="spec-info-box">
+          <div class="sib-icon">💬</div>
+          <div class="sib-val">متاح الآن</div>
+          <div class="sib-lbl">عبر واتساب</div>
+        </div>
+        <div class="spec-info-box">
+          <div class="sib-icon">⭐</div>
+          <div class="sib-val">بصريات معتمد</div>
+          <div class="sib-lbl">ترخيص مهني</div>
+        </div>
+      </div>
+
+      <div class="spec-cert-row">
+        <div class="spec-cert-icon">🏅</div>
+        <div>
+          <div class="spec-cert-text">معتمد من الهيئة السعودية للتخصصات الصحية</div>
+          <div class="spec-cert-sub">Saudi Commission for Health Specialties — SCFHS</div>
+        </div>
+      </div>
+
+      <div class="spec-cert-row" style="background:var(--blueb);border-color:rgba(77,171,247,.2)">
+        <div class="spec-cert-icon">🎓</div>
+        <div>
+          <div class="spec-cert-text" style="color:var(--blue)">بكالوريوس علوم البصريات</div>
+          <div class="spec-cert-sub">جامعة النيلين — كلية علوم البصريات</div>
+        </div>
+      </div>
+
+      <div class="spec-divider"></div>
+
+      <div class="spec-hours" style="justify-content:center;margin-bottom:16px">
+        <div class="spec-hours-dot"></div>
+        <span style="font-weight:700;color:var(--tx)">متاح للاستشارة</span>
+        <span>· ٤ عصراً حتى ١٠ مساءً</span>
+      </div>
+
+      <button class="spec-wa-btn" onclick="openSpecialistWA()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        ابدأ الاستشارة على واتساب
+      </button>
+
+      <p style="text-align:center;font-size:.68rem;color:var(--tx3);margin-top:10px;line-height:1.6">
+        ⚕️ الاستشارة تكميلية ولا تغني عن الفحص الطبي المباشر
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- RATE APP -->
+<div class="modal-overlay center" id="rateModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⭐ تقييم التطبيق</div>
+      <button class="modal-close" onclick="closeModal('rateModal')">✕</button>
+    </div>
+    <div class="confirm-box" style="text-align:center">
+      <p style="color:var(--tx2);font-size:.85rem;margin-bottom:4px">كيف تقيّم تطبيق بصر؟</p>
+      <div class="stars" id="starsRow">
+        <span class="star" data-s="1" onclick="updateStars(1)">☆</span>
+        <span class="star" data-s="2" onclick="updateStars(2)">☆</span>
+        <span class="star" data-s="3" onclick="updateStars(3)">☆</span>
+        <span class="star" data-s="4" onclick="updateStars(4)">☆</span>
+        <span class="star" data-s="5" onclick="updateStars(5)">☆</span>
+      </div>
+      <div class="modal-footer" style="padding:0;margin-top:8px">
+        <button class="btn-secondary" onclick="closeModal('rateModal')">لاحقاً</button>
+        <button class="btn-primary" onclick="submitRating()">إرسال ⭐</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT CONFIRM -->
+<div class="modal-overlay center" id="importConfirmModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📥 استيراد البيانات</div>
+      <button class="modal-close" onclick="closeModal('importConfirmModal')">✕</button>
+    </div>
+    <div class="confirm-box">
+      <div class="confirm-msg">سيتم استبدال البيانات الحالية بالبيانات المستوردة. هل تريد المتابعة؟</div>
+      <div class="modal-footer" style="padding:0">
+        <button class="btn-secondary" onclick="closeModal('importConfirmModal')">إلغاء</button>
+        <button class="btn-primary" id="importConfirmOk">استيراد</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RX-INP style ══ -->
+<style>
+.rx-inp {
+  width:100%; padding:6px 4px; background:var(--c3);
+  border:1px solid var(--bdr); border-radius:6px;
+  color:var(--tx); font-family:var(--mono); font-size:.78rem;
+  text-align:center; outline:none;
+}
+.rx-inp:focus { border-color:var(--acc); background:var(--c2); }
+</style>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT — CORE LOGIC
+══════════════════════════════════════ -->
+<script>
+'use strict';
+// ══════════════════════════════════════
+// CONSTANTS & STATE
+// ══════════════════════════════════════
+const SB_URL = 'https://itblplmyuuvimdifldew.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0YmxwbG15dXV2aW1kaWZsZGV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDczMTksImV4cCI6MjA4ODY4MzMxOX0.UN7FQtZ9KPGWLgsQTk4yWbvWVvEQQkk-UI2vtwP_LBw';
+const AV_CLASSES = ['av-grn','av-blu','av-gold','av-red','av-pur','av-pink','av-teal','av-gray'];
+const RTL_LANGS = ['ar','ur','fa'];
+
+let sb = null;
+let currentUser = null;
+let _profileCache = null;
+let _membersCache = [];
+let editingMemberId = null;
+let memberImg = null;
+let currentAlerts = { gAlert:'', cAlert:'' };
+let currentLang = localStorage.getItem('basarLang') || 'ar';
+let _deferredInstall = null;
+let _currentRating = 0;
+
+// ══════════════════════════════════════
+// SUPABASE INIT
+// ══════════════════════════════════════
+function initSupabase() {
+  try {
+    const { createClient } = window.supabase;
+    sb = createClient(SB_URL, SB_KEY, {
+      auth: { persistSession:true, autoRefreshToken:true }
+    });
+    return true;
+  } catch(e) { console.error('Supabase init error:', e); return false; }
+}
+
+// ══════════════════════════════════════
+// CACHE HELPERS
+// ══════════════════════════════════════
+function getProfile() { return _profileCache || {}; }
+function getMembers() { return _membersCache || []; }
+function setMembers(arr) { _membersCache = arr; localStorage.setItem('basarFamily', JSON.stringify(arr)); }
+function setMembersLocal(arr) { _membersCache = arr; localStorage.setItem('basarFamily', JSON.stringify(arr)); }
+
+// ══════════════════════════════════════
+// LOADING & TOAST
+// ══════════════════════════════════════
+function showLoading(v) {
+  document.getElementById('loadingOverlay').classList.toggle('show', v);
+}
+let _toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ══════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+// Close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target === o) closeModal(o.id); });
+});
+
+// ══════════════════════════════════════
+// THEME
+// ══════════════════════════════════════
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('basarTheme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙' : '🌙';
+  document.querySelector('meta[name="theme-color"]').content = isLight ? '#ffffff' : '#0d1117';
+}
+function applyTheme() {
+  if(localStorage.getItem('basarTheme') === 'light') {
+    document.body.classList.add('light-mode');
+  }
+}
+
+// ══════════════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════════════
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  const page = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1));
+  if(page) page.classList.add('active');
+  const nb = document.getElementById('mn_' + p);
+  if(nb) nb.classList.add('active');
+  if(p === 'family')   renderFamily();
+  if(p === 'profile')  renderProfile();
+  if(p === 'settings') renderSettings();
+  if(p === 'timeline') renderTimeline();
+  if(p === 'compare')  renderCompare();
+  window.scrollTo({ top:0, behavior:'instant' });
+}
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab_' + tab)?.classList.add('active');
+  document.getElementById('formLogin').style.display    = tab==='login'    ? 'block' : 'none';
+  document.getElementById('formRegister').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('formForgot').style.display   = tab==='forgot'   ? 'block' : 'none';
+  document.getElementById('authTabsWrap').style.display = tab==='forgot'   ? 'none'  : 'flex';
+  clearAuthMsg();
+}
+function showAuthErr(m) {
+  const e=document.getElementById('authErr'), s=document.getElementById('authSucc');
+  e.textContent='⚠️ '+m; e.style.display='block'; s.style.display='none';
+}
+function showAuthSucc(m) {
+  const e=document.getElementById('authErr'), s=document.getElementById('authSucc');
+  s.textContent=m; s.style.display='block'; e.style.display='none';
+}
+function clearAuthMsg() {
+  document.getElementById('authErr').style.display='none';
+  document.getElementById('authSucc').style.display='none';
+}
+function showForgotPassword() { switchAuthTab('forgot'); }
+function showAuthScreen() { document.getElementById('authScreen').classList.remove('hidden'); }
+function hideAuthScreen() { document.getElementById('authScreen').classList.add('hidden'); }
+
+async function doLogin() {
+  const email = document.getElementById('login_email').value.trim();
+  const pass  = document.getElementById('login_pass').value;
+  if(!email || !pass) return showAuthErr('يرجى ملء جميع الحقول');
+  if(!sb) { initSupabase(); }
+  if(!sb) return showAuthErr('⚠️ خطأ في الاتصال، يرجى تحديث الصفحة');
+  clearAuthMsg();
+  showLoading(true);
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if(error) throw error;
+    if(data?.user && !currentUser) {
+      await onLoginSuccess(data.user);
+    }
+  } catch(e) {
+    showLoading(false);
+    showAuthErr(translateAuthError(e.message));
+  }
+}
+
+async function doRegister() {
+  const first = document.getElementById('reg_first').value.trim();
+  const last  = document.getElementById('reg_last').value.trim();
+  const email = document.getElementById('reg_email').value.trim();
+  const phone = document.getElementById('reg_phone').value.trim();
+  const pass  = document.getElementById('reg_pass').value;
+  const pass2 = document.getElementById('reg_pass2').value;
+  if(!first || !email || !pass) return showAuthErr('يرجى ملء الحقول المطلوبة');
+  if(pass !== pass2) return showAuthErr('كلمتا المرور غير متطابقتان');
+  if(pass.length < 8) return showAuthErr('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+  if(!sb) { initSupabase(); }
+  if(!sb) return showAuthErr('⚠️ خطأ في الاتصال، يرجى تحديث الصفحة');
+  clearAuthMsg();
+  showLoading(true);
+  try {
+    const { error } = await sb.auth.signUp({
+      email, password: pass,
+      options: { data: { first_name: first, last_name: last, phone } }
+    });
+    if(error) throw error;
+    showLoading(false);
+    showAuthSucc('✅ تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب');
+  } catch(e) {
+    showLoading(false);
+    showAuthErr(translateAuthError(e.message));
+  }
+}
+
+async function doForgot() {
+  const email = document.getElementById('forgot_email').value.trim();
+  if(!email) return showAuthErr('يرجى إدخال البريد الإلكتروني');
+  showLoading(true);
+  try {
+    const {error} = await sb.auth.resetPasswordForEmail(email);
+    if(error) throw error;
+    showLoading(false);
+    showAuthSucc('📧 تم إرسال رابط الاسترداد إلى بريدك');
+  } catch(e) { showLoading(false); showAuthErr(e.message); }
+}
+
+async function doLogout() {
+  closeModal('logoutModal');
+  showLoading(true);
+  await sb.auth.signOut();
+  showLoading(false);
+  currentUser=null; _profileCache=null; _membersCache=[];
+  showToast('👋 تم تسجيل الخروج');
+  showAuthScreen();
+}
+function openLogoutModal() { openModal('logoutModal'); }
+
+function translateAuthError(msg) {
+  const m = msg.toLowerCase();
+  if(m.includes('invalid login')) return 'البريد أو كلمة المرور غير صحيحة';
+  if(m.includes('email not confirmed')) return 'يرجى تأكيد بريدك الإلكتروني أولاً';
+  if(m.includes('already registered')) return 'هذا البريد مسجّل مسبقاً';
+  if(m.includes('password')) return 'كلمة المرور قصيرة جداً (8 أحرف على الأقل)';
+  return msg;
+}
+
+// ══════════════════════════════════════
+// SUPABASE DATA LAYER
+// ══════════════════════════════════════
+async function loadUserData() {
+  if(!sb||!currentUser) return;
+  showLoading(true);
+  try {
+    const {data:pd} = await sb.from('profiles').select('*').eq('user_id',currentUser.id).single();
+    if(pd) {
+      _profileCache = {
+        first:pd.first_name||'', last:pd.last_name||'',
+        email:pd.email||currentUser.email, phone:pd.phone||'',
+        city:pd.city||'', country:pd.country||'', dob:pd.dob||'', gender:pd.gender||'',
+        avatar:pd.avatar_url||null
+      };
+    } else {
+      const meta = currentUser.user_metadata||{};
+      _profileCache = { first:meta.first_name||'', last:meta.last_name||'',
+        email:currentUser.email, phone:meta.phone||'', city:'', country:'', dob:'', gender:'', avatar:null };
+      await upsertProfile(_profileCache);
+    }
+    const {data:fd} = await sb.from('family_members').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:true});
+    _membersCache = (fd||[]).map(r => ({
+      id:r.id, _dbId:r.id,
+      name:r.name, rel:r.relationship, age:r.age||'',
+      notes:r.notes||'', colorIdx:r.color_idx||0,
+      sound:r.sound||'bell', image:r.prescription_image||null,
+      addedAt:r.created_at?r.created_at.split('T')[0]:'',
+      grx:r.glasses_rx?(typeof r.glasses_rx==='string'?JSON.parse(r.glasses_rx):r.glasses_rx):null,
+      crx:r.contacts_rx?(typeof r.contacts_rx==='string'?JSON.parse(r.contacts_rx):r.contacts_rx):null,
+    }));
+  } catch(e) {
+    console.warn('loadUserData error:', e.message);
+    _profileCache = JSON.parse(localStorage.getItem('basarProfile')||'null') || {first:'',last:'',email:currentUser.email,phone:'',city:'',dob:'',gender:'',avatar:null};
+    _membersCache = JSON.parse(localStorage.getItem('basarFamily')||'[]');
+  }
+  showLoading(false);
+}
+
+async function upsertProfile(p) {
+  if(!sb||!currentUser) return;
+  await sb.from('profiles').upsert({
+    user_id:currentUser.id, first_name:p.first, last_name:p.last,
+    email:p.email, phone:p.phone, city:p.city, country:p.country||'',
+    dob:p.dob||null, gender:p.gender||null, avatar_url:p.avatar||null,
+    updated_at:new Date().toISOString()
+  }, {onConflict:'user_id'});
+}
+
+async function upsertMemberDB(m) {
+  if(!sb||!currentUser) return null;
+  const row = {
+    user_id:currentUser.id, name:m.name, relationship:m.rel,
+    age:m.age||null, notes:m.notes||null, color_idx:m.colorIdx||0,
+    sound:m.sound||'bell', prescription_image:m.image||null,
+    glasses_rx:m.grx?JSON.stringify(m.grx):null,
+    contacts_rx:m.crx?JSON.stringify(m.crx):null,
+    updated_at:new Date().toISOString()
+  };
+  if(m._dbId) { row.id=m._dbId; }
+  const {data,error} = await sb.from('family_members').upsert(row,{onConflict:'id'}).select().single();
+  if(error) { console.error('upsert member error:', error); return null; }
+  return data;
+}
+
+async function deleteMemberDB(dbId) {
+  if(!sb||!currentUser) return;
+  await sb.from('family_members').delete().eq('id',dbId).eq('user_id',currentUser.id);
+}
+
+// ══════════════════════════════════════
+// ON LOGIN SUCCESS
+// ══════════════════════════════════════
+async function onLoginSuccess(user) {
+  currentUser = user;
+  await loadUserData();
+  hideAuthScreen();
+  updateUserChip();
+  showPage('profile');
+  checkAlerts();
+  showToast('👋 ' + t('toast_welcome').replace('👋 ',''));
+}
+
+function updateUserChip() {
+  if(!currentUser) return;
+  const meta = currentUser.user_metadata||{};
+  const p = getProfile();
+  const name = p.first || meta.first_name || currentUser.email.split('@')[0];
+  document.getElementById('userChipName').textContent = name;
+  if(p.avatar) {
+    document.getElementById('userChipAv').innerHTML = `<img src="${p.avatar}" alt="av">`;
+  } else {
+    document.getElementById('userChipAv').textContent = name.charAt(0).toUpperCase();
+  }
+}
+
+// ══════════════════════════════════════
+// RENDER PROFILE
+// ══════════════════════════════════════
+function renderProfile() {
+  const p = getProfile();
+  const members = getMembers();
+  const name = (p.first||'') + (p.last?' '+p.last:'') || 'مستخدم بصر';
+  document.getElementById('profileSubtitle').textContent = p.city || 'مرحباً بك في بصر';
+
+  // Stats
+  const withGlasses = members.filter(m=>hasGlassesRx(m)).length;
+  const withContacts = members.filter(m=>hasContactsRx(m)).length;
+
+  document.getElementById('profileHero').innerHTML = `
+    <div class="profile-hero">
+      <div class="hero-banner"></div>
+      <div class="hero-body">
+        <div class="hero-av-wrap">
+          <div class="hero-av" id="heroAv" onclick="triggerAvatarUpload()">
+            ${p.avatar ? `<img src="${p.avatar}" alt="av">` : `<span>${name.charAt(0).toUpperCase()}</span>`}
+          </div>
+          <div class="hero-info">
+            <div class="hero-name">${name}</div>
+            <div class="hero-email">${p.email||''}</div>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-box"><div class="stat-val">${members.length}</div><div class="stat-lbl">فرد عائلة</div></div>
+          <div class="stat-box"><div class="stat-val">${withGlasses}</div><div class="stat-lbl">نظارات</div></div>
+          <div class="stat-box"><div class="stat-val">${withContacts}</div><div class="stat-lbl">عدسات</div></div>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatarUpload()">
+  `;
+
+  // Recent Rx
+  const recent = members.filter(m=>hasGlassesRx(m)||hasContactsRx(m)).slice(0,5);
+  const recEl = document.getElementById('recentRx');
+  if(!recent.length) {
+    recEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">${t('empty_rx')}</div></div>`;
+  } else {
+    recEl.innerHTML = recent.map(m => {
+      const av = AV_CLASSES[m.colorIdx||0];
+      const badges = [];
+      if(hasGlassesRx(m)) badges.push(`<span class="badge badge-grn">🕶️ نظارة</span>`);
+      if(hasContactsRx(m)) badges.push(`<span class="badge badge-blu">👁️ عدسات</span>`);
+      return `
+        <div class="rx-preview" onclick="viewRx('${m.id}')">
+          <div class="rx-av ${av}">${m.name.charAt(0)}</div>
+          <div class="rx-info">
+            <div class="rx-name">${m.name}</div>
+            <div class="rx-meta">${m.rel}${m.age?' · '+m.age+' سنة':''}</div>
+            <div class="rx-badges">${badges.join('')}</div>
+          </div>
+          <div class="rx-arrow">›</div>
+        </div>`;
+    }).join('');
+  }
+}
+
+// ══════════════════════════════════════
+// RENDER FAMILY
+// ══════════════════════════════════════
+function renderFamily() {
+  const members = getMembers();
+  document.getElementById('familyCount').textContent = members.length + ' ' + (members.length===1?'فرد':'أفراد');
+  const grid = document.getElementById('familyGrid');
+  if(!members.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">👨‍👩‍👧‍👦</div><div class="empty-text">${t('empty_family')}</div></div>`;
+    return;
+  }
+  grid.innerHTML = members.map(m => {
+    const av = AV_CLASSES[m.colorIdx||0];
+    const badges = [];
+    if(hasGlassesRx(m)) badges.push(`<span class="badge badge-grn">🕶️</span>`);
+    if(hasContactsRx(m)) badges.push(`<span class="badge badge-blu">👁️</span>`);
+    if(m.age) badges.push(`<span class="badge" style="background:var(--c3);color:var(--tx2);border:1px solid var(--bdr)">${m.age}y</span>`);
+    return `
+      <div class="member-card">
+        <div class="member-head">
+          <div class="member-av ${av}">${m.name.charAt(0)}</div>
+          <div class="member-info">
+            <div class="member-name">${m.name}</div>
+            <div class="member-rel">${m.rel}</div>
+            <div class="member-badges">${badges.join('')}</div>
+          </div>
+        </div>
+        <div class="member-actions">
+          <button class="ma-btn view" onclick="viewRx('${m.id}')">👁️ عرض</button>
+          <button class="ma-btn" onclick="openEditMember('${m.id}')">✏️ تعديل</button>
+          <button class="ma-btn wa" onclick="shareWAMember('${m.id}')">💬 واتس</button>
+          <button class="ma-btn" onclick="exportPDFMember('${m.id}')">📄 PDF</button>
+          <button class="ma-btn del" onclick="confirmDelete('${m.id}')">🗑️</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// RX HELPERS
+// ══════════════════════════════════════
+function hasGlassesRx(m) {
+  if(!m.grx) return false;
+  const g=m.grx; const r=g.r||{}; const l=g.l||{};
+  return !!(r.sph||r.cyl||r.ax||l.sph||l.cyl||l.ax);
+}
+function hasContactsRx(m) {
+  if(!m.crx) return false;
+  const c=m.crx; const r=c.r||{}; const l=c.l||{};
+  return !!(r.sph||r.cyl||r.ax||l.sph||r.bc||l.bc);
+}
+
+// ══════════════════════════════════════
+// VIEW RX
+// ══════════════════════════════════════
+function viewRx(id) {
+  const members = getMembers();
+  const m = members.find(x => String(x.id)===String(id));
+  if(!m) return;
+  const av = AV_CLASSES[m.colorIdx||0];
+  document.getElementById('rxModalTitle').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="rx-av ${av}" style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900">${m.name.charAt(0)}</div>
+      <div><div style="font-size:.95rem;font-weight:900">${m.name}</div><div style="font-size:.72rem;color:var(--tx2);font-weight:500">${m.rel}</div></div>
+    </div>`;
+  let html = '';
+  if(hasGlassesRx(m)) {
+    const g=m.grx, r=g.r||{}, l=g.l||{};
+    html += `<div class="rx-section">
+      <div class="rx-section-head">🕶️ وصفة النظارات${g.date?` <span style="color:var(--tx3);font-size:.72rem;font-weight:400">${g.date}</span>`:''}${g.doc?` <span style="color:var(--tx3);font-size:.72rem;font-weight:400">| ${g.doc}</span>`:''}</div>
+      <div class="rx-overflow"><table class="rx-table">
+        <tr><th>العين</th><th>SPH</th><th>CYL</th><th>AXIS</th><th>ADD</th><th>IPD</th></tr>
+        <tr><td class="eye-td">يمنى OD</td><td>${r.sph||'—'}</td><td>${r.cyl||'—'}</td><td>${r.ax||'—'}</td><td>${r.add||'—'}</td><td>${r.ipd||'—'}</td></tr>
+        <tr><td class="eye-td">يسرى OS</td><td>${l.sph||'—'}</td><td>${l.cyl||'—'}</td><td>${l.ax||'—'}</td><td>${l.add||'—'}</td><td>${l.ipd||'—'}</td></tr>
+      </table></div>
+      ${g.alert?`<div style="padding:8px 14px"><span class="badge badge-gold">🔔 تذكير: ${g.alert} شهر</span></div>`:''}
+    </div>`;
+  }
+  if(hasContactsRx(m)) {
+    const c=m.crx, r=c.r||{}, l=c.l||{};
+    html += `<div class="rx-section">
+      <div class="rx-section-head">👁️ وصفة العدسات${c.lensType?` <span class="badge badge-blu" style="font-size:.65rem">${c.lensType}</span>`:''}${c.date?` <span style="color:var(--tx3);font-size:.72rem;font-weight:400">${c.date}</span>`:''}</div>
+      <div class="rx-overflow"><table class="rx-table">
+        <tr><th>العين</th><th>SPH</th><th>CYL</th><th>AXIS</th><th>BC</th><th>DIA</th></tr>
+        <tr><td class="eye-td">يمنى OD</td><td>${r.sph||'—'}</td><td>${r.cyl||'—'}</td><td>${r.ax||'—'}</td><td>${r.bc||'—'}</td><td>${r.dia||'—'}</td></tr>
+        <tr><td class="eye-td">يسرى OS</td><td>${l.sph||'—'}</td><td>${l.cyl||'—'}</td><td>${l.ax||'—'}</td><td>${l.bc||'—'}</td><td>${l.dia||'—'}</td></tr>
+      </table></div>
+      ${c.alert?`<div style="padding:8px 14px"><span class="badge badge-blu">🔔 تذكير: ${c.alert}</span></div>`:''}
+    </div>`;
+  }
+  if(!hasGlassesRx(m)&&!hasContactsRx(m)) {
+    html = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">لا توجد وصفة مسجّلة لهذا الفرد</div></div>`;
+  }
+  if(m.notes) html += `<div style="background:var(--c3);border-radius:var(--r3);padding:10px 12px;font-size:.82rem;color:var(--tx2);margin-top:8px">📝 ${m.notes}</div>`;
+  if(m.image) html += `<div style="margin-top:10px"><img src="${m.image}" style="max-width:100%;border-radius:var(--r3);display:block"></div>`;
+  html += `<div class="disclaimer">⚕️ ${t('medical_disclaimer')}</div>`;
+  document.getElementById('rxModalBody').innerHTML = html;
+  document.getElementById('rxBtnWA').onclick = () => { closeModal('rxModal'); shareWAMember(id); };
+  document.getElementById('rxBtnPDF').onclick = () => { closeModal('rxModal'); exportPDFMember(id); };
+  openModal('rxModal');
+}
+
+// ══════════════════════════════════════
+// OPEN ADD/EDIT MEMBER
+// ══════════════════════════════════════
+function openAddMember() {
+  editingMemberId = null; memberImg = null;
+  document.getElementById('memberModalTitle').textContent = t('member_add_title');
+  clearMemberForm();
+  openModal('memberModal');
+}
+function openEditMember(id) {
+  const m = getMembers().find(x => String(x.id)===String(id));
+  if(!m) return;
+  editingMemberId = id;
+  document.getElementById('memberModalTitle').textContent = '✏️ تعديل ' + m.name;
+  clearMemberForm();
+  document.getElementById('m_name').value = m.name||'';
+  document.getElementById('m_rel').value  = m.rel||'';
+  document.getElementById('m_age').value  = m.age||'';
+  document.getElementById('m_notes').value= m.notes||'';
+  memberImg = m.image||null;
+  if(m.image) {
+    document.getElementById('mPreview').src=m.image;
+    document.getElementById('mPreview').style.display='block';
+    document.getElementById('uploadArea').classList.add('has');
+  }
+  if(m.grx) {
+    const g=m.grx, r=g.r||{}, l=g.l||{};
+    document.getElementById('m_g_date').value=g.date||'';
+    document.getElementById('m_g_doc').value=g.doc||'';
+    document.getElementById('g_r_sph').value=r.sph||''; document.getElementById('g_r_cyl').value=r.cyl||'';
+    document.getElementById('g_r_ax').value=r.ax||'';   document.getElementById('g_r_add').value=r.add||'';
+    document.getElementById('g_r_ipd').value=r.ipd||'';
+    document.getElementById('g_l_sph').value=l.sph||''; document.getElementById('g_l_cyl').value=l.cyl||'';
+    document.getElementById('g_l_ax').value=l.ax||'';   document.getElementById('g_l_add').value=l.add||'';
+    document.getElementById('g_l_ipd').value=l.ipd||'';
+    currentAlerts.gAlert=g.alert||'';
+    document.querySelectorAll('#gAlertChips .chip-btn').forEach(b=>b.classList.toggle('sel',b.dataset.v===(g.alert||'')));
+  }
+  if(m.crx) {
+    const c=m.crx, r=c.r||{}, l=c.l||{};
+    document.getElementById('m_c_date').value=c.date||'';
+    document.getElementById('m_c_type').value=c.lensType||'';
+    document.getElementById('c_r_sph').value=r.sph||''; document.getElementById('c_r_cyl').value=r.cyl||'';
+    document.getElementById('c_r_ax').value=r.ax||'';   document.getElementById('c_r_bc').value=r.bc||'';
+    document.getElementById('c_r_dia').value=r.dia||'';
+    document.getElementById('c_l_sph').value=l.sph||''; document.getElementById('c_l_cyl').value=l.cyl||'';
+    document.getElementById('c_l_ax').value=l.ax||'';   document.getElementById('c_l_bc').value=l.bc||'';
+    document.getElementById('c_l_dia').value=l.dia||'';
+    currentAlerts.cAlert=c.alert||'';
+    document.querySelectorAll('#cAlertChips .chip-btn').forEach(b=>b.classList.toggle('sel',b.dataset.v===(c.alert||'')));
+  }
+  openModal('memberModal');
+}
+function clearMemberForm() {
+  ['m_name','m_rel','m_age','m_notes','m_g_date','m_g_doc','m_c_date','m_c_type',
+   'g_r_sph','g_r_cyl','g_r_ax','g_r_add','g_r_ipd','g_l_sph','g_l_cyl','g_l_ax','g_l_add','g_l_ipd',
+   'c_r_sph','c_r_cyl','c_r_ax','c_r_bc','c_r_dia','c_l_sph','c_l_cyl','c_l_ax','c_l_bc','c_l_dia'
+  ].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('mPreview').style.display='none';
+  document.getElementById('uploadArea').classList.remove('has');
+  document.getElementById('uploadArea').querySelector('.upload-txt').textContent='انقر لرفع صورة الوصفة';
+  memberImg=null;
+  currentAlerts={gAlert:'',cAlert:''};
+  document.querySelectorAll('.chip-btn').forEach(b=>b.classList.remove('sel'));
+}
+function selChip(el, group) {
+  el.closest('.alert-chips, .lens-chips, .sound-chips').querySelectorAll('.chip-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  currentAlerts[group]=el.dataset.v;
+}
+
+// ══════════════════════════════════════
+// SAVE MEMBER
+// ══════════════════════════════════════
+async function saveMember() {
+  const name = document.getElementById('m_name').value.trim();
+  const rel  = document.getElementById('m_rel').value;
+  if(!name) return showToast('⚠️ يرجى إدخال الاسم');
+  const gRx = {
+    date:document.getElementById('m_g_date').value,
+    doc:document.getElementById('m_g_doc').value,
+    alert:currentAlerts.gAlert||'',
+    r:{sph:document.getElementById('g_r_sph').value,cyl:document.getElementById('g_r_cyl').value,ax:document.getElementById('g_r_ax').value,add:document.getElementById('g_r_add').value,ipd:document.getElementById('g_r_ipd').value},
+    l:{sph:document.getElementById('g_l_sph').value,cyl:document.getElementById('g_l_cyl').value,ax:document.getElementById('g_l_ax').value,add:document.getElementById('g_l_add').value,ipd:document.getElementById('g_l_ipd').value}
+  };
+  const cRx = {
+    date:document.getElementById('m_c_date').value,
+    lensType:document.getElementById('m_c_type').value,
+    alert:currentAlerts.cAlert||'',
+    r:{sph:document.getElementById('c_r_sph').value,cyl:document.getElementById('c_r_cyl').value,ax:document.getElementById('c_r_ax').value,bc:document.getElementById('c_r_bc').value,dia:document.getElementById('c_r_dia').value},
+    l:{sph:document.getElementById('c_l_sph').value,cyl:document.getElementById('c_l_cyl').value,ax:document.getElementById('c_l_ax').value,bc:document.getElementById('c_l_bc').value,dia:document.getElementById('c_l_dia').value}
+  };
+  let members = getMembers();
+  let m;
+  if(editingMemberId) {
+    const idx = members.findIndex(x=>String(x.id)===String(editingMemberId));
+    if(idx<0) return;
+    m = {...members[idx], name, rel, age:document.getElementById('m_age').value,
+      notes:document.getElementById('m_notes').value, image:memberImg, grx:gRx, crx:cRx};
+    members[idx]=m;
+  } else {
+    m = { id:Date.now()+'', name, rel, age:document.getElementById('m_age').value,
+      notes:document.getElementById('m_notes').value, image:memberImg, grx:gRx, crx:cRx,
+      colorIdx:members.length%AV_CLASSES.length, sound:'bell', addedAt:new Date().toISOString().split('T')[0] };
+    members.push(m);
+  }
+  setMembers(members);
+  closeModal('memberModal');
+  showLoading(true);
+  try {
+    const saved = await upsertMemberDB(m);
+    if(saved) {
+      // update local id with DB id
+      const idx = _membersCache.findIndex(x=>String(x.id)===String(m.id));
+      if(idx>=0) { _membersCache[idx].id=saved.id; _membersCache[idx]._dbId=saved.id; }
+      setMembers(_membersCache);
+    }
+  } catch(e) { console.error(e); }
+  showLoading(false);
+  showToast(editingMemberId?'✅ تم التحديث ☁️':'✅ تم الإضافة ☁️');
+  renderFamily(); renderProfile();
+}
+
+// ══════════════════════════════════════
+// DELETE MEMBER
+// ══════════════════════════════════════
+function confirmDelete(id) {
+  const m = getMembers().find(x=>String(x.id)===String(id));
+  if(!m) return;
+  document.getElementById('confirmMsg').textContent = `هل تريد حذف بيانات ${m.name}؟ لا يمكن التراجع.`;
+  document.getElementById('confirmOkBtn').onclick = async () => { await deleteMember(id); closeModal('confirmModal'); };
+  openModal('confirmModal');
+}
+async function deleteMember(id) {
+  let members = getMembers();
+  const m = members.find(x=>String(x.id)===String(id));
+  if(!m) return;
+  if(m._dbId||m.id) {
+    showLoading(true);
+    await deleteMemberDB(m._dbId||m.id);
+    showLoading(false);
+  }
+  members = members.filter(x=>String(x.id)!==String(id));
+  setMembers(members);
+  renderFamily(); renderProfile();
+  showToast('🗑️ تم الحذف');
+}
+
+// ══════════════════════════════════════
+// PROFILE EDIT & AVATAR
+// ══════════════════════════════════════
+function openEditProfile() {
+  const p = getProfile();
+  document.getElementById('ep_first').value=p.first||'';
+  document.getElementById('ep_last').value=p.last||'';
+  document.getElementById('ep_phone').value=p.phone||'';
+  document.getElementById('ep_city').value=p.city||'';
+  document.getElementById('ep_gender').value=p.gender||'';
+  document.getElementById('ep_dob').value=p.dob||'';
+  openModal('editProfileModal');
+}
+async function saveProfile() {
+  const p = {
+    ...getProfile(),
+    first:document.getElementById('ep_first').value.trim(),
+    last:document.getElementById('ep_last').value.trim(),
+    phone:document.getElementById('ep_phone').value.trim(),
+    city:document.getElementById('ep_city').value.trim(),
+    gender:document.getElementById('ep_gender').value,
+    dob:document.getElementById('ep_dob').value,
+  };
+  _profileCache=p; localStorage.setItem('basarProfile',JSON.stringify(p));
+  closeModal('editProfileModal');
+  showLoading(true);
+  await upsertProfile(p);
+  showLoading(false);
+  updateUserChip(); renderProfile();
+  showToast('✅ تم حفظ الملف ☁️');
+}
+function triggerAvatarUpload() { document.getElementById('avatarInput')?.click(); }
+function handleAvatarUpload() {
+  const file = document.getElementById('avatarInput').files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    _profileCache = {...getProfile(), avatar:e.target.result};
+    localStorage.setItem('basarProfile',JSON.stringify(_profileCache));
+    await upsertProfile(_profileCache);
+    updateUserChip(); renderProfile();
+    showToast('✅ تم تحديث الصورة ☁️');
+  };
+  reader.readAsDataURL(file);
+}
+function handleMemberImg() {
+  const file = document.getElementById('mFileInput').files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    memberImg=e.target.result;
+    const prev=document.getElementById('mPreview');
+    prev.src=memberImg; prev.style.display='block';
+    document.getElementById('uploadArea').classList.add('has');
+    document.getElementById('uploadArea').querySelector('.upload-txt').textContent='✅ تم رفع الصورة';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════
+// SHARE WA
+// ══════════════════════════════════════
+function shareWAMember(id) {
+  const m = getMembers().find(x=>String(x.id)===String(id));
+  if(!m) return;
+  const p = getProfile();
+  let msg = `👁️ *وصفة بصر — Basar App*\n━━━━━━━━━━━━━━\n`;
+  msg += `👤 *${m.name}* (${m.rel})`;
+  if(m.age) msg+=` · ${m.age} سنة`;
+  msg+='\n';
+  if(p.first) msg+=`👨‍👩‍👧‍👦 من ملف: ${p.first} ${p.last}\n`;
+  msg+='━━━━━━━━━━━━━━\n';
+  if(hasGlassesRx(m)){
+    const g=m.grx,r=g.r||{},l=g.l||{};
+    msg+=`*🕶️ النظارات*${g.date?' ('+g.date+')':''}${g.doc?' | '+g.doc:''}\n`;
+    msg+=`يمنى: SPH ${r.sph||'—'} | CYL ${r.cyl||'—'} | AXIS ${r.ax||'—'}\n`;
+    msg+=`يسرى: SPH ${l.sph||'—'} | CYL ${l.cyl||'—'} | AXIS ${l.ax||'—'}\n`;
+  }
+  if(hasContactsRx(m)){
+    const c=m.crx,r=c.r||{},l=c.l||{};
+    msg+=`\n*👁️ العدسات*${c.date?' ('+c.date+')':''}${c.lensType?' | '+c.lensType:''}\n`;
+    msg+=`يمنى: SPH ${r.sph||'—'} | BC ${r.bc||'—'} | DIA ${r.dia||'—'}\n`;
+    msg+=`يسرى: SPH ${l.sph||'—'} | BC ${l.bc||'—'} | DIA ${l.dia||'—'}\n`;
+  }
+  if(m.notes) msg+=`\n📝 ${m.notes}\n`;
+  msg+='\n⚕️ تطبيق بصر · لا يغني عن استشارة الطبيب المختص';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══════════════════════════════════════
+// PDF EXPORT
+// ══════════════════════════════════════
+function exportPDFMember(id) {
+  const {jsPDF}=window.jspdf;
+  const m=getMembers().find(x=>String(x.id)===String(id));
+  if(!m) return;
+  const p=getProfile();
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210;
+  doc.setFillColor(8,12,16); doc.rect(0,0,W,36,'F');
+  doc.setTextColor(0,212,170); doc.setFontSize(18); doc.setFont('helvetica','bold');
+  doc.text('BASAR APP — Eye Prescription',W/2,14,{align:'center'});
+  doc.setTextColor(139,154,181); doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('basar-app.vercel.app',W/2,22,{align:'center'});
+  doc.setTextColor(80,100,120); doc.setFontSize(7.5);
+  doc.text('Not a substitute for specialist consultation.',W/2,30,{align:'center'});
+  let y=44;
+  doc.setFillColor(22,27,34); doc.roundedRect(12,y,W-24,20,3,3,'F');
+  doc.setTextColor(240,246,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text(m.name+' ('+m.rel+')'+(m.age?' — '+m.age+' y':''),16,y+8);
+  if(p.first) {doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(139,154,181);doc.text('Family: '+p.first+' '+p.last,16,y+15);}
+  y+=26;
+  if(hasGlassesRx(m)){
+    const g=m.grx,r=g.r||{},l=g.l||{};
+    doc.setFillColor(0,66,58); doc.rect(12,y,W-24,8,'F');
+    doc.setTextColor(0,212,170); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('GLASSES PRESCRIPTION'+(g.date?' — '+g.date:'')+(g.doc?' | '+g.doc:''),16,y+5.5);
+    y+=8;
+    const ghdr=['Eye','SPH','CYL','AXIS','ADD','IPD'],gcw=[36,28,28,28,28,24];
+    doc.setFillColor(31,39,50);doc.rect(12,y,W-24,7,'F');
+    doc.setTextColor(139,154,181);doc.setFontSize(8);doc.setFont('helvetica','bold');
+    let gx=12;ghdr.forEach((h,i)=>{doc.text(h,gx+gcw[i]/2,y+4.8,{align:'center'});gx+=gcw[i];});y+=7;
+    [[`OD (Right)`,[r.sph,r.cyl,r.ax,r.add,r.ipd]],[`OS (Left)`,[l.sph,l.cyl,l.ax,l.add,l.ipd]]].forEach(([lbl,vals],ri)=>{
+      doc.setFillColor(ri%2===0?20:16,ri%2===0?25:20,ri%2===0?34:28);
+      doc.rect(12,y,W-24,8,'F');
+      doc.setTextColor(220,230,240);doc.setFontSize(8.5);
+      gx=12;doc.setFont('helvetica','bold');doc.text(lbl,gx+gcw[0]/2,y+5.2,{align:'center'});gx+=gcw[0];
+      doc.setFont('helvetica','normal');
+      vals.forEach((v,i)=>{doc.text(v||'—',gx+gcw[i+1]/2,y+5.2,{align:'center'});gx+=gcw[i+1];});
+      y+=8;
+    });y+=6;
+  }
+  if(hasContactsRx(m)){
+    const c=m.crx,r=c.r||{},l=c.l||{};
+    doc.setFillColor(0,30,60);doc.rect(12,y,W-24,8,'F');
+    doc.setTextColor(77,171,247);doc.setFontSize(9);doc.setFont('helvetica','bold');
+    doc.text('CONTACTS PRESCRIPTION'+(c.date?' — '+c.date:'')+(c.lensType?' | '+c.lensType:''),16,y+5.5);
+    y+=8;
+    const chdr=['Eye','SPH','CYL','AXIS','BC','DIA'],ccw=[36,28,28,28,26,22];
+    doc.setFillColor(31,39,50);doc.rect(12,y,W-24,7,'F');
+    doc.setTextColor(139,154,181);doc.setFontSize(8);doc.setFont('helvetica','bold');
+    let cx=12;chdr.forEach((h,i)=>{doc.text(h,cx+ccw[i]/2,y+4.8,{align:'center'});cx+=ccw[i];});y+=7;
+    [[`OD (Right)`,[r.sph,r.cyl,r.ax,r.bc,r.dia]],[`OS (Left)`,[l.sph,l.cyl,l.ax,l.bc,l.dia]]].forEach(([lbl,vals],ri)=>{
+      doc.setFillColor(ri%2===0?20:16,ri%2===0?25:20,ri%2===0?34:28);
+      doc.rect(12,y,W-24,8,'F');
+      doc.setTextColor(220,230,240);doc.setFontSize(8.5);
+      cx=12;doc.setFont('helvetica','bold');doc.text(lbl,cx+ccw[0]/2,y+5.2,{align:'center'});cx+=ccw[0];
+      doc.setFont('helvetica','normal');
+      vals.forEach((v,i)=>{doc.text(v||'—',cx+ccw[i+1]/2,y+5.2,{align:'center'});cx+=ccw[i+1];});
+      y+=8;
+    });y+=6;
+  }
+  if(m.notes){
+    doc.setFillColor(22,27,34);doc.roundedRect(12,y,W-24,12,2,2,'F');
+    doc.setTextColor(139,154,181);doc.setFontSize(8);doc.setFont('helvetica','bold');
+    doc.text('Notes:',16,y+5);doc.setFont('helvetica','normal');doc.setTextColor(200,210,220);
+    doc.text(doc.splitTextToSize(m.notes,W-40),30,y+5);y+=16;
+  }
+  y=Math.max(y,252);
+  doc.setFillColor(22,27,34);doc.roundedRect(12,y,W-24,14,2,2,'F');
+  doc.setTextColor(80,100,80);doc.setFontSize(7);doc.setFont('helvetica','normal');
+  doc.text('⚕️ Basar App is for storing prescriptions only. Always consult your ophthalmologist.',W/2,y+5.5,{align:'center'});
+  doc.text('Generated by Basar App (بصر) — basar-app.vercel.app',W/2,y+11,{align:'center'});
+  doc.save(`basar-${m.name}-${new Date().toISOString().split('T')[0]}.pdf`);
+  showToast('📄 تم تصدير PDF');
+}
+
+// ══════════════════════════════════════
+// FULL PDF EXPORT (Settings)
+// ══════════════════════════════════════
+function exportFullPDFReport() {
+  const members = getMembers();
+  if(!members.length) return showToast('⚠️ لا توجد بيانات للتصدير');
+  members.forEach(m => exportPDFMember(m.id));
+}
+
+// ══════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════
+function checkAlerts() {
+  const alerts = JSON.parse(localStorage.getItem('basarAlerts2')||'[]');
+  const today = new Date(); today.setHours(0,0,0,0);
+  alerts.forEach(a => {
+    if(a.checked) return;
+    let due=null;
+    if(a.gAlert&&a.gDate){
+      const d=new Date(a.gDate); d.setMonth(d.getMonth()+parseInt(a.gAlert));
+      if(today>=d) due=`حان وقت تجديد نظارة ${a.name}`;
+    }
+    if(!due&&a.cAlert&&a.cDate){
+      const map={daily:1,weekly:7,monthly:30,yearly:365};
+      const d=new Date(a.cDate); d.setDate(d.getDate()+(map[a.cAlert]||30));
+      if(today>=d) due=`حان وقت تغيير عدسات ${a.name}`;
+    }
+    if(due){
+      setTimeout(()=>{
+        document.getElementById('notifTitle').textContent='تذكير وصفة العيون';
+        document.getElementById('notifBody').textContent=due;
+        openModal('notifModal');
+      },2000);
+      a.checked=true;
+    }
+  });
+  localStorage.setItem('basarAlerts2',JSON.stringify(alerts));
+}
+
+// ══════════════════════════════════════
+// STORES NOTIFY
+// ══════════════════════════════════════
+function doNotify() {
+  const email=document.getElementById('notifyEmail').value.trim();
+  if(!email) return;
+  const subs=JSON.parse(localStorage.getItem('basarNotifySubs')||'[]');
+  if(!subs.includes(email)){subs.push(email);localStorage.setItem('basarNotifySubs',JSON.stringify(subs));}
+  showToast('✅ شكراً! سنخبرك عند الإطلاق 🎉');
+  document.getElementById('notifyEmail').value='';
+}
+
+// ══════════════════════════════════════
+// SETTINGS RENDER
+// ══════════════════════════════════════
+function renderSettings() {
+  const notifPrefs = JSON.parse(localStorage.getItem('basarNotifPrefs')||'{}');
+  const p = getProfile();
+  const name = (p.first||'') + (p.last?' '+p.last:'') || 'مستخدم';
+  const fz = localStorage.getItem('basarFontSize')||'100';
+  document.getElementById('settingsContent').innerHTML = `
+    <!-- ACCOUNT -->
+    <div class="sett-section">
+      <div class="sett-section-title">الحساب</div>
+      <div class="sett-card">
+        <div class="sett-row" onclick="openEditProfile()">
+          <div class="sett-icon si-grn">👤</div>
+          <div class="sett-text"><div class="sett-label">تعديل الملف الشخصي</div><div class="sett-sub">${name}</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="showForgotPasswordFromSettings()">
+          <div class="sett-icon si-blu">🔑</div>
+          <div class="sett-text"><div class="sett-label">تغيير كلمة المرور</div><div class="sett-sub">إرسال رابط عبر البريد</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row sett-row-nc">
+          <div class="sett-icon si-gray">✉️</div>
+          <div class="sett-text"><div class="sett-label">البريد الإلكتروني</div><div class="sett-sub">${p.email||currentUser?.email||'—'}</div></div>
+          <span class="badge badge-grn" style="font-size:.6rem">مفعّل</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPEARANCE -->
+    <div class="sett-section">
+      <div class="sett-section-title">المظهر</div>
+      <div class="sett-card">
+        <div class="sett-row" onclick="toggleTheme()">
+          <div class="sett-icon si-gray">🌙</div>
+          <div class="sett-text"><div class="sett-label">الوضع الليلي</div><div class="sett-sub">تبديل المظهر الفاتح/الداكن</div></div>
+          <button class="toggle" data-on="${document.body.classList.contains('light-mode')?'false':'true'}" onclick="event.stopPropagation();toggleTheme();this.setAttribute('data-on',document.body.classList.contains('light-mode')?'false':'true')"></button>
+        </div>
+        <div class="sett-row sett-row-nc">
+          <div class="sett-icon si-pur">🔤</div>
+          <div class="sett-text"><div class="sett-label">حجم الخط</div></div>
+          <div class="font-ctrl">
+            <button class="fz-btn" onclick="changeFontSize(-1)">−</button>
+            <span class="fz-val" id="settFzVal">${fz}%</span>
+            <button class="fz-btn" onclick="changeFontSize(1)">+</button>
+          </div>
+        </div>
+        <div class="sett-row" onclick="openSettingsLangPicker()">
+          <div class="sett-icon si-gold">🌐</div>
+          <div class="sett-text"><div class="sett-label">اللغة</div><div class="sett-sub" id="settLangSub">${{ar:'العربية',en:'English',fr:'Français',ur:'اردو',fa:'فارسی',tr:'Türkçe'}[currentLang]||'العربية'}</div></div>
+          <div class="sett-arrow" id="settLangArrow">›</div>
+        </div>
+        <div id="settLangDrop">
+          <div class="lang-opt${currentLang==='ar'?' active':''}" onclick="setLang('ar');renderSettings()">🇸🇦 العربية</div>
+          <div class="lang-opt${currentLang==='en'?' active':''}" onclick="setLang('en');renderSettings()">🇬🇧 English</div>
+          <div class="lang-opt${currentLang==='fr'?' active':''}" onclick="setLang('fr');renderSettings()">🇫🇷 Français</div>
+          <div class="lang-opt${currentLang==='ur'?' active':''}" onclick="setLang('ur');renderSettings()">🇵🇰 اردو</div>
+          <div class="lang-opt${currentLang==='fa'?' active':''}" onclick="setLang('fa');renderSettings()">🇮🇷 فارسی</div>
+          <div class="lang-opt${currentLang==='tr'?' active':''}" onclick="setLang('tr');renderSettings()">🇹🇷 Türkçe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKUP -->
+    <div class="sett-section">
+      <div class="sett-section-title">النسخ الاحتياطي</div>
+      <div class="sett-card">
+        <div class="sett-row" onclick="exportDataJSON()">
+          <div class="sett-icon si-grn">📤</div>
+          <div class="sett-text"><div class="sett-label">تصدير البيانات</div><div class="sett-sub">حفظ كملف JSON</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="exportFullPDFReport()">
+          <div class="sett-icon si-red">📄</div>
+          <div class="sett-text"><div class="sett-label">تصدير PDF لجميع الوصفات</div><div class="sett-sub">${getMembers().length} وصفة</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="document.getElementById('importFileInput').click()">
+          <div class="sett-icon si-blu">📥</div>
+          <div class="sett-text"><div class="sett-label">استيراد البيانات</div><div class="sett-sub">من ملف JSON</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importDataJSON(this)">
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="sett-section">
+      <div class="sett-section-title">الإشعارات</div>
+      <div class="sett-card">
+        <div class="sett-row sett-row-nc">
+          <div class="sett-icon si-gold">🔔</div>
+          <div class="sett-text"><div class="sett-label">إشعارات التطبيق</div></div>
+          <button class="toggle" id="notifPush" data-on="${notifPrefs.notifPush?'true':'false'}" onclick="toggleSettingSwitch('notifPush')"></button>
+        </div>
+        <div class="sett-row sett-row-nc">
+          <div class="sett-icon si-grn">💊</div>
+          <div class="sett-text"><div class="sett-label">تذكير تجديد الوصفات</div></div>
+          <button class="toggle" id="notifRx" data-on="${notifPrefs.notifRx?'true':'false'}" onclick="toggleSettingSwitch('notifRx')"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIVACY & ABOUT -->
+    <div class="sett-section">
+      <div class="sett-section-title">الخصوصية والمعلومات</div>
+      <div class="sett-card">
+        <div class="sett-row" onclick="openModal('privacyModal')">
+          <div class="sett-icon si-pur">🔒</div>
+          <div class="sett-text"><div class="sett-label">سياسة الخصوصية</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="doClearCache()">
+          <div class="sett-icon si-gray">🧹</div>
+          <div class="sett-text"><div class="sett-label">مسح الكاش المحلي</div><div class="sett-sub">لن يؤثر على البيانات السحابية</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="openModal('whatsNewModal')">
+          <div class="sett-icon si-grn">✨</div>
+          <div class="sett-text"><div class="sett-label">ما الجديد</div><div class="sett-sub">v2.0 — تصميم جديد</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="openModal('rateModal')">
+          <div class="sett-icon si-gold">⭐</div>
+          <div class="sett-text"><div class="sett-label">تقييم التطبيق</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="shareApp()">
+          <div class="sett-icon si-blu">📲</div>
+          <div class="sett-text"><div class="sett-label">مشاركة التطبيق</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+        <div class="sett-row" onclick="window.location='mailto:contact.basar.app@gmail.com'">
+          <div class="sett-icon si-gray">💬</div>
+          <div class="sett-text"><div class="sett-label">تواصل مع الدعم</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="about-love">
+      <div style="font-size:32px;margin-bottom:8px">👁️</div>
+      <strong>بصر | Basar App</strong> v2.0<br>
+      صُنع بـ ❤️ في المملكة العربية السعودية 🇸🇦<br>
+      <span style="font-size:.72rem;color:var(--tx3)">تطبيق بصر لحفظ الوصفات الطبية · لا يغني عن استشارة الطبيب</span>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════
+// SETTINGS HELPERS
+// ══════════════════════════════════════
+let _currentFontSize = parseInt(localStorage.getItem('basarFontSize')||'100');
+(function(){ document.documentElement.style.fontSize=(_currentFontSize/100)*16+'px'; })();
+
+function changeFontSize(dir) {
+  _currentFontSize = Math.min(130,Math.max(80,_currentFontSize+dir*10));
+  localStorage.setItem('basarFontSize',_currentFontSize);
+  document.documentElement.style.fontSize=(_currentFontSize/100)*16+'px';
+  const el=document.getElementById('settFzVal'); if(el) el.textContent=_currentFontSize+'%';
+  showToast('🔤 حجم الخط: '+_currentFontSize+'%');
+}
+function toggleSettingSwitch(id) {
+  const el=document.getElementById(id); if(!el) return;
+  const isOn=el.getAttribute('data-on')==='true';
+  el.setAttribute('data-on',isOn?'false':'true');
+  const prefs=JSON.parse(localStorage.getItem('basarNotifPrefs')||'{}');
+  prefs[id]=!isOn; localStorage.setItem('basarNotifPrefs',JSON.stringify(prefs));
+  showToast((!isOn?'✅ تفعيل':'🔕 إيقاف')+' الإشعارات');
+}
+function openSettingsLangPicker() {
+  const drop=document.getElementById('settLangDrop');
+  const arrow=document.getElementById('settLangArrow');
+  const isOpen=drop.style.display==='block';
+  drop.style.display=isOpen?'none':'block';
+  if(arrow) arrow.textContent=isOpen?'›':'⌃';
+}
+function showForgotPasswordFromSettings() {
+  if(currentUser) {
+    sb.auth.resetPasswordForEmail(currentUser.email);
+    showToast('📧 تم إرسال رابط تغيير كلمة المرور');
+  }
+}
+function doClearCache() {
+  localStorage.removeItem('basarProfile');
+  localStorage.removeItem('basarFamily');
+  localStorage.removeItem('basarAlerts2');
+  _profileCache=null; _membersCache=[];
+  showToast('🧹 تم مسح الكاش المحلي');
+}
+function shareApp() {
+  const url='https://basar-app.vercel.app';
+  if(navigator.share) {
+    navigator.share({title:'بصر | Basar App',text:'تطبيق لحفظ وصفات العيون للعائلة',url});
+  } else {
+    window.open('https://wa.me/?text='+encodeURIComponent('👁️ تطبيق بصر لحفظ وصفات العيون: '+url),'_blank');
+  }
+}
+function exportDataJSON() {
+  const data={profile:getProfile(),members:getMembers(),exportDate:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`basar-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); showToast('📤 تم التصدير');
+}
+function importDataJSON(input) {
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try {
+      const data=JSON.parse(e.target.result);
+      document.getElementById('importConfirmOk').onclick=async()=>{
+        closeModal('importConfirmModal');
+        if(data.profile){_profileCache=data.profile;localStorage.setItem('basarProfile',JSON.stringify(data.profile));}
+        if(data.members&&Array.isArray(data.members)){
+          setMembers(data.members);
+          showLoading(true);
+          for(const m of data.members){try{await upsertMemberDB(m);}catch(e){}}
+          showLoading(false);
+        }
+        renderProfile();renderFamily();
+        showToast('✅ تم الاستيراد بنجاح');
+      };
+      openModal('importConfirmModal');
+    } catch(e){showToast('⚠️ ملف غير صالح');}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+
+
+// ══════════════════════════════════════
+// SPECIALIST PAGE
+// ══════════════════════════════════════
+function renderSpecialistPage() {
+  // الصفحة static — لا تحتاج render ديناميكي
+}
+
+// الرقم محفوظ في Supabase Edge Function — لا يظهر في الكود
+async function callSpecialistEdge(topic) {
+  const p = getProfile();
+  const userName = (p.first||'') + (p.last?' '+p.last:'') || 'مستخدم بصر';
+  const members = getMembers();
+
+  let rxSummary = '';
+  const withRx = members.filter(m => hasGlassesRx(m) || hasContactsRx(m));
+  if(withRx.length) {
+    rxSummary += `📋 الوصفات المحفوظة:\n`;
+    withRx.slice(0,2).forEach(m => {
+      rxSummary += `• ${m.name} (${m.rel})`;
+      if(hasGlassesRx(m)) {
+        const r = m.grx.r||{}, l = m.grx.l||{};
+        rxSummary += `\n  🕶️ OD ${r.sph||'—'}/${r.cyl||'—'} | OS ${l.sph||'—'}/${l.cyl||'—'}`;
+      }
+      if(hasContactsRx(m)) {
+        const r = m.crx.r||{}, l = m.crx.l||{};
+        rxSummary += `\n  👁️ OD ${r.sph||'—'} | OS ${l.sph||'—'}`;
+      }
+      rxSummary += '\n';
+    });
+  }
+
+  try {
+    const session = await sb.auth.getSession();
+    const token = session?.data?.session?.access_token;
+    const res = await fetch(
+      'https://itblplmyuuvimdifldew.supabase.co/functions/v1/get-specialist-contact',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ topic, userName, rxSummary })
+      }
+    );
+    const data = await res.json();
+    if(data.url) {
+      window.open(data.url, '_blank');
+    } else {
+      showToast('⚠️ تعذّر فتح واتساب، حاول مجدداً');
+    }
+  } catch(e) {
+    console.error(e);
+    showToast('⚠️ تعذّر الاتصال بالخادم');
+  }
+}
+
+function quickConsult(topic) {
+  callSpecialistEdge(topic);
+}
+
+// ══════════════════════════════════════
+// SPECIALIST — WhatsApp
+// ══════════════════════════════════════
+function openSpecialistWA() {
+  closeModal('specialistModal');
+  callSpecialistEdge('استشارة بصرية');
+}
+
+// ══════════════════════════════════════
+// STAR RATING
+// ══════════════════════════════════════
+function updateStars(n) {
+  _currentRating=n;
+  document.querySelectorAll('#starsRow .star').forEach((s,i)=>s.textContent=i<n?'⭐':'☆');
+}
+function submitRating() {
+  if(!_currentRating) return showToast('⚠️ اختر عدد النجوم');
+  localStorage.setItem('basarRating',_currentRating);
+  closeModal('rateModal');
+  showToast('⭐ شكراً لتقييمك!');
+}
+
+// ══════════════════════════════════════
+// LANGUAGE SYSTEM
+// ══════════════════════════════════════
+function toggleLangMenu() {
+  const m=document.getElementById('langMenu');
+  m.style.display=m.style.display==='block'?'none':'block';
+}
+document.addEventListener('click', e=>{
+  const wrap=document.querySelector('.lang-wrap');
+  if(wrap&&!wrap.contains(e.target)) document.getElementById('langMenu').style.display='none';
+});
+function setLang(lang) {
+  currentLang=lang; localStorage.setItem('basarLang',lang);
+  document.getElementById('langMenu').style.display='none';
+  applyLang();
+  showToast('🌐 تم تغيير اللغة');
+}
+function applyLang() {
+  const isRTL=RTL_LANGS.includes(currentLang);
+  document.documentElement.lang=currentLang;
+  document.documentElement.dir=isRTL?'rtl':'ltr';
+  const labels={ar:'AR',en:'EN',fr:'FR',ur:'UR',fa:'FA',tr:'TR'};
+  document.getElementById('langLabel').textContent=labels[currentLang]||'AR';
+  document.querySelectorAll('.lang-opt').forEach(el=>el.classList.toggle('active',el.dataset.l===currentLang));
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    const v=t(k); if(v&&v!==k) el.textContent=v;
+  });
+  renderProfile(); renderFamily();
+}
+function t(key) {
+  return (TRANSLATIONS[currentLang]||TRANSLATIONS.ar)[key]||TRANSLATIONS.ar[key]||key;
+}
+
+// ══════════════════════════════════════
+// PWA
+// ══════════════════════════════════════
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); _deferredInstall=e;
+  document.getElementById('pwaBanner').style.display='flex';
+});
+function installPWA() {
+  if(!_deferredInstall) return;
+  _deferredInstall.prompt();
+  _deferredInstall.userChoice.then(c=>{
+    if(c.outcome==='accepted') showToast('✅ تم تثبيت بصر على جهازك!');
+    _deferredInstall=null;
+    document.getElementById('pwaBanner').style.display='none';
+  });
+}
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r=>console.log('✅ SW registered'))
+      .catch(e=>console.log('SW error',e));
+  });
+}
+
+
+// ══════════════════════════════════════
+// TIMELINE — Renewal Tracking
+// ══════════════════════════════════════
+let _tlFilter = 'all';
+
+function renderTimeline() {
+  const members = getMembers();
+  const items = [];
+
+  members.forEach(m => {
+    // Glasses renewal
+    if(m.grx && m.grx.alert && m.grx.date) {
+      const months = parseInt(m.grx.alert);
+      const startDate = new Date(m.grx.date);
+      const renewDate = new Date(startDate);
+      renewDate.setMonth(renewDate.getMonth() + months);
+      const today = new Date(); today.setHours(0,0,0,0);
+      const totalDays = Math.round((renewDate - startDate) / 86400000);
+      const daysLeft = Math.round((renewDate - today) / 86400000);
+      const pct = Math.max(0, Math.min(100, Math.round(((totalDays - daysLeft) / totalDays) * 100)));
+      items.push({ m, type:'glasses', label:'نظارة', renewDate, daysLeft, pct,
+        dateStr: renewDate.toLocaleDateString('ar-SA'), icon:'🕶️' });
+    }
+    // Contacts renewal
+    if(m.crx && m.crx.alert && m.crx.date) {
+      const map = { daily:1, weekly:7, monthly:30, yearly:365 };
+      const days = map[m.crx.alert] || 30;
+      const startDate = new Date(m.crx.date);
+      const renewDate = new Date(startDate);
+      renewDate.setDate(renewDate.getDate() + days);
+      const today = new Date(); today.setHours(0,0,0,0);
+      const daysLeft = Math.round((renewDate - today) / 86400000);
+      const pct = Math.max(0, Math.min(100, Math.round(((days - daysLeft) / days) * 100)));
+      items.push({ m, type:'contacts', label:'عدسات', renewDate, daysLeft, pct,
+        dateStr: renewDate.toLocaleDateString('ar-SA'), icon:'👁️' });
+    }
+  });
+
+  // Sort by daysLeft ascending
+  items.sort((a,b) => a.daysLeft - b.daysLeft);
+
+  const urgent  = items.filter(i => i.daysLeft <= 14);
+  const soon    = items.filter(i => i.daysLeft > 14 && i.daysLeft <= 60);
+  const ok      = items.filter(i => i.daysLeft > 60);
+  const expired = items.filter(i => i.daysLeft < 0);
+
+  const filtered = _tlFilter === 'urgent' ? [...expired, ...urgent]
+                 : _tlFilter === 'soon'   ? soon
+                 : _tlFilter === 'ok'     ? ok
+                 : items;
+
+  document.getElementById('tlSubtitle').textContent =
+    items.length ? `${items.length} وصفة مُتابَعة` : 'أضف تواريخ التذكير لأفراد الأسرة';
+
+  let html = '';
+
+  // Summary stats
+  html += `<div class="tl-summary">
+    <div class="tl-stat">
+      <div class="tl-stat-val" style="color:var(--red)">${[...expired,...urgent].length}</div>
+      <div class="tl-stat-lbl">عاجل</div>
+    </div>
+    <div class="tl-stat">
+      <div class="tl-stat-val" style="color:var(--gold)">${soon.length}</div>
+      <div class="tl-stat-lbl">قريباً</div>
+    </div>
+    <div class="tl-stat">
+      <div class="tl-stat-val" style="color:var(--acc)">${ok.length}</div>
+      <div class="tl-stat-lbl">مرتاح</div>
+    </div>
+  </div>`;
+
+  // Filter tabs
+  html += `<div class="tl-filter-tabs">
+    <button class="tl-filter-tab ${_tlFilter==='all'?'active':''}"    onclick="_tlFilter='all';renderTimeline()">الكل (${items.length})</button>
+    <button class="tl-filter-tab ${_tlFilter==='urgent'?'active':''}" onclick="_tlFilter='urgent';renderTimeline()">🔴 عاجل (${[...expired,...urgent].length})</button>
+    <button class="tl-filter-tab ${_tlFilter==='soon'?'active':''}"   onclick="_tlFilter='soon';renderTimeline()">🟡 قريباً (${soon.length})</button>
+    <button class="tl-filter-tab ${_tlFilter==='ok'?'active':''}"     onclick="_tlFilter='ok';renderTimeline()">🟢 مرتاح (${ok.length})</button>
+  </div>`;
+
+  if(!items.length) {
+    html += `<div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <div class="empty-text">لا توجد تواريخ تذكير مُضافة<br>أضف تاريخ الوصفة + التذكير عند إضافة فرد</div>
+    </div>`;
+    document.getElementById('timelineContent').innerHTML = html;
+    return;
+  }
+
+  if(!filtered.length) {
+    html += `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">لا توجد وصفات في هذه الفئة</div></div>`;
+    document.getElementById('timelineContent').innerHTML = html;
+    return;
+  }
+
+  filtered.forEach(item => {
+    const { m, type, label, daysLeft, pct, dateStr, icon } = item;
+    const av = AV_CLASSES[m.colorIdx||0];
+    const isExpired = daysLeft < 0;
+    const color = isExpired || daysLeft <= 14 ? 'red' : daysLeft <= 60 ? 'yellow' : 'green';
+    const statusText = isExpired
+      ? `انتهت منذ ${Math.abs(daysLeft)} يوم`
+      : daysLeft === 0 ? 'اليوم! 🚨'
+      : daysLeft === 1 ? 'غداً ⚠️'
+      : `${daysLeft} يوم متبقي`;
+
+    const urgencyBadge = isExpired
+      ? `<span class="badge" style="background:var(--redb);color:var(--red);border:1px solid rgba(255,71,87,.2)">منتهية</span>`
+      : daysLeft <= 7
+      ? `<span class="badge" style="background:var(--redb);color:var(--red);border:1px solid rgba(255,71,87,.2)">عاجل</span>`
+      : daysLeft <= 30
+      ? `<span class="badge badge-gold">قريباً</span>`
+      : `<span class="badge badge-grn">مرتاح</span>`;
+
+    html += `
+      <div class="timeline-card">
+        <div class="tl-card-head">
+          <div class="member-av ${av}" style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex-shrink:0">${m.name.charAt(0)}</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-size:.9rem;font-weight:800;color:var(--tx)">${m.name}</span>
+              <span style="font-size:.72rem;color:var(--tx2)">${m.rel}</span>
+              ${urgencyBadge}
+            </div>
+            <div style="font-size:.75rem;color:var(--tx2);margin-top:2px">${icon} ${label} · تجديد: ${dateStr}</div>
+          </div>
+          <button class="ma-btn" style="flex:0;padding:7px 10px;font-size:.7rem" onclick="openEditMember('${m.id}')">✏️</button>
+        </div>
+        <div class="tl-card-body">
+          <div class="progress-bar-wrap">
+            <div class="progress-bar ${color}" style="width:${pct}%"></div>
+          </div>
+          <div class="tl-info-row">
+            <span style="color:var(--tx3);font-size:.7rem">${type==='glasses'?`${m.grx.alert} شهر`:`${m.crx.alert==='daily'?'يومي':m.crx.alert==='weekly'?'أسبوعي':m.crx.alert==='monthly'?'شهري':'سنوي'}`}</span>
+            <span class="tl-days-left ${color}">${statusText}</span>
+          </div>
+          ${isExpired || daysLeft <= 14 ? `
+          <button class="tl-notif-btn" onclick="shareRenewalWA('${m.id}','${type}')">
+            💬 تذكير عبر واتساب
+          </button>` : ''}
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('timelineContent').innerHTML = html;
+}
+
+function shareRenewalWA(id, type) {
+  const m = getMembers().find(x => String(x.id)===String(id));
+  if(!m) return;
+  const typeAr = type==='glasses'?'النظارات':'العدسات اللاصقة';
+  const msg = `👁️ *تذكير من تطبيق بصر*\n━━━━━━━━━━━━\n🔔 حان وقت تجديد ${typeAr} لـ *${m.name}*\n\n⚕️ لا تؤجل صحة عينيك — راجع طبيب العيون للحصول على وصفة جديدة.`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══════════════════════════════════════
+// COMPARE — Visual Prescription Comparison
+// ══════════════════════════════════════
+let _selectedForCompare = [];
+
+function renderCompare() {
+  const members = getMembers().filter(m => hasGlassesRx(m) || hasContactsRx(m));
+  const chips = document.getElementById('cmpChips');
+
+  if(!members.length) {
+    chips.innerHTML = '<div style="color:var(--tx3);font-size:.82rem">لا توجد أفراد بوصفات مسجّلة</div>';
+    document.getElementById('compareResult').innerHTML = '';
+    return;
+  }
+
+  // Remove invalid selections
+  _selectedForCompare = _selectedForCompare.filter(id => members.find(m=>String(m.id)===String(id)));
+
+  chips.innerHTML = members.map(m => {
+    const av = AV_CLASSES[m.colorIdx||0];
+    const sel = _selectedForCompare.includes(String(m.id));
+    return `
+      <div class="cmp-chip ${sel?'selected':''}" onclick="toggleCompareSelect('${m.id}')">
+        <div class="cmp-av ${av}">${m.name.charAt(0)}</div>
+        ${m.name}
+      </div>`;
+  }).join('');
+
+  renderCompareResult();
+}
+
+function toggleCompareSelect(id) {
+  const idx = _selectedForCompare.indexOf(String(id));
+  if(idx >= 0) {
+    _selectedForCompare.splice(idx,1);
+  } else {
+    if(_selectedForCompare.length >= 4) {
+      showToast('⚠️ يمكن مقارنة 4 أفراد كحد أقصى');
+      return;
+    }
+    _selectedForCompare.push(String(id));
+  }
+  renderCompare();
+}
+
+function renderCompareResult() {
+  const el = document.getElementById('compareResult');
+  if(_selectedForCompare.length < 2) {
+    el.innerHTML = `<div class="cmp-empty">
+      <div style="font-size:40px;margin-bottom:12px">👁️</div>
+      <div>اختر فردين على الأقل للمقارنة</div>
+      <div style="font-size:.72rem;color:var(--tx3);margin-top:6px">يمكن مقارنة حتى 4 أفراد</div>
+    </div>`;
+    return;
+  }
+
+  const all = getMembers();
+  const selected = _selectedForCompare.map(id => all.find(m=>String(m.id)===String(id))).filter(Boolean);
+  const cols = selected.length;
+  const colPct = Math.floor(100/cols);
+
+  // Table header
+  let html = `<div class="compare-result">
+    <div class="cmp-header-row" style="grid-template-columns:repeat(${cols},1fr)">
+      ${selected.map(m => {
+        const av = AV_CLASSES[m.colorIdx||0];
+        return `<div class="cmp-header-cell">
+          <div class="member-av ${av}" style="width:36px;height:36px;border-radius:10px;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 6px">${m.name.charAt(0)}</div>
+          <div class="cmp-header-name">${m.name}</div>
+          <div class="cmp-header-rel">${m.rel}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Check who has glasses
+  const hasG = selected.some(m=>hasGlassesRx(m));
+  const hasC = selected.some(m=>hasContactsRx(m));
+
+  const fields = [
+    {label:'SPH', key:'sph', eye:'r', section:'glasses'},
+    {label:'CYL', key:'cyl', eye:'r', section:'glasses'},
+    {label:'AXIS',key:'ax',  eye:'r', section:'glasses'},
+    {label:'ADD', key:'add', eye:'r', section:'glasses'},
+    {label:'SPH', key:'sph', eye:'l', section:'glasses'},
+    {label:'CYL', key:'cyl', eye:'l', section:'glasses'},
+    {label:'AXIS',key:'ax',  eye:'l', section:'glasses'},
+  ];
+  const cFields = [
+    {label:'SPH', key:'sph', eye:'r', section:'contacts'},
+    {label:'CYL', key:'cyl', eye:'r', section:'contacts'},
+    {label:'BC',  key:'bc',  eye:'r', section:'contacts'},
+    {label:'DIA', key:'dia', eye:'r', section:'contacts'},
+    {label:'SPH', key:'sph', eye:'l', section:'contacts'},
+    {label:'CYL', key:'cyl', eye:'l', section:'contacts'},
+    {label:'BC',  key:'bc',  eye:'l', section:'contacts'},
+  ];
+
+  function getVal(m, field) {
+    if(field.section==='glasses') {
+      if(!m.grx) return '—';
+      const eye = field.eye==='r' ? m.grx.r : m.grx.l;
+      return (eye&&eye[field.key]) ? eye[field.key] : '—';
+    } else {
+      if(!m.crx) return '—';
+      const eye = field.eye==='r' ? m.crx.r : m.crx.l;
+      return (eye&&eye[field.key]) ? eye[field.key] : '—';
+    }
+  }
+
+  function allSame(vals) {
+    const v = vals.filter(v=>v!=='—');
+    if(v.length<2) return true;
+    return v.every(x=>x===v[0]);
+  }
+
+  function buildRows(fields, sectionLabel, eyeLabel1, eyeLabel2) {
+    let rows = '';
+    // Section head
+    rows += `<tr><td colspan="${cols}" class="cmp-row-label">${sectionLabel}</td></tr>`;
+    // Right eye subhead
+    rows += `<tr><td colspan="${cols}" class="cmp-section-head">👁️ ${eyeLabel1}</td></tr>`;
+    fields.filter(f=>f.eye==='r').forEach(field => {
+      const vals = selected.map(m=>getVal(m,field));
+      const same = allSame(vals);
+      rows += `<tr>
+        <td colspan="1" style="padding:8px 12px;font-size:.72rem;color:var(--tx3);font-weight:700;background:var(--c3);border-bottom:1px solid var(--bdr)">${field.label}</td>`;
+      // We need to show per-member columns differently
+    });
+
+    // Build table rows with per-member columns
+    rows = '';
+    rows += `<tr><td colspan="${cols+1}" class="cmp-row-label">${sectionLabel}</td></tr>`;
+
+    ['r','l'].forEach((eye,ei) => {
+      const eyeFields = fields.filter(f=>f.eye===eye);
+      if(!eyeFields.length) return;
+      rows += `<tr><td colspan="${cols+1}" class="cmp-section-head">👁️ ${ei===0?eyeLabel1:eyeLabel2}</td></tr>`;
+      eyeFields.forEach(field => {
+        const vals = selected.map(m=>getVal(m,field));
+        const same = allSame(vals);
+        // Compute numeric diff for SPH/CYL highlighting
+        const numVals = vals.map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+        const maxDiff = numVals.length>1 ? Math.max(...numVals)-Math.min(...numVals) : 0;
+
+        rows += `<tr>
+          <td style="padding:8px 10px;font-size:.7rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr);white-space:nowrap">${field.label}</td>
+          ${vals.map((v,i) => {
+            let cls = 'cmp-cell';
+            if(v!=='—' && !same) cls += maxDiff>1?' diff':' highlight';
+            return `<td class="${cls}">${v}</td>`;
+          }).join('')}
+        </tr>`;
+      });
+    });
+
+    return rows;
+  }
+
+  html += `<table class="cmp-table">
+    <colgroup>
+      <col style="width:52px">
+      ${selected.map(()=>`<col style="width:${colPct}%">`).join('')}
+    </colgroup>
+    <thead>
+      <tr>
+        <th style="padding:8px 10px;background:var(--c3);font-size:.7rem;color:var(--tx3);font-weight:800;text-align:right;border-bottom:1px solid var(--bdr)">القيمة</th>
+        ${selected.map(m=>{
+          const av=AV_CLASSES[m.colorIdx||0];
+          return `<th class="cmp-header-cell" style="padding:10px 6px">
+            <div class="member-av ${av}" style="width:30px;height:30px;border-radius:9px;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 4px">${m.name.charAt(0)}</div>
+            <div style="font-size:.75rem;font-weight:800;color:var(--tx)">${m.name}</div>
+          </th>`;
+        }).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  if(hasG) {
+    const gFields = [
+      {label:'SPH يمنى',key:'sph',eye:'r',section:'glasses'},
+      {label:'CYL يمنى',key:'cyl',eye:'r',section:'glasses'},
+      {label:'AXIS يمنى',key:'ax',eye:'r',section:'glasses'},
+      {label:'ADD يمنى',key:'add',eye:'r',section:'glasses'},
+      {label:'SPH يسرى',key:'sph',eye:'l',section:'glasses'},
+      {label:'CYL يسرى',key:'cyl',eye:'l',section:'glasses'},
+      {label:'AXIS يسرى',key:'ax',eye:'l',section:'glasses'},
+    ];
+    html += `<tr><td colspan="${cols+1}" class="cmp-row-label">🕶️ النظارات</td></tr>`;
+    gFields.forEach(field => {
+      const vals = selected.map(m=>{
+        if(!m.grx) return '—';
+        const e=field.eye==='r'?m.grx.r:m.grx.l;
+        return (e&&e[field.key])||'—';
+      });
+      const numVals=vals.map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+      const same=vals.filter(v=>v!=='—').every((v,i,a)=>v===a[0]);
+      const maxDiff=numVals.length>1?Math.max(...numVals)-Math.min(...numVals):0;
+      html+=`<tr>
+        <td style="padding:8px 10px;font-size:.72rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr);white-space:nowrap">${field.label}</td>
+        ${vals.map(v=>{
+          const hasDiff=v!=='—'&&!same;
+          const isMax=hasDiff&&numVals.length>1&&parseFloat(v)===Math.max(...numVals);
+          return `<td class="cmp-cell${hasDiff?(maxDiff>=0.5?' diff':''):''}" style="${isMax?'color:var(--gold);font-weight:700':''}">${v}</td>`;
+        }).join('')}
+      </tr>`;
+    });
+    // Date comparison
+    html+=`<tr>
+      <td style="padding:8px 10px;font-size:.72rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr)">التاريخ</td>
+      ${selected.map(m=>`<td class="cmp-cell" style="font-family:var(--font);font-size:.72rem;color:var(--tx2)">${m.grx&&m.grx.date?m.grx.date:'—'}</td>`).join('')}
+    </tr>`;
+  }
+
+  if(hasC) {
+    const cFields2 = [
+      {label:'SPH يمنى',key:'sph',eye:'r',section:'contacts'},
+      {label:'CYL يمنى',key:'cyl',eye:'r',section:'contacts'},
+      {label:'BC يمنى', key:'bc', eye:'r',section:'contacts'},
+      {label:'DIA يمنى',key:'dia',eye:'r',section:'contacts'},
+      {label:'SPH يسرى',key:'sph',eye:'l',section:'contacts'},
+      {label:'CYL يسرى',key:'cyl',eye:'l',section:'contacts'},
+      {label:'BC يسرى', key:'bc', eye:'l',section:'contacts'},
+    ];
+    html += `<tr><td colspan="${cols+1}" class="cmp-row-label">👁️ العدسات اللاصقة</td></tr>`;
+    cFields2.forEach(field => {
+      const vals = selected.map(m=>{
+        if(!m.crx) return '—';
+        const e=field.eye==='r'?m.crx.r:m.crx.l;
+        return (e&&e[field.key])||'—';
+      });
+      const numVals=vals.map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+      const same=vals.filter(v=>v!=='—').every((v,i,a)=>v===a[0]);
+      const maxDiff=numVals.length>1?Math.max(...numVals)-Math.min(...numVals):0;
+      html+=`<tr>
+        <td style="padding:8px 10px;font-size:.72rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr);white-space:nowrap">${field.label}</td>
+        ${vals.map(v=>{
+          const hasDiff=v!=='—'&&!same;
+          const isMax=hasDiff&&numVals.length>1&&parseFloat(v)===Math.max(...numVals);
+          return `<td class="cmp-cell${hasDiff?(maxDiff>=0.5?' diff':''):''}" style="${isMax?'color:var(--gold);font-weight:700':''}">${v}</td>`;
+        }).join('')}
+      </tr>`;
+    });
+    html+=`<tr>
+      <td style="padding:8px 10px;font-size:.72rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr)">النوع</td>
+      ${selected.map(m=>`<td class="cmp-cell" style="font-family:var(--font);font-size:.72rem;color:var(--tx2)">${m.crx&&m.crx.lensType?m.crx.lensType:'—'}</td>`).join('')}
+    </tr>`;
+  }
+
+  html += `</tbody></table>`;
+
+  // Legend
+  html += `<div style="padding:12px 16px;display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid var(--bdr)">
+    <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--tx2)">
+      <div style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></div> قيمة مختلفة (فرق ≥ 0.5)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--tx2)">
+      <div style="width:10px;height:10px;border-radius:2px;background:var(--acc)"></div> متطابق
+    </div>
+  </div>`;
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+// Initialize Supabase immediately when script loads (not waiting for DOMContentLoaded)
+
+// ══ BULLETPROOF INIT ══
+// شاشة الدخول دائماً مرئية عند البداية — لا تخفيها حتى يكتمل التحقق
+(function immediateInit() {
+  applyTheme();
+  applyLang();
+  // لا نعرض loading عند البداية — شاشة الدخول هي الافتراضية
+})();
+
+window.addEventListener('load', async () => {
+  // محاولة تهيئة Supabase
+  let ready = false;
+  try { ready = initSupabase(); } catch(e) { console.error(e); }
+
+  if(!ready || !sb) {
+    // Supabase غير متوفر — أظهر شاشة الدخول مباشرة
+    showAuthScreen();
+    return;
+  }
+
+  // تحقق من الجلسة الحالية — مع timeout 5 ثوانٍ
+  let session = null;
+  try {
+    const timeoutPromise = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000));
+    const sessionPromise = sb.auth.getSession();
+    const res = await Promise.race([sessionPromise, timeoutPromise]);
+    session = res?.data?.session || null;
+  } catch(e) {
+    console.warn('Session check failed:', e.message);
+    session = null;
+  }
+
+  if(session) {
+    showLoading(true);
+    try {
+      await onLoginSuccess(session.user);
+    } catch(e) {
+      console.error(e);
+      showLoading(false);
+      showAuthScreen();
+    }
+  } else {
+    showAuthScreen();
+  }
+
+  // مراقبة تغييرات الجلسة
+  try {
+    sb.auth.onAuthStateChange(async(event, session) => {
+      if((event === 'SIGNED_IN') && session && !currentUser) {
+        showLoading(true);
+        try { await onLoginSuccess(session.user); }
+        catch(e) { showLoading(false); showAuthScreen(); }
+      } else if(event === 'SIGNED_OUT') {
+        currentUser = null; _profileCache = null; _membersCache = [];
+        showLoading(false);
+        showAuthScreen();
+      }
+    });
+  } catch(e) { console.error(e); }
+
+  // Saved email
+  const savedEmail = localStorage.getItem('basarRememberEmail');
+  if(savedEmail) {
+    const el = document.getElementById('login_email');
+    if(el) el.value = savedEmail;
+  }
+});
+
+</script>
+
+<!-- ══ TRANSLATIONS ══ -->
+<script>
+const TRANSLATIONS = {
+  ar: {
+    nav_profile:'الملف', nav_family:'الأسرة', nav_stores:'المعارض', nav_settings:'الإعدادات',
+    auth_login:'تسجيل الدخول', auth_register:'حساب جديد', auth_email:'البريد الإلكتروني',
+    auth_password:'كلمة المرور', auth_confirm_pass:'تأكيد كلمة المرور', auth_forgot:'نسيت كلمة المرور؟',
+    auth_login_btn:'🔑 تسجيل الدخول', auth_register_btn:'✨ إنشاء الحساب',
+    auth_first:'الاسم الأول', auth_last:'اسم العائلة', auth_phone:'رقم الجوال',
+    auth_forgot_hint:'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور',
+    auth_send_reset:'📧 إرسال رابط الاسترداد', auth_back:'← رجوع',
+    auth_tagline:'حفظ الوصفات الطبية للعائلة',
+    auth_footer:'تطبيق بصر لحفظ الوصفات الطبية · لا يغني عن استشارة الطبيب',
+    profile_recent:'آخر الوصفات', profile_view_all:'عرض الكل',
+    stat_family:'فرد عائلة', stat_glasses:'وصفة نظارات', stat_contacts:'وصفة عدسات',
+    edit_profile_title:'✏️ تعديل الملف الشخصي',
+    field_first:'الاسم الأول', field_last:'اسم العائلة', field_dob:'تاريخ الميلاد',
+    field_gender:'الجنس', field_phone:'رقم الهاتف', field_email:'البريد الإلكتروني',
+    field_city:'المدينة', field_select:'اختر',
+    gender_male:'ذكر', gender_female:'أنثى',
+    btn_cancel:'إلغاء', btn_save:'💾 حفظ',
+    family_title:'أفراد الأسرة', family_add:'إضافة فرد جديد',
+    member_add_title:'👤 إضافة فرد جديد',
+    field_name:'الاسم', field_rel:'صلة القرابة', field_age:'العمر',
+    field_notes:'ملاحظات', field_rx_date:'تاريخ وصفة النظارات',
+    field_rx_doc:'الطبيب / العيادة', field_cl_date:'تاريخ وصفة العدسات', field_lens_type:'نوع العدسات',
+    btn_save_member:'💾 حفظ', btn_cancel:'إلغاء', btn_close:'إغلاق',
+    delete_title:'تأكيد الحذف', delete_confirm:'حذف',
+    logout_title:'تسجيل الخروج', logout_msg:'هل تريد تسجيل الخروج؟', logout_btn:'تسجيل الخروج',
+    stores_title:'معارض البصريات', stores_working:'نعمل بجد لإطلاق هذه الخاصية في أقرب وقت 🚀',
+    notify_btn:'أبلغني عند الإطلاق 🚀',
+    toast_welcome:'أهلاً بك في بصر!',
+    medical_disclaimer:'تطبيق بصر لحفظ الوصفات الطبية والعدسات اللاصقة، ولا يغني عن استشارة الطبيب المختص.',
+    empty_rx:'أضف أفراد الأسرة لعرض وصفاتهم هنا',
+    empty_family:'أضف أفراد الأسرة مع وصفاتهم لعرضها هنا',
+    nav_settings:'الإعدادات',
+  },
+  en: {
+    nav_profile:'Profile', nav_family:'Family', nav_stores:'Stores', nav_settings:'Settings',
+    auth_login:'Sign In', auth_register:'New Account', auth_email:'Email',
+    auth_password:'Password', auth_confirm_pass:'Confirm Password', auth_forgot:'Forgot password?',
+    auth_login_btn:'🔑 Sign In', auth_register_btn:'✨ Create Account',
+    auth_first:'First Name', auth_last:'Last Name', auth_phone:'Phone',
+    auth_forgot_hint:'Enter your email and we will send you a password reset link',
+    auth_send_reset:'📧 Send Reset Link', auth_back:'← Back',
+    auth_tagline:'Family Eye Prescription Manager',
+    auth_footer:'Basar App for eye prescriptions · Not a substitute for specialist consultation',
+    profile_recent:'Recent Prescriptions', profile_view_all:'View All',
+    stat_family:'Family Members', stat_glasses:'Glasses Rx', stat_contacts:'Contacts Rx',
+    edit_profile_title:'✏️ Edit Profile',
+    field_first:'First Name', field_last:'Last Name', field_dob:'Date of Birth',
+    field_gender:'Gender', field_phone:'Phone', field_email:'Email',
+    field_city:'City', field_select:'Select',
+    gender_male:'Male', gender_female:'Female',
+    btn_cancel:'Cancel', btn_save:'💾 Save',
+    family_title:'Family Members', family_add:'Add New Member',
+    member_add_title:'👤 Add New Member',
+    field_name:'Name', field_rel:'Relationship', field_age:'Age',
+    field_notes:'Notes', field_rx_date:'Glasses Date', field_rx_doc:'Doctor/Clinic',
+    field_cl_date:'Contacts Date', field_lens_type:'Lens Type',
+    btn_save_member:'💾 Save', btn_cancel:'Cancel', btn_close:'Close',
+    delete_title:'Confirm Delete', delete_confirm:'Delete',
+    logout_title:'Sign Out', logout_msg:'Are you sure you want to sign out?', logout_btn:'Sign Out',
+    stores_title:'Optical Stores', stores_working:'Working hard to launch this feature soon 🚀',
+    notify_btn:'Notify Me 🚀',
+    toast_welcome:'Welcome to Basar!',
+    medical_disclaimer:'Basar App is for storing prescriptions only. Not a substitute for specialist consultation.',
+    empty_rx:'Add family members to view their prescriptions', empty_family:'Add family members with prescriptions',
+    nav_settings:'Settings',
+  },
+  fr: {
+    nav_profile:'Profil', nav_family:'Famille', nav_stores:'Magasins', nav_settings:'Paramètres',
+    auth_login:'Connexion', auth_register:'Nouveau Compte', auth_email:'Email',
+    auth_password:'Mot de passe', auth_confirm_pass:'Confirmer le MDP', auth_forgot:'Mot de passe oublié?',
+    auth_login_btn:'🔑 Se connecter', auth_register_btn:'✨ Créer un compte',
+    auth_first:'Prénom', auth_last:'Nom', auth_phone:'Téléphone',
+    auth_forgot_hint:'Entrez votre email, nous vous enverrons un lien',
+    auth_send_reset:'📧 Envoyer le lien', auth_back:'← Retour',
+    auth_tagline:'Gestionnaire d\'ordonnances oculaires',
+    auth_footer:'Basar App · Ne remplace pas la consultation médicale',
+    profile_recent:'Ordonnances récentes', profile_view_all:'Voir tout',
+    stat_family:'Membres', stat_glasses:'Ordonnances lunettes', stat_contacts:'Ordonnances lentilles',
+    edit_profile_title:'✏️ Modifier le profil',
+    field_first:'Prénom', field_last:'Nom', field_dob:'Date de naissance',
+    field_gender:'Genre', field_phone:'Téléphone', field_email:'Email',
+    field_city:'Ville', field_select:'Sélectionner',
+    gender_male:'Homme', gender_female:'Femme',
+    btn_cancel:'Annuler', btn_save:'💾 Enregistrer',
+    family_title:'Membres de la famille', family_add:'Ajouter un membre',
+    member_add_title:'👤 Ajouter un membre',
+    field_name:'Nom', field_rel:'Relation', field_age:'Âge',
+    field_notes:'Notes', field_rx_date:'Date ordonnance', field_rx_doc:'Médecin/Clinique',
+    field_cl_date:'Date lentilles', field_lens_type:'Type de lentilles',
+    btn_save_member:'💾 Enregistrer', btn_cancel:'Annuler', btn_close:'Fermer',
+    delete_title:'Confirmer la suppression', delete_confirm:'Supprimer',
+    logout_title:'Déconnexion', logout_msg:'Voulez-vous vous déconnecter?', logout_btn:'Déconnexion',
+    stores_title:'Opticiens', stores_working:'Bientôt disponible 🚀',
+    notify_btn:'Me notifier 🚀', toast_welcome:'Bienvenue sur Basar!',
+    medical_disclaimer:'Basar App pour stocker les ordonnances uniquement.',
+    empty_rx:'Ajoutez des membres pour voir leurs ordonnances', empty_family:'Ajoutez des membres',
+    nav_settings:'Paramètres',
+  },
+  ur: {
+    nav_profile:'پروفائل', nav_family:'خاندان', nav_stores:'دکانیں', nav_settings:'ترتیبات',
+    auth_login:'سائن ان', auth_register:'نیا اکاؤنٹ', auth_email:'ای میل',
+    auth_password:'پاس ورڈ', auth_confirm_pass:'پاس ورڈ تصدیق', auth_forgot:'پاس ورڈ بھول گئے؟',
+    auth_login_btn:'🔑 سائن ان', auth_register_btn:'✨ اکاؤنٹ بنائیں',
+    auth_first:'پہلا نام', auth_last:'خاندانی نام', auth_phone:'فون',
+    auth_forgot_hint:'ای میل درج کریں', auth_send_reset:'📧 لنک بھیجیں', auth_back:'← واپس',
+    auth_tagline:'خاندانی آنکھوں کے نسخے', auth_footer:'بصر ایپ · ڈاکٹر کا متبادل نہیں',
+    profile_recent:'حالیہ نسخے', profile_view_all:'سب دیکھیں',
+    stat_family:'خاندان', stat_glasses:'عینک', stat_contacts:'لینز',
+    edit_profile_title:'✏️ پروفائل ترمیم',
+    field_first:'پہلا نام', field_last:'خاندانی نام', field_dob:'تاریخ پیدائش',
+    field_gender:'جنس', field_phone:'فون', field_email:'ای میل', field_city:'شہر', field_select:'منتخب',
+    gender_male:'مرد', gender_female:'عورت', btn_cancel:'منسوخ', btn_save:'💾 محفوظ',
+    family_title:'خاندان کے افراد', family_add:'رکن شامل کریں',
+    member_add_title:'👤 نیا رکن', field_name:'نام', field_rel:'رشتہ', field_age:'عمر',
+    field_notes:'نوٹس', field_rx_date:'تاریخ', field_rx_doc:'ڈاکٹر', field_cl_date:'تاریخ', field_lens_type:'لینز',
+    btn_save_member:'💾 محفوظ', btn_cancel:'منسوخ', btn_close:'بند',
+    delete_title:'حذف تصدیق', delete_confirm:'حذف',
+    logout_title:'سائن آؤٹ', logout_msg:'سائن آؤٹ کریں؟', logout_btn:'سائن آؤٹ',
+    stores_title:'دکانیں', stores_working:'جلد آ رہا ہے 🚀', notify_btn:'مطلع کریں 🚀',
+    toast_welcome:'بصر میں خوش آمدید!',
+    medical_disclaimer:'بصر ایپ نسخے محفوظ کرنے کے لیے۔ ڈاکٹر کا متبادل نہیں۔',
+    empty_rx:'نسخے دیکھنے کے لیے افراد شامل کریں', empty_family:'خاندان شامل کریں',
+    nav_settings:'ترتیبات',
+  },
+  fa: {
+    nav_profile:'پروفایل', nav_family:'خانواده', nav_stores:'فروشگاه', nav_settings:'تنظیمات',
+    auth_login:'ورود', auth_register:'حساب جدید', auth_email:'ایمیل',
+    auth_password:'رمز عبور', auth_confirm_pass:'تأیید رمز', auth_forgot:'رمز فراموش؟',
+    auth_login_btn:'🔑 ورود', auth_register_btn:'✨ ایجاد حساب',
+    auth_first:'نام', auth_last:'نام خانوادگی', auth_phone:'تلفن',
+    auth_forgot_hint:'ایمیل خود را وارد کنید', auth_send_reset:'📧 ارسال لینک', auth_back:'← برگشت',
+    auth_tagline:'مدیریت نسخه‌های چشم', auth_footer:'اپلیکیشن بصر · جایگزین پزشک نیست',
+    profile_recent:'نسخه‌های اخیر', profile_view_all:'همه',
+    stat_family:'اعضا', stat_glasses:'نسخه عینک', stat_contacts:'نسخه لنز',
+    edit_profile_title:'✏️ ویرایش پروفایل',
+    field_first:'نام', field_last:'نام خانوادگی', field_dob:'تاریخ تولد',
+    field_gender:'جنسیت', field_phone:'تلفن', field_email:'ایمیل', field_city:'شهر', field_select:'انتخاب',
+    gender_male:'مرد', gender_female:'زن', btn_cancel:'لغو', btn_save:'💾 ذخیره',
+    family_title:'اعضای خانواده', family_add:'افزودن عضو',
+    member_add_title:'👤 عضو جدید', field_name:'نام', field_rel:'نسبت', field_age:'سن',
+    field_notes:'یادداشت', field_rx_date:'تاریخ', field_rx_doc:'پزشک', field_cl_date:'تاریخ', field_lens_type:'نوع لنز',
+    btn_save_member:'💾 ذخیره', btn_cancel:'لغو', btn_close:'بستن',
+    delete_title:'تأیید حذف', delete_confirm:'حذف',
+    logout_title:'خروج', logout_msg:'خارج شوید؟', logout_btn:'خروج',
+    stores_title:'فروشگاه‌ها', stores_working:'به زودی 🚀', notify_btn:'اطلاع دهید 🚀',
+    toast_welcome:'به بصر خوش آمدید!',
+    medical_disclaimer:'بصر برای ذخیره نسخه‌ها. جایگزین پزشک نیست.',
+    empty_rx:'اعضا را اضافه کنید', empty_family:'خانواده را اضافه کنید',
+    nav_settings:'تنظیمات',
+  },
+  tr: {
+    nav_profile:'Profil', nav_family:'Aile', nav_stores:'Mağazalar', nav_settings:'Ayarlar',
+    auth_login:'Giriş', auth_register:'Yeni Hesap', auth_email:'E-posta',
+    auth_password:'Şifre', auth_confirm_pass:'Şifreyi Onayla', auth_forgot:'Şifremi Unuttum?',
+    auth_login_btn:'🔑 Giriş', auth_register_btn:'✨ Hesap Oluştur',
+    auth_first:'Ad', auth_last:'Soyad', auth_phone:'Telefon',
+    auth_forgot_hint:'E-postanızı girin', auth_send_reset:'📧 Bağlantı Gönder', auth_back:'← Geri',
+    auth_tagline:'Aile Göz Reçetesi Yöneticisi', auth_footer:'Basar App · Uzman muayenesinin yerini tutmaz',
+    profile_recent:'Son Reçeteler', profile_view_all:'Tümü',
+    stat_family:'Üyeler', stat_glasses:'Gözlük', stat_contacts:'Lens',
+    edit_profile_title:'✏️ Profili Düzenle',
+    field_first:'Ad', field_last:'Soyad', field_dob:'Doğum Tarihi',
+    field_gender:'Cinsiyet', field_phone:'Telefon', field_email:'E-posta', field_city:'Şehir', field_select:'Seçin',
+    gender_male:'Erkek', gender_female:'Kadın', btn_cancel:'İptal', btn_save:'💾 Kaydet',
+    family_title:'Aile Üyeleri', family_add:'Üye Ekle',
+    member_add_title:'👤 Yeni Üye', field_name:'İsim', field_rel:'İlişki', field_age:'Yaş',
+    field_notes:'Notlar', field_rx_date:'Tarih', field_rx_doc:'Doktor', field_cl_date:'Tarih', field_lens_type:'Lens Türü',
+    btn_save_member:'💾 Kaydet', btn_cancel:'İptal', btn_close:'Kapat',
+    delete_title:'Silmeyi Onayla', delete_confirm:'Sil',
+    logout_title:'Çıkış', logout_msg:'Çıkış yapmak istiyor musunuz?', logout_btn:'Çıkış',
+    stores_title:'Optik Mağazalar', stores_working:'Yakında 🚀', notify_btn:'Haber Ver 🚀',
+    toast_welcome:'Basar\'a Hoş Geldiniz!',
+    medical_disclaimer:'Basar App yalnızca reçete saklar. Uzman muayenesinin yerini tutmaz.',
+    empty_rx:'Üye ekleyin', empty_family:'Aile ekleyin',
+    nav_settings:'Ayarlar',
+  }
+};
+</script>
+</body>
+</html>
