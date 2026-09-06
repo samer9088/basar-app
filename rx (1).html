@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بطاقة وصفتي — بصر</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+    background: #f6f5fb;
+    margin: 0;
+    padding: 24px 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e2f5;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .brand { font-weight: 700; font-size: 15px; color: #3C3489; margin-bottom: 12px; }
+  .name { font-size: 17px; font-weight: 700; margin: 0 0 2px; }
+  .date { font-size: 13px; color: #777; margin: 0 0 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { color: #999; font-weight: 500; padding: 4px 6px; text-align: center; }
+  th:first-child { text-align: right; }
+  td { padding: 8px 6px; text-align: center; border-top: 1px solid #eee; }
+  td:first-child { text-align: right; color: #666; }
+  .note {
+    font-size: 12px; color: #999; margin-top: 16px;
+    border-top: 1px solid #eee; padding-top: 12px;
+  }
+  .state { text-align: center; color: #777; padding: 24px 0; font-size: 14px; }
+  .qr-wrap { display: flex; justify-content: center; margin: 16px 0 4px; }
+  .qr-wrap canvas { border-radius: 8px; }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="state">جارِ التحميل...</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://itblplmyuuvimdifldew.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0YmxwbG15dXV2aW1kaWZsZGV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDczMTksImV4cCI6MjA4ODY4MzMxOX0.UN7FQtZ9KPGWLgsQTk4yWbvWVvEQQkk-UI2vtwP_LBw";
+
+    function fmt(v) {
+      if (!v || v.trim() === "") return "—";
+      return v;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return null;
+      const d = new Date(iso);
+      return d.toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" });
+    }
+
+    function render(data) {
+      const card = document.getElementById("card");
+      if (!data) {
+        card.innerHTML = '<div class="state">لم يتم العثور على هذه الوصفة</div>';
+        return;
+      }
+      const dateLine = formatDate(data.prescribed_date)
+        ? `<p class="date">وصفة بتاريخ ${formatDate(data.prescribed_date)}</p>`
+        : "";
+      card.innerHTML = `
+        <div class="brand">بصر</div>
+        <p class="name">${data.first_name || ""}</p>
+        ${dateLine}
+        <table>
+          <thead>
+            <tr><th></th><th>SPH</th><th>CYL</th><th>AXIS</th><th>ADD</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>OD</td><td>${fmt(data.od_sph)}</td><td>${fmt(data.od_cyl)}</td><td>${fmt(data.od_axis)}</td><td>${fmt(data.od_add)}</td></tr>
+            <tr><td>OS</td><td>${fmt(data.os_sph)}</td><td>${fmt(data.os_cyl)}</td><td>${fmt(data.os_axis)}</td><td>${fmt(data.os_add)}</td></tr>
+          </tbody>
+        </table>
+        <div class="qr-wrap" id="qr"></div>
+        <p class="note">هذه الوصفة معروضة للمشاركة فقط. لا تحتوي على بيانات تواصل شخصية.</p>
+      `;
+      new QRCode(document.getElementById("qr"), {
+        text: window.location.href,
+        width: 120,
+        height: 120,
+        colorDark: "#3C3489",
+        colorLight: "#ffffff"
+      });
+    }
+
+    async function load() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      if (!code) {
+        document.getElementById("card").innerHTML = '<div class="state">رابط غير صالح</div>';
+        return;
+      }
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/rx_card_public?share_code=eq.${encodeURIComponent(code)}&select=*`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }
+        );
+        const rows = await res.json();
+        render(rows && rows[0]);
+      } catch (e) {
+        document.getElementById("card").innerHTML = '<div class="state">تعذر تحميل الوصفة</div>';
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>
