@@ -2460,7 +2460,7 @@ async function loadUserData() {
     }
     const {data:fd} = await sb.from('family_members').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:true});
     _membersCache = (fd||[]).map(r => ({
-      id:r.id, _dbId:r.id,
+           id:r.id, _dbId:r.id, shareCode:r.share_code||null,
       name:r.name, rel:r.relationship, age:r.age||'',
       notes:r.notes||'', colorIdx:r.color_idx||0,
       sound:r.sound||'bell', image:r.prescription_image||null,
@@ -2625,7 +2625,7 @@ function renderFamily() {
           <button class="ma-btn view" onclick="viewRx('${m.id}')">👁️ عرض</button>
           <button class="ma-btn" onclick="openEditMember('${m.id}')">✏️ تعديل</button>
           <button class="ma-btn wa" onclick="shareWAMember('${m.id}')">💬 واتس</button>
-          <button class="ma-btn" onclick="exportPDFMember('${m.id}')">📄 PDF</button>
+          <button class="ma-btn" onclick="exportPDFMember('${m.id}')">📄 PDF</button>          ${m.shareCode ? `<button class="ma-btn" style="color:var(--acc);border-color:var(--bdr2)" onclick="shareRxCard('${m.id}')">🔗 بطاقة</button>` : ''}
           <button class="ma-btn del" onclick="confirmDelete('${m.id}')">🗑️</button>
         </div>
       </div>`;
@@ -2931,6 +2931,12 @@ function shareWAMember(id) {
   if(m.notes) msg+=`\n📝 ${m.notes}\n`;
   msg+='\n⚕️ تطبيق بصر · لا يغني عن استشارة الطبيب المختص';
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+function shareRxCard(id) {
+  const m = getMembers().find(x=>String(x.id)===String(id));
+  if(!m || !m.shareCode) return showToast('⚠️ لا يوجد رمز مشاركة لهذا الفرد');
+  const url = `https://mybasar.app/rx.html?code=${m.shareCode}`;
+  window.open(url, '_blank');
 }
 
 // ══════════════════════════════════════
