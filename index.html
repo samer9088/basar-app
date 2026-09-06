@@ -2174,6 +2174,43 @@ body {
   </div>
 </div>
 
+<!-- MERCHANT ADMIN -->
+<div class="modal-overlay" id="merchantAdminModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">🏪 إدارة متجري</div>
+      <button class="modal-close" onclick="closeModal('merchantAdminModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>الوصف المختصر (يظهر بقائمة المتاجر)</label>
+        <input type="text" id="mm_desc" placeholder="مثال: أفضل الأسعار وأحدث الموديلات">
+      </div>
+      <div class="form-group">
+        <label>الوصف الكامل (يظهر بصفحة المتجر)</label>
+        <textarea id="mm_full_desc" rows="4" placeholder="اكتب نبذة عن متجرك..." style="width:100%;padding:12px 14px;background:var(--c3);border:1px solid var(--bdr);border-radius:var(--r3);color:var(--tx);font-family:var(--font);font-size:.9rem;resize:vertical"></textarea>
+      </div>
+      <div class="form-group">
+        <label>رقم واتساب المتجر</label>
+        <input type="text" id="mm_whatsapp" placeholder="9665XXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>العروض (سطر لكل عرض: العنوان | التفاصيل)</label>
+        <textarea id="mm_offers" rows="4" placeholder="خصم 20% على العدسات الطبية | العرض ساري حتى نهاية الشهر" style="width:100%;padding:12px 14px;background:var(--c3);border:1px solid var(--bdr);border-radius:var(--r3);color:var(--tx);font-family:var(--font);font-size:.9rem;resize:vertical"></textarea>
+      </div>
+      <div class="form-group">
+        <label>روابط الصور (رابط صورة بكل سطر)</label>
+        <textarea id="mm_photos" rows="3" placeholder="https://..." style="width:100%;padding:12px 14px;background:var(--c3);border:1px solid var(--bdr);border-radius:var(--r3);color:var(--tx);font-family:var(--font);font-size:.9rem;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('merchantAdminModal')">إلغاء</button>
+      <button class="btn-primary" onclick="saveMerchantAdmin()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
 <!-- RATE APP -->
 <div class="modal-overlay center" id="rateModal">
   <div class="modal">
@@ -2249,6 +2286,7 @@ let currentAlerts = { gAlert:'', cAlert:'' };
 let currentLang = localStorage.getItem('basarLang') || 'ar';
 let _deferredInstall = null;
 let _currentRating = 0;
+let _myMerchant = null;
 
 // ══════════════════════════════════════
 // SUPABASE INIT
@@ -2508,11 +2546,66 @@ async function deleteMemberDB(dbId) {
 }
 
 // ══════════════════════════════════════
+// MY MERCHANT (Rawabi store admin panel)
+// ══════════════════════════════════════
+async function loadMyMerchant() {
+  if(!sb || !currentUser) { _myMerchant = null; return; }
+  try {
+    const { data } = await sb.from('merchants').select('*').eq('owner_user_id', currentUser.id).maybeSingle();
+    _myMerchant = data || null;
+  } catch(e) { console.warn('loadMyMerchant error:', e.message); _myMerchant = null; }
+}
+
+function openMerchantAdmin() {
+  if(!_myMerchant) return;
+  document.getElementById('mm_desc').value = _myMerchant.description || '';
+  document.getElementById('mm_full_desc').value = _myMerchant.full_description || '';
+  document.getElementById('mm_whatsapp').value = _myMerchant.whatsapp || '';
+  const offers = Array.isArray(_myMerchant.offers) ? _myMerchant.offers : [];
+  document.getElementById('mm_offers').value = offers.map(o => `${o.title||''} | ${o.detail||''}`).join('\n');
+  const photos = Array.isArray(_myMerchant.photos) ? _myMerchant.photos : [];
+  document.getElementById('mm_photos').value = photos.join('\n');
+  openModal('merchantAdminModal');
+}
+
+async function saveMerchantAdmin() {
+  if(!_myMerchant || !sb) return;
+  const description = document.getElementById('mm_desc').value.trim();
+  const full_description = document.getElementById('mm_full_desc').value.trim();
+  const whatsapp = document.getElementById('mm_whatsapp').value.trim();
+  const offers = document.getElementById('mm_offers').value.split('\n').map(l=>l.trim()).filter(Boolean).map(line => {
+    const parts = line.split('|');
+    const title = (parts[0]||'').trim();
+    const detail = parts.slice(1).join('|').trim();
+    return { title, detail };
+  });
+  const photos = document.getElementById('mm_photos').value.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  showLoading(true);
+  try {
+    const { data, error } = await sb.from('merchants')
+      .update({ description, full_description, whatsapp, offers, photos, updated_at: new Date().toISOString() })
+      .eq('id', _myMerchant.id)
+      .select()
+      .single();
+    if(error) throw error;
+    _myMerchant = data;
+    closeModal('merchantAdminModal');
+    showToast('✅ تم حفظ بيانات المتجر');
+  } catch(e) {
+    console.error(e);
+    showToast('⚠️ تعذر حفظ البيانات');
+  }
+  showLoading(false);
+}
+
+// ══════════════════════════════════════
 // ON LOGIN SUCCESS
 // ══════════════════════════════════════
 async function onLoginSuccess(user) {
   currentUser = user;
   await loadUserData();
+  await loadMyMerchant();
   hideAuthScreen();
   updateUserChip();
   showPage('profile');
@@ -3098,6 +3191,19 @@ function renderSettings() {
         </div>
       </div>
     </div>
+
+    ${_myMerchant ? `
+    <div class="sett-section">
+      <div class="sett-section-title">متجري</div>
+      <div class="sett-card">
+        <div class="sett-row" onclick="openMerchantAdmin()">
+          <div class="sett-icon si-grn">🏪</div>
+          <div class="sett-text"><div class="sett-label">إدارة متجري</div><div class="sett-sub">${_myMerchant.name}</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+      </div>
+    </div>
+    ` : ''}
 
     <!-- APPEARANCE -->
     <div class="sett-section">
