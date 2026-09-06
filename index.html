@@ -3427,9 +3427,10 @@ function applyLang() {
   });
   renderProfile(); renderFamily();
 }
-function t(key) {
-  return (TRANSLATIONS[currentLang]||TRANSLATIONS.ar)[key]||TRANSLATIONS.ar[key]||key;
-}
+    function t(key) {
+      if (typeof TRANSLATIONS === 'undefined') return key;
+      return (TRANSLATIONS[currentLang]||TRANSLATIONS.ar)[key]||TRANSLATIONS.ar[key]||key;
+    }
 
 // ══════════════════════════════════════
 // PWA
