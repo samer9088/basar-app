@@ -1787,6 +1787,10 @@ body {
       <span class="nav-icon">⚙️</span>
       <span class="nav-label" data-i18n="nav_settings">الإعدادات</span>
     </button>
+    <button class="nav-btn" id="mn_stores" onclick="window.open('https://mybasar.app/stores.html','_blank')">
+      <span class="nav-icon">🕶️</span>
+      <span class="nav-label">المتاجر</span>
+    </button>
   </nav>
 </div>
 
@@ -2184,6 +2188,14 @@ body {
     </div>
     <div class="modal-body">
       <div class="form-group">
+        <label>شعار المتجر</label>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div id="mm_logo_preview" style="width:56px;height:56px;border-radius:14px;background:var(--c3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"></div>
+          <button type="button" class="btn-secondary" style="flex:0;padding:10px 16px" onclick="document.getElementById('mmLogoInput').click()">تغيير الشعار</button>
+        </div>
+        <input type="file" id="mmLogoInput" accept="image/*" style="display:none" onchange="handleMerchantLogoUpload()">
+      </div>
+      <div class="form-group">
         <label>الوصف المختصر (يظهر بقائمة المتاجر)</label>
         <input type="text" id="mm_desc" placeholder="مثال: أفضل الأسعار وأحدث الموديلات">
       </div>
@@ -2293,6 +2305,7 @@ let _deferredInstall = null;
 let _currentRating = 0;
 let _myMerchant = null;
 let _mmPhotos = [];
+let _mmLogoUrl = null;
 
 // ══════════════════════════════════════
 // SUPABASE INIT
@@ -2571,7 +2584,34 @@ function openMerchantAdmin() {
   document.getElementById('mm_offers').value = offers.map(o => `${o.title||''} | ${o.detail||''}`).join('\n');
   _mmPhotos = Array.isArray(_myMerchant.photos) ? [..._myMerchant.photos] : [];
   renderMerchantPhotosGrid();
+  _mmLogoUrl = _myMerchant.logo_url || null;
+  renderMerchantLogoPreview();
   openModal('merchantAdminModal');
+}
+
+function renderMerchantLogoPreview() {
+  const el = document.getElementById('mm_logo_preview');
+  el.innerHTML = _mmLogoUrl
+    ? `<img src="${_mmLogoUrl}" style="width:100%;height:100%;object-fit:cover">`
+    : `<span style="font-size:20px;color:var(--tx3)">🏪</span>`;
+}
+
+async function handleMerchantLogoUpload() {
+  const input = document.getElementById('mmLogoInput');
+  const file = input.files && input.files[0];
+  if(!file || !sb || !currentUser) return;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${currentUser.id}/logo-${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from('merchant-photos').upload(path, file, { upsert: false });
+    if(error) throw error;
+    const { data: pub } = sb.storage.from('merchant-photos').getPublicUrl(path);
+    if(pub && pub.publicUrl) { _mmLogoUrl = pub.publicUrl; renderMerchantLogoPreview(); }
+  } catch(e) {
+    console.error('logo upload error:', e);
+    showToast('⚠️ تعذر رفع الشعار');
+  }
+  input.value = '';
 }
 
 function renderMerchantPhotosGrid() {
@@ -2629,7 +2669,7 @@ async function saveMerchantAdmin() {
   showLoading(true);
   try {
     const { data, error } = await sb.from('merchants')
-      .update({ description, full_description, whatsapp, offers, photos, updated_at: new Date().toISOString() })
+      .update({ description, full_description, whatsapp, offers, photos, logo_url: _mmLogoUrl, updated_at: new Date().toISOString() })
       .eq('id', _myMerchant.id)
       .select()
       .single();
@@ -3324,19 +3364,6 @@ function renderSettings() {
       </div>
     </div>
 
-       <!-- STORES DIRECTORY -->
-    <div class="sett-section">
-      <div class="sett-section-title">الخدمات</div>
-      <div class="sett-card">
-        <div class="sett-row" onclick="window.open('https://mybasar.app/stores.html','_blank')">
-          <div class="sett-icon si-blu">🕶️</div>
-          <div class="sett-text"><div class="sett-label">دليل متاجر النظارات</div><div class="sett-sub">محلات النظارات والعدسات القريبة منك</div></div>
-          <div class="sett-arrow">›</div>
-        </div>
-      </div>
-    </div>
-
-   
     <!-- PRIVACY & ABOUT -->
     <div class="sett-section">
       <div class="sett-section-title">الخصوصية والمعلومات</div>
