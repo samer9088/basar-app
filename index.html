@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 /* ═══════════════════════════════════════
@@ -1391,6 +1392,71 @@ body {
 .spec-quick-btn:hover { border-color: var(--bdr2); color: var(--acc); background: var(--acc4); }
 .spec-quick-btn:active { transform: scale(.97); }
 .spec-quick-btn .sqb-icon { font-size: 20px; }
+
+/* ═══════════════════════════════════════
+   PROFESSIONAL MICRO-INTERACTIONS
+   حركات موحّدة لكل الأيقونات والأزرار والبطاقات
+═══════════════════════════════════════ */
+button, .nav-btn, .ma-btn, .chip-btn, .topbar-btn, .add-btn, .fz-btn,
+.tl-filter-tab, .spec-quick-btn, .city-chip, .cmp-chip, .compare-selector,
+.user-chip, .rx-preview, .modal-close, .lang-opt, .compare-opt, .tl-notif-btn,
+.hero-av, .upload-area, .rx-inp, .toggle, .star {
+  transition: transform .16s cubic-bezier(.34,1.56,.64,1),
+              box-shadow .2s ease, border-color .2s ease,
+              background-color .2s ease, color .2s ease;
+}
+button:active:not(:disabled), .nav-btn:active, .ma-btn:active, .chip-btn:active,
+.topbar-btn:active, .add-btn:active, .fz-btn:active, .tl-filter-tab:active,
+.spec-quick-btn:active, .city-chip:active, .cmp-chip:active,
+.compare-selector:active, .user-chip:active, .rx-preview:active,
+.modal-close:active, .lang-opt:active, .compare-opt:active, .tl-notif-btn:active {
+  transform: scale(.93);
+}
+.nav-btn .nav-icon {
+  display: inline-block;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.nav-btn.active .nav-icon { transform: scale(1.22) translateY(-2px); }
+.nav-btn:active .nav-icon { transform: scale(.85); }
+
+.member-card, .rx-preview, .timeline-card, .renewal-card, .rx-section,
+.spec-cert-card, .card, .auth-card, .compare-result, .profile-hero {
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.member-card:hover, .timeline-card:hover, .renewal-card:hover, .spec-cert-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.12);
+}
+.member-card:active, .timeline-card:active, .renewal-card:active {
+  transform: translateY(0) scale(.99);
+}
+
+.btn-primary:active, .btn-secondary:active, .btn-danger:active, .btn-auth:active {
+  transform: scale(.96);
+}
+.pwa-install:active, .notify-btn:active { transform: scale(.94); }
+
+.hero-av:hover { transform: scale(1.06) rotate(-2deg); }
+.hero-av:active { transform: scale(.95); }
+
+.upload-area:active { transform: scale(.98); }
+
+/* أيقونة الشعار العلوي: نبضة هادئة خفيفة */
+.topbar-icon { animation: logoBreathe 3.5s ease-in-out infinite; }
+@keyframes logoBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* انتقال أنعم بين الصفحات */
+.page.active { animation: pageIn .3s cubic-bezier(.22,1,.36,1); }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* دوران أيقونة زر تحديث الجدول */
+.topbar-btn:active .nav-icon, .topbar-btn:active { transform: scale(.88) rotate(-8deg); }
 </style>
 </head>
 <body class="avatar-colors">
@@ -1535,33 +1601,6 @@ body {
         <button class="topbar-btn" onclick="openEditProfile()" title="تعديل">✏️</button>
       </div>
       <div id="profileHero"></div>
-      <!-- SPECIALIST CARD -->
-      <div class="specialist-banner" onclick="openModal('specialistModal')">
-        <div class="spec-banner-bg"></div>
-        <div class="spec-body">
-          <div class="spec-av-row">
-            <div class="spec-av">أ</div>
-            <div class="spec-name-wrap">
-              <div class="spec-name">أحمد صلاح الدين</div>
-              <div class="spec-title">أخصائي بصريات معتمد 👁️</div>
-            </div>
-          </div>
-          <div class="spec-badges">
-            <span class="spec-badge spec-badge-grn">🏅 معتمد SCFHS</span>
-            <span class="spec-badge spec-badge-blu">🎓 جامعة النيلين</span>
-            <span class="spec-badge spec-badge-gold">⭐ استشارة مجانية</span>
-          </div>
-          <div class="spec-hours">
-            <div class="spec-hours-dot"></div>
-            <span>متاح · ٤ عصراً – ١٠ مساءً</span>
-          </div>
-          <div class="spec-divider"></div>
-          <button class="spec-wa-btn" onclick="event.stopPropagation();openSpecialistWA()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            استشر أخصائي البصريات الآن
-          </button>
-        </div>
-      </div>
 
       <div class="section-title" data-i18n="profile_recent">آخر الوصفات</div>
       <div id="recentRx"></div>
@@ -1640,113 +1679,11 @@ body {
     <div class="page" id="pageSpecialist">
       <div class="page-header">
         <div>
-          <div class="page-title">👨‍⚕️ أخصائي البصريات</div>
-          <div class="page-subtitle">استشارة مجانية عبر واتساب</div>
+          <div class="page-title">👨‍⚕️ أخصائيو البصريات</div>
+          <div class="page-subtitle">استشارة مباشرة عبر واتساب</div>
         </div>
       </div>
-
-      <!-- Hero -->
-      <div class="spec-page-hero">
-        <div class="spec-hero-av">أ</div>
-        <div class="spec-hero-name">أحمد صلاح الدين أحمد سليمان</div>
-        <div class="spec-hero-role">أخصائي بصريات معتمد 👁️</div>
-        <div class="spec-hero-badges">
-          <span class="spec-badge spec-badge-grn">🏅 SCFHS معتمد</span>
-          <span class="spec-badge spec-badge-blu">🎓 جامعة النيلين</span>
-          <span class="spec-badge spec-badge-gold">💬 واتساب</span>
-        </div>
-      </div>
-
-      <!-- شريط التوفر -->
-      <div class="spec-avail-strip">
-        <div class="spec-avail-left">
-          <div class="spec-avail-dot"></div>
-          <div>
-            <div class="spec-avail-text">متاح للاستشارة</div>
-            <div class="spec-avail-hours">٤ عصراً – ١٠ مساءً يومياً</div>
-          </div>
-        </div>
-        <span class="badge badge-grn" style="font-size:.68rem">مجاناً ✓</span>
-      </div>
-
-      <!-- رسائل سريعة -->
-      <div class="section-title">استشارة سريعة</div>
-      <div class="spec-quick-btns">
-        <button class="spec-quick-btn" onclick="quickConsult('أريد الاستفسار عن وصفة نظاراتي')">
-          <span class="sqb-icon">🕶️</span>
-          <span>استفسار عن النظارة</span>
-        </button>
-        <button class="spec-quick-btn" onclick="quickConsult('أريد الاستفسار عن العدسات اللاصقة')">
-          <span class="sqb-icon">👁️</span>
-          <span>استفسار عن العدسات</span>
-        </button>
-        <button class="spec-quick-btn" onclick="quickConsult('أريد قراءة وصفتي الطبية')">
-          <span class="sqb-icon">📋</span>
-          <span>قراءة الوصفة</span>
-        </button>
-        <button class="spec-quick-btn" onclick="quickConsult('أريد نصيحة بخصوص صحة العيون')">
-          <span class="sqb-icon">💡</span>
-          <span>نصيحة طبية</span>
-        </button>
-      </div>
-
-      <!-- زر الواتساب الكبير -->
-      <div class="section-title">تواصل مباشر</div>
-      <button class="spec-big-wa" onclick="openSpecialistWA()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        ابدأ الاستشارة الآن
-      </button>
-      <div class="spec-wa-sub">سيتم فتح واتساب مباشرة مع رسالة جاهزة تحتوي اسمك ووصفتك</div>
-
-      <!-- بطاقات المؤهلات -->
-      <div class="section-title">المؤهلات والخبرة</div>
-      <div class="spec-cert-card">
-        <div class="scc-icon si-grn">🏅</div>
-        <div class="scc-body">
-          <div class="scc-title">معتمد من الهيئة السعودية للتخصصات الصحية</div>
-          <div class="scc-sub">Saudi Commission for Health Specialties — SCFHS<br>ترخيص مهني معتمد في المملكة العربية السعودية</div>
-        </div>
-      </div>
-      <div class="spec-cert-card">
-        <div class="scc-icon si-blu">🎓</div>
-        <div class="scc-body">
-          <div class="scc-title">بكالوريوس علوم البصريات</div>
-          <div class="scc-sub">جامعة النيلين — كلية علوم البصريات<br>Bachelor of Optometry Sciences</div>
-        </div>
-      </div>
-      <div class="spec-cert-card">
-        <div class="scc-icon si-gold">👁️</div>
-        <div class="scc-body">
-          <div class="scc-title">أخصائي بصريات معتمد</div>
-          <div class="scc-sub">خبرة في فحص النظر، تشخيص الوصفات،<br>وتركيب العدسات اللاصقة وإطارات النظارات</div>
-        </div>
-      </div>
-
-      <!-- معلومات الاتصال -->
-      <div class="section-title">معلومات الاتصال</div>
-      <div class="spec-info-cards">
-        <div class="spec-info-card">
-          <div class="sic-icon">📱</div>
-          <div class="sic-val" dir="ltr" style="color:var(--tx3);letter-spacing:.15em">••• •••• ••••</div>
-          <div class="sic-lbl">رقم الواتساب</div>
-        </div>
-        <div class="spec-info-card">
-          <div class="sic-icon">🕐</div>
-          <div class="sic-val">٤ عصراً – ١٠ مساءً</div>
-          <div class="sic-lbl">أوقات الاستشارة</div>
-        </div>
-        <div class="spec-info-card">
-          <div class="sic-icon">💬</div>
-          <div class="sic-val">واتساب فقط</div>
-          <div class="sic-lbl">وسيلة التواصل</div>
-        </div>
-        <div class="spec-info-card">
-          <div class="sic-icon">⭐</div>
-          <div class="sic-val">مجانية</div>
-          <div class="sic-lbl">الاستشارة</div>
-        </div>
-      </div>
-
+      <div id="specialistsList"></div>
       <div class="disclaimer">
         ⚕️ الاستشارة عبر واتساب تكميلية ولا تغني عن الفحص الطبي المباشر مع طبيب العيون المختص.
       </div>
@@ -2111,69 +2048,50 @@ body {
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title">👨‍⚕️ أخصائي البصريات</div>
+      <div class="modal-title">👨‍⚕️ الأخصائي</div>
       <button class="modal-close" onclick="closeModal('specialistModal')">✕</button>
     </div>
+    <div class="modal-body" id="specialistModalBody"></div>
+  </div>
+</div>
+
+<!-- SPECIALIST ADMIN (self-management) -->
+<div class="modal-overlay" id="specialistAdminModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">👨‍⚕️ إدارة ملفي</div>
+      <button class="modal-close" onclick="closeModal('specialistAdminModal')">✕</button>
+    </div>
     <div class="modal-body">
-      <div class="spec-modal-av">أ</div>
-      <div class="spec-modal-name">أحمد صلاح الدين أحمد سليمان</div>
-      <div class="spec-modal-role">أخصائي بصريات معتمد 👁️</div>
-
-      <div class="spec-info-grid">
-        <div class="spec-info-box">
-          <div class="sib-icon">🎓</div>
-          <div class="sib-val">جامعة النيلين</div>
-          <div class="sib-lbl">كلية علوم البصريات</div>
+      <div class="form-group">
+        <label>الصورة الشخصية</label>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div id="sp_avatar_preview" style="width:56px;height:56px;border-radius:14px;background:var(--c3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"></div>
+          <button type="button" class="btn-secondary" style="flex:0;padding:10px 16px" onclick="document.getElementById('spAvatarInput').click()">تغيير الصورة</button>
         </div>
-        <div class="spec-info-box">
-          <div class="sib-icon">🕐</div>
-          <div class="sib-val">٤ عصراً – ١٠ مساءً</div>
-          <div class="sib-lbl">أوقات العمل يومياً</div>
-        </div>
-        <div class="spec-info-box">
-          <div class="sib-icon">💬</div>
-          <div class="sib-val">متاح الآن</div>
-          <div class="sib-lbl">عبر واتساب</div>
-        </div>
-        <div class="spec-info-box">
-          <div class="sib-icon">⭐</div>
-          <div class="sib-val">بصريات معتمد</div>
-          <div class="sib-lbl">ترخيص مهني</div>
-        </div>
+        <input type="file" id="spAvatarInput" accept="image/*" style="display:none" onchange="handleSpecialistAvatarUpload()">
       </div>
-
-      <div class="spec-cert-row">
-        <div class="spec-cert-icon">🏅</div>
-        <div>
-          <div class="spec-cert-text">معتمد من الهيئة السعودية للتخصصات الصحية</div>
-          <div class="spec-cert-sub">Saudi Commission for Health Specialties — SCFHS</div>
-        </div>
+      <div class="form-group">
+        <label>اللقب / التخصص</label>
+        <input type="text" id="sp_title" placeholder="أخصائي بصريات معتمد">
       </div>
-
-      <div class="spec-cert-row" style="background:var(--blueb);border-color:rgba(77,171,247,.2)">
-        <div class="spec-cert-icon">🎓</div>
-        <div>
-          <div class="spec-cert-text" style="color:var(--blue)">بكالوريوس علوم البصريات</div>
-          <div class="spec-cert-sub">جامعة النيلين — كلية علوم البصريات</div>
-        </div>
+      <div class="form-group">
+        <label>رقم الواتساب</label>
+        <input type="text" id="sp_whatsapp" placeholder="9665XXXXXXXX">
       </div>
-
-      <div class="spec-divider"></div>
-
-      <div class="spec-hours" style="justify-content:center;margin-bottom:16px">
-        <div class="spec-hours-dot"></div>
-        <span style="font-weight:700;color:var(--tx)">متاح للاستشارة</span>
-        <span>· ٤ عصراً حتى ١٠ مساءً</span>
+      <div class="form-group">
+        <label>أوقات العمل</label>
+        <input type="text" id="sp_hours" placeholder="٤ عصراً – ١٠ مساءً يومياً">
       </div>
-
-      <button class="spec-wa-btn" onclick="openSpecialistWA()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        ابدأ الاستشارة على واتساب
-      </button>
-
-      <p style="text-align:center;font-size:.68rem;color:var(--tx3);margin-top:10px;line-height:1.6">
-        ⚕️ الاستشارة تكميلية ولا تغني عن الفحص الطبي المباشر
-      </p>
+      <div class="form-group">
+        <label>الشهادات والمؤهلات (سطر لكل شهادة: العنوان | التفاصيل)</label>
+        <textarea id="sp_certs" rows="4" placeholder="بكالوريوس علوم البصريات | جامعة النيلين" style="width:100%;padding:12px 14px;background:var(--c3);border:1px solid var(--bdr);border-radius:var(--r3);color:var(--tx);font-family:var(--font);font-size:.9rem;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('specialistAdminModal')">إلغاء</button>
+      <button class="btn-primary" onclick="saveSpecialistAdmin()">💾 حفظ</button>
     </div>
   </div>
 </div>
@@ -2383,6 +2301,7 @@ function showPage(p) {
   if(p === 'settings') renderSettings();
   if(p === 'timeline') renderTimeline();
   if(p === 'compare')  renderCompare();
+  if(p === 'specialist') renderSpecialistsPage();
   window.scrollTo({ top:0, behavior:'instant' });
 }
 
@@ -2600,13 +2519,22 @@ async function handleMerchantLogoUpload() {
   const input = document.getElementById('mmLogoInput');
   const file = input.files && input.files[0];
   if(!file || !sb || !currentUser) return;
+  const oldUrl = _mmLogoUrl;
   try {
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = `${currentUser.id}/logo-${Date.now()}.${ext}`;
     const { error } = await sb.storage.from('merchant-photos').upload(path, file, { upsert: false });
     if(error) throw error;
     const { data: pub } = sb.storage.from('merchant-photos').getPublicUrl(path);
-    if(pub && pub.publicUrl) { _mmLogoUrl = pub.publicUrl; renderMerchantLogoPreview(); }
+    if(pub && pub.publicUrl) {
+      _mmLogoUrl = pub.publicUrl;
+      renderMerchantLogoPreview();
+      if(oldUrl) {
+        const marker = '/merchant-photos/';
+        const i = oldUrl.indexOf(marker);
+        if(i >= 0) await sb.storage.from('merchant-photos').remove([oldUrl.slice(i + marker.length)]);
+      }
+    }
   } catch(e) {
     console.error('logo upload error:', e);
     showToast('⚠️ تعذر رفع الشعار');
@@ -2624,9 +2552,18 @@ function renderMerchantPhotosGrid() {
   `).join('');
 }
 
-function removeMerchantPhoto(idx) {
+async function removeMerchantPhoto(idx) {
+  const url = _mmPhotos[idx];
   _mmPhotos.splice(idx, 1);
   renderMerchantPhotosGrid();
+  try {
+    const marker = '/merchant-photos/';
+    const i = url.indexOf(marker);
+    if(i >= 0 && sb) {
+      const path = url.slice(i + marker.length);
+      await sb.storage.from('merchant-photos').remove([path]);
+    }
+  } catch(e) { console.warn('photo cleanup error:', e); }
 }
 
 async function handleMerchantPhotoUpload() {
@@ -2691,6 +2628,8 @@ async function onLoginSuccess(user) {
   currentUser = user;
   await loadUserData();
   await loadMyMerchant();
+  await loadSpecialists();
+  await loadMySpecialist();
   hideAuthScreen();
   updateUserChip();
   showPage('profile');
@@ -2750,7 +2689,15 @@ function renderProfile() {
   // Recent Rx
   const recent = members.filter(m=>hasGlassesRx(m)||hasContactsRx(m)).slice(0,5);
   const recEl = document.getElementById('recentRx');
-  if(!recent.length) {
+  if(!members.length) {
+    recEl.innerHTML = `
+      <div class="empty-state" style="background:var(--acc4);border:1px dashed var(--bdr2);border-radius:var(--r);padding:32px 20px">
+        <div class="empty-icon">👋</div>
+        <div class="empty-text" style="color:var(--tx);font-weight:700;font-size:.95rem;margin-bottom:6px">أهلاً بك في بصر!</div>
+        <div class="empty-text" style="margin-bottom:16px">ابدأ بإضافة أول فرد من عائلتك لحفظ وصفته الطبية</div>
+        <button class="btn-primary" style="max-width:220px;margin:0 auto" onclick="showPage('family');setTimeout(openAddMember,150)">➕ إضافة أول فرد</button>
+      </div>`;
+  } else if(!recent.length) {
     recEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">${t('empty_rx')}</div></div>`;
   } else {
     recEl.innerHTML = recent.map(m => {
@@ -3084,30 +3031,51 @@ function handleMemberImg() {
 // ══════════════════════════════════════
 // SHARE WA
 // ══════════════════════════════════════
+function padCol(v, w) {
+  v = (v === null || v === undefined || v === '') ? '—' : String(v);
+  return v.length >= w ? v : ' '.repeat(w - v.length) + v;
+}
+
+function buildRxTable(rows, headers) {
+  // rows: [{label:'OD', vals:[...]}, {label:'OS', vals:[...]}]
+  const labelW = 4;
+  const colW = headers.map(h => Math.max(h.length + 2, 6));
+  let out = ' '.repeat(labelW) + headers.map((h,i) => padCol(h, colW[i])).join('') + '\n';
+  rows.forEach(r => {
+    out += r.label.padEnd(labelW) + r.vals.map((v,i) => padCol(v, colW[i])).join('') + '\n';
+  });
+  return out;
+}
+
 function shareWAMember(id) {
   const m = getMembers().find(x=>String(x.id)===String(id));
   if(!m) return;
   const p = getProfile();
-  let msg = `👁️ *وصفة بصر — Basar App*\n━━━━━━━━━━━━━━\n`;
-  msg += `👤 *${m.name}* (${m.rel})`;
-  if(m.age) msg+=` · ${m.age} سنة`;
-  msg+='\n';
-  if(p.first) msg+=`👨‍👩‍👧‍👦 من ملف: ${p.first} ${p.last}\n`;
-  msg+='━━━━━━━━━━━━━━\n';
+  let msg = `👓 *بطاقة وصفة — بصر*\n`;
+  msg += `─────────────────────\n`;
+  msg += `👤 *${m.name}* — ${m.rel}${m.age ? ' · '+m.age+' سنة' : ''}\n`;
+  if(p.first) msg += `👨‍👩‍👧‍👦 عائلة ${p.first} ${p.last||''}`.trim() + '\n';
+  msg += `─────────────────────\n`;
+
   if(hasGlassesRx(m)){
-    const g=m.grx,r=g.r||{},l=g.l||{};
-    msg+=`*🕶️ النظارات*${g.date?' ('+g.date+')':''}${g.doc?' | '+g.doc:''}\n`;
-    msg+=`يمنى: SPH ${r.sph||'—'} | CYL ${r.cyl||'—'} | AXIS ${r.ax||'—'}\n`;
-    msg+=`يسرى: SPH ${l.sph||'—'} | CYL ${l.cyl||'—'} | AXIS ${l.ax||'—'}\n`;
+    const g=m.grx, r=g.r||{}, l=g.l||{};
+    msg += `🕶️ *النظارات*${g.date?' · '+g.date:''}${g.doc?' · '+g.doc:''}\n`;
+    msg += '```\n' + buildRxTable(
+      [ {label:'OD', vals:[r.sph, r.cyl, r.ax]}, {label:'OS', vals:[l.sph, l.cyl, l.ax]} ],
+      ['SPH','CYL','AXIS']
+    ) + '```\n';
   }
   if(hasContactsRx(m)){
-    const c=m.crx,r=c.r||{},l=c.l||{};
-    msg+=`\n*👁️ العدسات*${c.date?' ('+c.date+')':''}${c.lensType?' | '+c.lensType:''}\n`;
-    msg+=`يمنى: SPH ${r.sph||'—'} | BC ${r.bc||'—'} | DIA ${r.dia||'—'}\n`;
-    msg+=`يسرى: SPH ${l.sph||'—'} | BC ${l.bc||'—'} | DIA ${l.dia||'—'}\n`;
+    const c=m.crx, r=c.r||{}, l=c.l||{};
+    msg += `\n👁️ *العدسات اللاصقة*${c.date?' · '+c.date:''}${c.lensType?' · '+c.lensType:''}\n`;
+    msg += '```\n' + buildRxTable(
+      [ {label:'OD', vals:[r.sph, r.bc, r.dia]}, {label:'OS', vals:[l.sph, l.bc, l.dia]} ],
+      ['SPH','BC','DIA']
+    ) + '```\n';
   }
-  if(m.notes) msg+=`\n📝 ${m.notes}\n`;
-  msg+='\n⚕️ تطبيق بصر · لا يغني عن استشارة الطبيب المختص';
+  if(m.notes) msg += `\n📝 ${m.notes}\n`;
+  msg += `─────────────────────\n`;
+  msg += `⚕️ عبر تطبيق بصر · لا يغني عن استشارة الطبيب المختص`;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 function shareRxCard(id) {
@@ -3120,79 +3088,99 @@ function shareRxCard(id) {
 // ══════════════════════════════════════
 // PDF EXPORT
 // ══════════════════════════════════════
-function exportPDFMember(id) {
-  const {jsPDF}=window.jspdf;
-  const m=getMembers().find(x=>String(x.id)===String(id));
+function buildRxTableHtml(rows, headers) {
+  return `
+    <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:13px">
+      <tr>
+        <th style="padding:8px 6px;color:#8b9ab5;font-weight:600;text-align:center;background:#f4f3fb"></th>
+        ${headers.map(h => `<th style="padding:8px 6px;color:#8b9ab5;font-weight:600;text-align:center;background:#f4f3fb">${h}</th>`).join('')}
+      </tr>
+      ${rows.map(r => `
+        <tr>
+          <td style="padding:8px 6px;color:#534AB7;font-weight:700;text-align:center;border-top:1px solid #eee">${r.label}</td>
+          ${r.vals.map(v => `<td style="padding:8px 6px;color:#1a1a1a;text-align:center;border-top:1px solid #eee">${v || '—'}</td>`).join('')}
+        </tr>
+      `).join('')}
+    </table>`;
+}
+
+function buildPdfCardHtml(m, p) {
+  const glasses = hasGlassesRx(m) ? (() => {
+    const g=m.grx, r=g.r||{}, l=g.l||{};
+    return `
+      <div style="margin-top:18px">
+        <div style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:2px">🕶️ وصفة النظارات</div>
+        <div style="font-size:11px;color:#999;margin-bottom:8px">${g.date || ''}${g.doc ? ' · ' + g.doc : ''}</div>
+        ${buildRxTableHtml(
+          [ {label:'OD', vals:[r.sph, r.cyl, r.ax, r.add, r.ipd]}, {label:'OS', vals:[l.sph, l.cyl, l.ax, l.add, l.ipd]} ],
+          ['SPH','CYL','AXIS','ADD','IPD']
+        )}
+      </div>`;
+  })() : '';
+
+  const contacts = hasContactsRx(m) ? (() => {
+    const c=m.crx, r=c.r||{}, l=c.l||{};
+    return `
+      <div style="margin-top:18px">
+        <div style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:2px">👁️ وصفة العدسات اللاصقة</div>
+        <div style="font-size:11px;color:#999;margin-bottom:8px">${c.date || ''}${c.lensType ? ' · ' + c.lensType : ''}</div>
+        ${buildRxTableHtml(
+          [ {label:'OD', vals:[r.sph, r.cyl, r.ax, r.bc, r.dia]}, {label:'OS', vals:[l.sph, l.cyl, l.ax, l.bc, l.dia]} ],
+          ['SPH','CYL','AXIS','BC','DIA']
+        )}
+      </div>`;
+  })() : '';
+
+  const notes = m.notes ? `
+    <div style="margin-top:18px;background:#f8f8fc;border-radius:10px;padding:12px 14px;font-size:12px;color:#555;line-height:1.6">
+      📝 ${m.notes}
+    </div>` : '';
+
+  return `
+    <div style="width:600px;background:#ffffff;font-family:-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;direction:rtl;padding:0">
+      <div style="background:linear-gradient(135deg,#00d4aa,#00b894);padding:22px 28px;color:#04231d">
+        <div style="font-size:20px;font-weight:900">👁️ بصر — بطاقة وصفة طبية</div>
+        <div style="font-size:11px;opacity:.75;margin-top:2px">basar-app.vercel.app</div>
+      </div>
+      <div style="padding:24px 28px 28px">
+        <div style="font-size:17px;font-weight:800;color:#1a1a1a">${m.name} — ${m.rel}${m.age ? ' · ' + m.age + ' سنة' : ''}</div>
+        ${p.first ? `<div style="font-size:12px;color:#999;margin-top:2px">عائلة ${p.first} ${p.last||''}</div>` : ''}
+        ${glasses}
+        ${contacts}
+        ${notes}
+        <div style="margin-top:24px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#aaa;line-height:1.7;text-align:center">
+          ⚕️ تطبيق بصر لحفظ الوصفات الطبية فقط، ولا يغني عن استشارة طبيب العيون المختص
+        </div>
+      </div>
+    </div>`;
+}
+
+async function exportPDFMember(id) {
+  const m = getMembers().find(x=>String(x.id)===String(id));
   if(!m) return;
-  const p=getProfile();
-  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const W=210;
-  doc.setFillColor(8,12,16); doc.rect(0,0,W,36,'F');
-  doc.setTextColor(0,212,170); doc.setFontSize(18); doc.setFont('helvetica','bold');
-  doc.text('BASAR APP — Eye Prescription',W/2,14,{align:'center'});
-  doc.setTextColor(139,154,181); doc.setFontSize(9); doc.setFont('helvetica','normal');
-  doc.text('basar-app.vercel.app',W/2,22,{align:'center'});
-  doc.setTextColor(80,100,120); doc.setFontSize(7.5);
-  doc.text('Not a substitute for specialist consultation.',W/2,30,{align:'center'});
-  let y=44;
-  doc.setFillColor(22,27,34); doc.roundedRect(12,y,W-24,20,3,3,'F');
-  doc.setTextColor(240,246,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
-  doc.text(m.name+' ('+m.rel+')'+(m.age?' — '+m.age+' y':''),16,y+8);
-  if(p.first) {doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(139,154,181);doc.text('Family: '+p.first+' '+p.last,16,y+15);}
-  y+=26;
-  if(hasGlassesRx(m)){
-    const g=m.grx,r=g.r||{},l=g.l||{};
-    doc.setFillColor(0,66,58); doc.rect(12,y,W-24,8,'F');
-    doc.setTextColor(0,212,170); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text('GLASSES PRESCRIPTION'+(g.date?' — '+g.date:'')+(g.doc?' | '+g.doc:''),16,y+5.5);
-    y+=8;
-    const ghdr=['Eye','SPH','CYL','AXIS','ADD','IPD'],gcw=[36,28,28,28,28,24];
-    doc.setFillColor(31,39,50);doc.rect(12,y,W-24,7,'F');
-    doc.setTextColor(139,154,181);doc.setFontSize(8);doc.setFont('helvetica','bold');
-    let gx=12;ghdr.forEach((h,i)=>{doc.text(h,gx+gcw[i]/2,y+4.8,{align:'center'});gx+=gcw[i];});y+=7;
-    [[`OD (Right)`,[r.sph,r.cyl,r.ax,r.add,r.ipd]],[`OS (Left)`,[l.sph,l.cyl,l.ax,l.add,l.ipd]]].forEach(([lbl,vals],ri)=>{
-      doc.setFillColor(ri%2===0?20:16,ri%2===0?25:20,ri%2===0?34:28);
-      doc.rect(12,y,W-24,8,'F');
-      doc.setTextColor(220,230,240);doc.setFontSize(8.5);
-      gx=12;doc.setFont('helvetica','bold');doc.text(lbl,gx+gcw[0]/2,y+5.2,{align:'center'});gx+=gcw[0];
-      doc.setFont('helvetica','normal');
-      vals.forEach((v,i)=>{doc.text(v||'—',gx+gcw[i+1]/2,y+5.2,{align:'center'});gx+=gcw[i+1];});
-      y+=8;
-    });y+=6;
+  const p = getProfile();
+  showLoading(true);
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;top:0;left:-9999px;z-index:-1';
+  holder.innerHTML = buildPdfCardHtml(m, p);
+  document.body.appendChild(holder);
+  try {
+    const canvas = await html2canvas(holder.firstElementChild, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = 210;
+    const margin = 12;
+    const imgW = pageW - margin * 2;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, imgW, imgH);
+    doc.save(`basar-${m.name}-${new Date().toISOString().split('T')[0]}.pdf`);
+    showToast('📄 تم تصدير PDF');
+  } catch(e) {
+    console.error('PDF export error:', e);
+    showToast('⚠️ تعذر تصدير PDF');
   }
-  if(hasContactsRx(m)){
-    const c=m.crx,r=c.r||{},l=c.l||{};
-    doc.setFillColor(0,30,60);doc.rect(12,y,W-24,8,'F');
-    doc.setTextColor(77,171,247);doc.setFontSize(9);doc.setFont('helvetica','bold');
-    doc.text('CONTACTS PRESCRIPTION'+(c.date?' — '+c.date:'')+(c.lensType?' | '+c.lensType:''),16,y+5.5);
-    y+=8;
-    const chdr=['Eye','SPH','CYL','AXIS','BC','DIA'],ccw=[36,28,28,28,26,22];
-    doc.setFillColor(31,39,50);doc.rect(12,y,W-24,7,'F');
-    doc.setTextColor(139,154,181);doc.setFontSize(8);doc.setFont('helvetica','bold');
-    let cx=12;chdr.forEach((h,i)=>{doc.text(h,cx+ccw[i]/2,y+4.8,{align:'center'});cx+=ccw[i];});y+=7;
-    [[`OD (Right)`,[r.sph,r.cyl,r.ax,r.bc,r.dia]],[`OS (Left)`,[l.sph,l.cyl,l.ax,l.bc,l.dia]]].forEach(([lbl,vals],ri)=>{
-      doc.setFillColor(ri%2===0?20:16,ri%2===0?25:20,ri%2===0?34:28);
-      doc.rect(12,y,W-24,8,'F');
-      doc.setTextColor(220,230,240);doc.setFontSize(8.5);
-      cx=12;doc.setFont('helvetica','bold');doc.text(lbl,cx+ccw[0]/2,y+5.2,{align:'center'});cx+=ccw[0];
-      doc.setFont('helvetica','normal');
-      vals.forEach((v,i)=>{doc.text(v||'—',cx+ccw[i+1]/2,y+5.2,{align:'center'});cx+=ccw[i+1];});
-      y+=8;
-    });y+=6;
-  }
-  if(m.notes){
-    doc.setFillColor(22,27,34);doc.roundedRect(12,y,W-24,12,2,2,'F');
-    doc.setTextColor(139,154,181);doc.setFontSize(8);doc.setFont('helvetica','bold');
-    doc.text('Notes:',16,y+5);doc.setFont('helvetica','normal');doc.setTextColor(200,210,220);
-    doc.text(doc.splitTextToSize(m.notes,W-40),30,y+5);y+=16;
-  }
-  y=Math.max(y,252);
-  doc.setFillColor(22,27,34);doc.roundedRect(12,y,W-24,14,2,2,'F');
-  doc.setTextColor(80,100,80);doc.setFontSize(7);doc.setFont('helvetica','normal');
-  doc.text('⚕️ Basar App is for storing prescriptions only. Always consult your ophthalmologist.',W/2,y+5.5,{align:'center'});
-  doc.text('Generated by Basar App (بصر) — basar-app.vercel.app',W/2,y+11,{align:'center'});
-  doc.save(`basar-${m.name}-${new Date().toISOString().split('T')[0]}.pdf`);
-  showToast('📄 تم تصدير PDF');
+  document.body.removeChild(holder);
+  showLoading(false);
 }
 
 // ══════════════════════════════════════
@@ -3284,6 +3272,19 @@ function renderSettings() {
         <div class="sett-row" onclick="openMerchantAdmin()">
           <div class="sett-icon si-grn">🏪</div>
           <div class="sett-text"><div class="sett-label">إدارة متجري</div><div class="sett-sub">${_myMerchant.name}</div></div>
+          <div class="sett-arrow">›</div>
+        </div>
+      </div>
+    </div>
+    ` : ''}
+
+    ${_mySpecialist ? `
+    <div class="sett-section">
+      <div class="sett-section-title">ملفي كأخصائي</div>
+      <div class="sett-card">
+        <div class="sett-row" onclick="openSpecialistAdmin()">
+          <div class="sett-icon si-grn">👨‍⚕️</div>
+          <div class="sett-text"><div class="sett-label">إدارة ملفي</div><div class="sett-sub">${_mySpecialist.name}</div></div>
           <div class="sett-arrow">›</div>
         </div>
       </div>
@@ -3424,9 +3425,70 @@ function changeFontSize(dir) {
   const el=document.getElementById('settFzVal'); if(el) el.textContent=_currentFontSize+'%';
   showToast('🔤 حجم الخط: '+_currentFontSize+'%');
 }
-function toggleSettingSwitch(id) {
+const VAPID_PUBLIC_KEY = 'BOfKRajpUhbF_KnF0Ud7561KTwhXodv-XCk0z-yj-3R_SXzq16IIW7AJH47jzSRBhUIjO9s1hImAJJex2XPMZMc';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function enablePushNotifications() {
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    showToast('⚠️ جهازك أو متصفحك لا يدعم الإشعارات');
+    return false;
+  }
+  try {
+    const permission = await Notification.requestPermission();
+    if(permission !== 'granted') { showToast('🔕 لم يتم منح إذن الإشعارات'); return false; }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    const json = sub.toJSON();
+    await sb.from('push_subscriptions').upsert({
+      user_id: currentUser.id,
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh,
+      auth_key: json.keys.auth
+    }, { onConflict: 'endpoint' });
+    return true;
+  } catch(e) {
+    console.error('push subscribe error:', e);
+    showToast('⚠️ تعذر تفعيل الإشعارات');
+    return false;
+  }
+}
+
+async function disablePushNotifications() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if(sub) {
+      await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+      await sub.unsubscribe();
+    }
+  } catch(e) { console.error('push unsubscribe error:', e); }
+}
+
+async function toggleSettingSwitch(id) {
   const el=document.getElementById(id); if(!el) return;
   const isOn=el.getAttribute('data-on')==='true';
+  if(id === 'notifPush') {
+    if(!isOn) {
+      const ok = await enablePushNotifications();
+      if(!ok) return;
+    } else {
+      await disablePushNotifications();
+    }
+  }
   el.setAttribute('data-on',isOn?'false':'true');
   const prefs=JSON.parse(localStorage.getItem('basarNotifPrefs')||'{}');
   prefs[id]=!isOn; localStorage.setItem('basarNotifPrefs',JSON.stringify(prefs));
@@ -3495,70 +3557,156 @@ function importDataJSON(input) {
 
 
 // ══════════════════════════════════════
-// SPECIALIST PAGE
+// SPECIALISTS (directory + self-management)
 // ══════════════════════════════════════
-function renderSpecialistPage() {
-  // الصفحة static — لا تحتاج render ديناميكي
+let _specialistsList = [];
+let _mySpecialist = null;
+let _spAvatarUrl = null;
+
+async function loadSpecialists() {
+  if(!sb) return;
+  try {
+    const { data } = await sb.from('specialists').select('*').eq('status','active').order('created_at',{ascending:true});
+    _specialistsList = data || [];
+  } catch(e) { console.warn('loadSpecialists error:', e.message); _specialistsList = []; }
 }
 
-// الرقم محفوظ في Supabase Edge Function — لا يظهر في الكود
-async function callSpecialistEdge(topic) {
-  const p = getProfile();
-  const userName = (p.first||'') + (p.last?' '+p.last:'') || 'مستخدم بصر';
-  const members = getMembers();
-
-  let rxSummary = '';
-  const withRx = members.filter(m => hasGlassesRx(m) || hasContactsRx(m));
-  if(withRx.length) {
-    rxSummary += `📋 الوصفات المحفوظة:\n`;
-    withRx.slice(0,2).forEach(m => {
-      rxSummary += `• ${m.name} (${m.rel})`;
-      if(hasGlassesRx(m)) {
-        const r = m.grx.r||{}, l = m.grx.l||{};
-        rxSummary += `\n  🕶️ OD ${r.sph||'—'}/${r.cyl||'—'} | OS ${l.sph||'—'}/${l.cyl||'—'}`;
-      }
-      if(hasContactsRx(m)) {
-        const r = m.crx.r||{}, l = m.crx.l||{};
-        rxSummary += `\n  👁️ OD ${r.sph||'—'} | OS ${l.sph||'—'}`;
-      }
-      rxSummary += '\n';
-    });
-  }
-
+async function loadMySpecialist() {
+  if(!sb || !currentUser) { _mySpecialist = null; return; }
   try {
-    const res = await fetch(
-      'https://itblplmyuuvimdifldew.supabase.co/functions/v1/get-specialist-contact',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SB_KEY
-        },
-        body: JSON.stringify({ topic, userName, rxSummary })
-      }
-    );
-    const data = await res.json();
-    if(data.url) {
-      window.open(data.url, '_blank');
-    } else {
-      showToast('⚠️ تعذّر فتح واتساب، حاول مجدداً');
-    }
+    const { data } = await sb.from('specialists').select('*').eq('owner_user_id', currentUser.id).maybeSingle();
+    _mySpecialist = data || null;
+  } catch(e) { _mySpecialist = null; }
+}
+
+function renderSpecialistsPage() {
+  const el = document.getElementById('specialistsList');
+  if(!el) return;
+  if(!_specialistsList.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">👨‍⚕️</div><div class="empty-text">لا يوجد أخصائيون متاحون حالياً</div></div>`;
+    return;
+  }
+  el.innerHTML = _specialistsList.map(s => `
+    <div class="spec-cert-card" style="cursor:pointer;align-items:center" onclick="openSpecialistDetail('${s.id}')">
+      <div class="scc-icon si-grn" style="width:52px;height:52px;border-radius:16px;overflow:hidden;font-size:22px">
+        ${s.avatar_url ? `<img src="${s.avatar_url}" style="width:100%;height:100%;object-fit:cover">` : '👨‍⚕️'}
+      </div>
+      <div class="scc-body">
+        <div class="scc-title">${s.name}</div>
+        <div class="scc-sub">${s.title || ''}${s.hours_text ? ' · ' + s.hours_text : ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openSpecialistDetail(id) {
+  const s = _specialistsList.find(x => String(x.id) === String(id));
+  if(!s) return;
+  const certs = Array.isArray(s.certifications) ? s.certifications : [];
+  document.getElementById('specialistModalBody').innerHTML = `
+    <div class="spec-modal-av" style="overflow:hidden">${s.avatar_url ? `<img src="${s.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:22px">` : '👨‍⚕️'}</div>
+    <div class="spec-modal-name">${s.name}</div>
+    <div class="spec-modal-role">${s.title || ''}</div>
+    ${s.hours_text ? `
+      <div class="spec-hours" style="justify-content:center;margin-bottom:16px">
+        <div class="spec-hours-dot"></div>
+        <span>${s.hours_text}</span>
+      </div>` : ''}
+    ${certs.map(c => `
+      <div class="spec-cert-row">
+        <div class="spec-cert-icon">🏅</div>
+        <div>
+          <div class="spec-cert-text">${c.title || ''}</div>
+          ${c.sub ? `<div class="spec-cert-sub">${c.sub}</div>` : ''}
+        </div>
+      </div>
+    `).join('')}
+    ${s.whatsapp ? `
+      <button class="spec-wa-btn" style="margin-top:8px" onclick="contactSpecialistWA('${s.id}')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        تواصل عبر واتساب
+      </button>
+    ` : `<p style="text-align:center;color:var(--tx3);font-size:.8rem;margin-top:8px">التواصل غير متاح حالياً</p>`}
+    <p style="text-align:center;font-size:.68rem;color:var(--tx3);margin-top:10px;line-height:1.6">
+      ⚕️ الاستشارة تكميلية ولا تغني عن الفحص الطبي المباشر
+    </p>
+  `;
+  openModal('specialistModal');
+}
+
+function contactSpecialistWA(id) {
+  const s = _specialistsList.find(x => String(x.id) === String(id));
+  if(!s || !s.whatsapp) return;
+  const p = getProfile();
+  const name = (p.first||'') + (p.last?' '+p.last:'') || 'مستخدم بصر';
+  const msg = `مرحباً ${s.name}،\nأنا ${name} من تطبيق بصر، أحتاج استشارة بخصوص وصفتي الطبية.`;
+  const clean = s.whatsapp.replace(/[^\d]/g,'');
+  window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function openSpecialistAdmin() {
+  if(!_mySpecialist) return;
+  document.getElementById('sp_title').value = _mySpecialist.title || '';
+  document.getElementById('sp_whatsapp').value = _mySpecialist.whatsapp || '';
+  document.getElementById('sp_hours').value = _mySpecialist.hours_text || '';
+  const certs = Array.isArray(_mySpecialist.certifications) ? _mySpecialist.certifications : [];
+  document.getElementById('sp_certs').value = certs.map(c => `${c.title||''} | ${c.sub||''}`).join('\n');
+  _spAvatarUrl = _mySpecialist.avatar_url || null;
+  renderSpecialistAvatarPreview();
+  openModal('specialistAdminModal');
+}
+
+function renderSpecialistAvatarPreview() {
+  const el = document.getElementById('sp_avatar_preview');
+  el.innerHTML = _spAvatarUrl
+    ? `<img src="${_spAvatarUrl}" style="width:100%;height:100%;object-fit:cover">`
+    : `<span style="font-size:20px;color:var(--tx3)">👨‍⚕️</span>`;
+}
+
+async function handleSpecialistAvatarUpload() {
+  const input = document.getElementById('spAvatarInput');
+  const file = input.files && input.files[0];
+  if(!file || !sb || !currentUser) return;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${currentUser.id}/specialist-avatar-${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from('merchant-photos').upload(path, file, { upsert: false });
+    if(error) throw error;
+    const { data: pub } = sb.storage.from('merchant-photos').getPublicUrl(path);
+    if(pub && pub.publicUrl) { _spAvatarUrl = pub.publicUrl; renderSpecialistAvatarPreview(); }
+  } catch(e) {
+    console.error('specialist avatar upload error:', e);
+    showToast('⚠️ تعذر رفع الصورة');
+  }
+  input.value = '';
+}
+
+async function saveSpecialistAdmin() {
+  if(!_mySpecialist || !sb) return;
+  const title = document.getElementById('sp_title').value.trim();
+  const whatsapp = document.getElementById('sp_whatsapp').value.trim();
+  const hours_text = document.getElementById('sp_hours').value.trim();
+  const certifications = document.getElementById('sp_certs').value.split('\n').map(l=>l.trim()).filter(Boolean).map(line => {
+    const parts = line.split('|');
+    return { title: (parts[0]||'').trim(), sub: parts.slice(1).join('|').trim() };
+  });
+  showLoading(true);
+  try {
+    const { data, error } = await sb.from('specialists')
+      .update({ title, whatsapp, hours_text, certifications, avatar_url: _spAvatarUrl, updated_at: new Date().toISOString() })
+      .eq('id', _mySpecialist.id)
+      .select()
+      .single();
+    if(error) throw error;
+    _mySpecialist = data;
+    await loadSpecialists();
+    closeModal('specialistAdminModal');
+    showToast('✅ تم حفظ الملف');
   } catch(e) {
     console.error(e);
-    showToast('⚠️ تعذّر الاتصال بالخادم');
+    showToast('⚠️ تعذر الحفظ');
   }
-}
-
-function quickConsult(topic) {
-  callSpecialistEdge(topic);
-}
-
-// ══════════════════════════════════════
-// SPECIALIST — WhatsApp
-// ══════════════════════════════════════
-function openSpecialistWA() {
-  closeModal('specialistModal');
-  callSpecialistEdge('استشارة بصرية');
+  showLoading(false);
 }
 
 // ══════════════════════════════════════
