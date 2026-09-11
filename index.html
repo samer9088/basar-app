@@ -2550,6 +2550,12 @@ function renderMerchantPhotosGrid() {
       <button onclick="removeMerchantPhoto(${i})" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
   `).join('');
+  const area = document.getElementById('mmUploadArea');
+  const txt = document.getElementById('mmUploadTxt');
+  const atMax = _mmPhotos.length >= MAX_MERCHANT_PHOTOS;
+  if(area) area.style.opacity = atMax ? '.45' : '1';
+  if(area) area.style.pointerEvents = atMax ? 'none' : 'auto';
+  if(txt) txt.textContent = atMax ? `تم الوصول للحد الأقصى (${MAX_MERCHANT_PHOTOS} صور)` : `إضافة صورة (${_mmPhotos.length}/${MAX_MERCHANT_PHOTOS})`;
 }
 
 async function removeMerchantPhoto(idx) {
@@ -2566,13 +2572,25 @@ async function removeMerchantPhoto(idx) {
   } catch(e) { console.warn('photo cleanup error:', e); }
 }
 
+const MAX_MERCHANT_PHOTOS = 3;
+
 async function handleMerchantPhotoUpload() {
   const input = document.getElementById('mmPhotoInput');
   const files = Array.from(input.files || []);
   if(!files.length || !sb || !currentUser) return;
+  const remaining = MAX_MERCHANT_PHOTOS - _mmPhotos.length;
+  if(remaining <= 0) {
+    showToast(`⚠️ الحد الأقصى ${MAX_MERCHANT_PHOTOS} صور لكل متجر`);
+    input.value = '';
+    return;
+  }
+  const toUpload = files.slice(0, remaining);
+  if(files.length > remaining) {
+    showToast(`⚠️ تم رفع ${remaining} صور فقط (الحد الأقصى ${MAX_MERCHANT_PHOTOS})`);
+  }
   const txt = document.getElementById('mmUploadTxt');
   txt.textContent = 'جارِ الرفع...';
-  for(const file of files) {
+  for(const file of toUpload) {
     try {
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
@@ -2586,7 +2604,6 @@ async function handleMerchantPhotoUpload() {
     }
   }
   renderMerchantPhotosGrid();
-  txt.textContent = 'انقر لإضافة صورة';
   input.value = '';
 }
 
