@@ -1529,7 +1529,48 @@ button:active:not(:disabled), .nav-btn:active, .ma-btn:active, .chip-btn:active,
       </div>
       <div class="form-group">
         <label data-i18n="auth_phone">رقم الجوال</label>
-        <input type="tel" id="reg_phone" placeholder="+966 5X XXX XXXX">
+        <input type="tel" id="reg_phone" placeholder="مثال: 5XXXXXXXX">
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الدولة</label>
+          <select id="reg_country">
+            <option value="">اختر الدولة</option>
+            <option value="السعودية">🇸🇦 السعودية</option>
+            <option value="الإمارات">🇦🇪 الإمارات</option>
+            <option value="الكويت">🇰🇼 الكويت</option>
+            <option value="قطر">🇶🇦 قطر</option>
+            <option value="البحرين">🇧🇭 البحرين</option>
+            <option value="عُمان">🇴🇲 عُمان</option>
+            <option value="مصر">🇪🇬 مصر</option>
+            <option value="الأردن">🇯🇴 الأردن</option>
+            <option value="العراق">🇮🇶 العراق</option>
+            <option value="سوريا">🇸🇾 سوريا</option>
+            <option value="لبنان">🇱🇧 لبنان</option>
+            <option value="فلسطين">🇵🇸 فلسطين</option>
+            <option value="اليمن">🇾🇪 اليمن</option>
+            <option value="المغرب">🇲🇦 المغرب</option>
+            <option value="الجزائر">🇩🇿 الجزائر</option>
+            <option value="تونس">🇹🇳 تونس</option>
+            <option value="ليبيا">🇱🇾 ليبيا</option>
+            <option value="السودان">🇸🇩 السودان</option>
+            <option value="تركيا">🇹🇷 تركيا</option>
+            <option value="باكستان">🇵🇰 باكستان</option>
+            <option value="إيران">🇮🇷 إيران</option>
+            <option value="ماليزيا">🇲🇾 ماليزيا</option>
+            <option value="إندونيسيا">🇮🇩 إندونيسيا</option>
+            <option value="بريطانيا">🇬🇧 بريطانيا</option>
+            <option value="أمريكا">🇺🇸 أمريكا</option>
+            <option value="كندا">🇨🇦 كندا</option>
+            <option value="فرنسا">🇫🇷 فرنسا</option>
+            <option value="ألمانيا">🇩🇪 ألمانيا</option>
+            <option value="أخرى">🌍 دولة أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>المدينة</label>
+          <input type="text" id="reg_city" placeholder="اسم المدينة">
+        </div>
       </div>
       <div class="form-group">
         <label data-i18n="auth_password">كلمة المرور</label>
@@ -1932,8 +1973,45 @@ button:active:not(:disabled), .nav-btn:active, .ma-btn:active, .chip-btn:active,
         <div class="form-group"><label data-i18n="field_first">الاسم الأول</label><input type="text" id="ep_first"></div>
         <div class="form-group"><label data-i18n="field_last">اسم العائلة</label><input type="text" id="ep_last"></div>
       </div>
-      <div class="form-group"><label data-i18n="field_phone">الهاتف</label><input type="tel" id="ep_phone" placeholder="+966"></div>
-      <div class="form-group"><label data-i18n="field_city">المدينة</label><input type="text" id="ep_city"></div>
+      <div class="form-group"><label data-i18n="field_phone">الهاتف</label><input type="tel" id="ep_phone" placeholder="مثال: 5XXXXXXXX"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الدولة</label>
+          <select id="ep_country">
+            <option value="">اختر الدولة</option>
+            <option value="السعودية">🇸🇦 السعودية</option>
+            <option value="الإمارات">🇦🇪 الإمارات</option>
+            <option value="الكويت">🇰🇼 الكويت</option>
+            <option value="قطر">🇶🇦 قطر</option>
+            <option value="البحرين">🇧🇭 البحرين</option>
+            <option value="عُمان">🇴🇲 عُمان</option>
+            <option value="مصر">🇪🇬 مصر</option>
+            <option value="الأردن">🇯🇴 الأردن</option>
+            <option value="العراق">🇮🇶 العراق</option>
+            <option value="سوريا">🇸🇾 سوريا</option>
+            <option value="لبنان">🇱🇧 لبنان</option>
+            <option value="فلسطين">🇵🇸 فلسطين</option>
+            <option value="اليمن">🇾🇪 اليمن</option>
+            <option value="المغرب">🇲🇦 المغرب</option>
+            <option value="الجزائر">🇩🇿 الجزائر</option>
+            <option value="تونس">🇹🇳 تونس</option>
+            <option value="ليبيا">🇱🇾 ليبيا</option>
+            <option value="السودان">🇸🇩 السودان</option>
+            <option value="تركيا">🇹🇷 تركيا</option>
+            <option value="باكستان">🇵🇰 باكستان</option>
+            <option value="إيران">🇮🇷 إيران</option>
+            <option value="ماليزيا">🇲🇾 ماليزيا</option>
+            <option value="إندونيسيا">🇮🇩 إندونيسيا</option>
+            <option value="بريطانيا">🇬🇧 بريطانيا</option>
+            <option value="أمريكا">🇺🇸 أمريكا</option>
+            <option value="كندا">🇨🇦 كندا</option>
+            <option value="فرنسا">🇫🇷 فرنسا</option>
+            <option value="ألمانيا">🇩🇪 ألمانيا</option>
+            <option value="أخرى">🌍 دولة أخرى</option>
+          </select>
+        </div>
+        <div class="form-group"><label data-i18n="field_city">المدينة</label><input type="text" id="ep_city"></div>
+      </div>
       <div class="form-group">
         <label data-i18n="field_gender">الجنس</label>
         <select id="ep_gender">
@@ -2358,6 +2436,8 @@ async function doRegister() {
   const last  = document.getElementById('reg_last').value.trim();
   const email = document.getElementById('reg_email').value.trim();
   const phone = document.getElementById('reg_phone').value.trim();
+  const country = document.getElementById('reg_country').value;
+  const city  = document.getElementById('reg_city').value.trim();
   const pass  = document.getElementById('reg_pass').value;
   const pass2 = document.getElementById('reg_pass2').value;
   if(!first || !email || !pass) return showAuthErr('يرجى ملء الحقول المطلوبة');
@@ -2370,7 +2450,7 @@ async function doRegister() {
   try {
     const { error } = await sb.auth.signUp({
       email, password: pass,
-      options: { data: { first_name: first, last_name: last, phone } }
+      options: { data: { first_name: first, last_name: last, phone, country, city } }
     });
     if(error) throw error;
     showLoading(false);
@@ -2431,7 +2511,7 @@ async function loadUserData() {
     } else {
       const meta = currentUser.user_metadata||{};
       _profileCache = { first:meta.first_name||'', last:meta.last_name||'',
-        email:currentUser.email, phone:meta.phone||'', city:'', country:'', dob:'', gender:'', avatar:null };
+        email:currentUser.email, phone:meta.phone||'', city:meta.city||'', country:meta.country||'', dob:'', gender:'', avatar:null };
       await upsertProfile(_profileCache);
     }
     const {data:fd} = await sb.from('family_members').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:true});
@@ -2994,6 +3074,7 @@ function openEditProfile() {
   document.getElementById('ep_first').value=p.first||'';
   document.getElementById('ep_last').value=p.last||'';
   document.getElementById('ep_phone').value=p.phone||'';
+  document.getElementById('ep_country').value=p.country||'';
   document.getElementById('ep_city').value=p.city||'';
   document.getElementById('ep_gender').value=p.gender||'';
   document.getElementById('ep_dob').value=p.dob||'';
@@ -3005,6 +3086,7 @@ async function saveProfile() {
     first:document.getElementById('ep_first').value.trim(),
     last:document.getElementById('ep_last').value.trim(),
     phone:document.getElementById('ep_phone').value.trim(),
+    country:document.getElementById('ep_country').value,
     city:document.getElementById('ep_city').value.trim(),
     gender:document.getElementById('ep_gender').value,
     dob:document.getElementById('ep_dob').value,
