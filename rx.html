@@ -35,6 +35,8 @@
     border-top: 1px solid #eee; padding-top: 12px;
   }
   .state { text-align: center; color: #777; padding: 24px 0; font-size: 14px; }
+  .qr-wrap { display: flex; justify-content: center; margin: 16px 0 4px; }
+  .qr-wrap canvas { border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -42,6 +44,7 @@
     <div class="state">جارِ التحميل...</div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     const SUPABASE_URL = "https://itblplmyuuvimdifldew.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0YmxwbG15dXV2aW1kaWZsZGV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMDczMTksImV4cCI6MjA4ODY4MzMxOX0.UN7FQtZ9KPGWLgsQTk4yWbvWVvEQQkk-UI2vtwP_LBw";
@@ -79,8 +82,16 @@
             <tr><td>OS</td><td>${fmt(data.os_sph)}</td><td>${fmt(data.os_cyl)}</td><td>${fmt(data.os_axis)}</td><td>${fmt(data.os_add)}</td></tr>
           </tbody>
         </table>
+        <div class="qr-wrap" id="qr"></div>
         <p class="note">هذه الوصفة معروضة للمشاركة فقط. لا تحتوي على بيانات تواصل شخصية.</p>
       `;
+      new QRCode(document.getElementById("qr"), {
+        text: window.location.href,
+        width: 120,
+        height: 120,
+        colorDark: "#3C3489",
+        colorLight: "#ffffff"
+      });
     }
 
     async function load() {
@@ -92,12 +103,15 @@
       }
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/rx_card_public?share_code=eq.${encodeURIComponent(code)}&select=*`,
+          `${SUPABASE_URL}/rest/v1/rpc/get_rx_card_public`,
           {
+            method: "POST",
             headers: {
               apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-            }
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ p_share_code: code })
           }
         );
         const rows = await res.json();
