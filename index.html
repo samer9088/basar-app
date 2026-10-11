@@ -1024,6 +1024,32 @@ body {
 .tl-act-btn:active { transform:scale(.97); }
 .cmp-chip-hist { opacity:.9; border-style:dashed !important; }
 .cmp-chip-sub { font-size:.62rem; color:var(--tx3); font-weight:600; }
+/* ── ملخص التغيّر للمريض ── */
+.chg-card { border-radius:16px; padding:16px; margin-bottom:14px; border:1px solid var(--bdr); background:var(--c2,var(--c3)); }
+.chg-card.lv0 { border-color:rgba(0,212,170,.35); background:linear-gradient(180deg,rgba(0,212,170,.10),transparent 70%); }
+.chg-card.lv1 { border-color:rgba(240,192,64,.4);  background:linear-gradient(180deg,rgba(240,192,64,.12),transparent 70%); }
+.chg-card.lv2 { border-color:rgba(255,71,87,.45);  background:linear-gradient(180deg,rgba(255,71,87,.12),transparent 70%); }
+.chg-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.chg-icon { font-size:28px; line-height:1; }
+.chg-title { font-size:1.05rem; font-weight:900; color:var(--tx); }
+.chg-sub { font-size:.72rem; color:var(--tx2); margin-top:2px; }
+.chg-meter { display:flex; gap:4px; margin:4px 0 12px; }
+.chg-meter span { flex:1; height:6px; border-radius:4px; background:var(--c3); }
+.chg-card.lv0 .chg-meter span:nth-child(1){ background:var(--acc); }
+.chg-card.lv1 .chg-meter span:nth-child(-n+2){ background:var(--gold); }
+.chg-card.lv2 .chg-meter span { background:var(--red); }
+.chg-eye { display:flex; gap:8px; align-items:flex-start; font-size:.84rem; color:var(--tx); line-height:1.7; margin-bottom:6px; }
+.chg-eye b { font-weight:800; }
+.chg-dot { width:9px; height:9px; border-radius:50%; margin-top:9px; flex-shrink:0; }
+.chg-dot.lv0{background:var(--acc)} .chg-dot.lv1{background:var(--gold)} .chg-dot.lv2{background:var(--red)}
+.chg-alert { margin-top:12px; padding:11px 12px; border-radius:12px; font-size:.84rem; font-weight:800; line-height:1.6;
+  background:var(--redb); color:var(--red); border:1px solid rgba(255,71,87,.25); }
+.chg-alert.soft { background:rgba(240,192,64,.1); color:var(--gold); border-color:rgba(240,192,64,.3); }
+.chg-tips { margin:10px 0 0; padding:0 18px 0 0; font-size:.8rem; color:var(--tx2); line-height:1.8; }
+.chg-btn { margin-top:12px; width:100%; padding:11px; border-radius:12px; border:none; background:var(--acc); color:#fff;
+  font-family:inherit; font-size:.82rem; font-weight:800; cursor:pointer; }
+.chg-note { margin-top:10px; font-size:.66rem; color:var(--tx3); text-align:center; }
+.cmp-arrow { font-size:.62rem; font-weight:800; margin-inline-start:4px; }
 .renewal-head {
   display:flex; align-items:center; gap:12px; margin-bottom:12px;
 }
@@ -4158,13 +4184,149 @@ function toggleCompareSelect(id) {
   renderCompare();
 }
 
+// ══════════════════════════════════════
+// RX CHANGE SUMMARY — ملخص التغيّر بلغة المريض
+// الحدود في مكان واحد لتعديلها بسهولة بعد مراجعة الأخصائي
+// ══════════════════════════════════════
+const RX_CHANGE_RULES = {
+  sph:  { mid:0.50, big:1.00 },   // ديوبتر: أقل من mid = مستقر
+  cyl:  { mid:0.50, big:0.75 },
+  axis: { mid:10,   big:20, minCyl:0.75 },  // بالدرجات، يُحسب فقط إذا الاستجماتيزم ≥ minCyl
+  fastPerYear: 1.00,   // تغيّر ≥ هذا بالسنة يرفع "المتوسط" إلى "كبير"
+  urgentWithinYears: 1, // تغيّر كبير خلال أقل من سنة = راجع قريباً
+  childAge: 18, childMyopiaPerYear: 0.50
+};
+
+function _rxNum(v) { const n=parseFloat(String(v||'').replace(/[^\d.+-]/g,'')); return isNaN(n)?0:n; }
+function _rxEmpty(e) { return !e || !(e.sph||e.cyl||e.ax); }
+function _rxAmountAr(d) {
+  d = Math.round(Math.abs(d)*4)/4;
+  const map = {0.25:'ربع درجة',0.5:'نصف درجة',0.75:'ثلاثة أرباع درجة',1:'درجة كاملة',1.25:'درجة وربع',1.5:'درجة ونصف',1.75:'درجة وثلاثة أرباع',2:'درجتين'};
+  return map[d] || `${d.toFixed(2)} درجة`;
+}
+function _yearsBetween(a,b) {
+  if(!a||!b) return null; const d=(new Date(a)-new Date(b))/(365.25*86400000);
+  return isNaN(d)?null:Math.abs(d);
+}
+function _periodAr(y) {
+  if(y==null) return '';
+  const mo = Math.round(y*12);
+  if(mo < 1)  return 'خلال أقل من شهر';
+  if(mo < 12) return mo===1?'خلال شهر':mo===2?'خلال شهرين':mo<=10?`خلال ${mo} أشهر`:`خلال ${mo} شهراً`;
+  const yr = Math.round(y*2)/2;
+  return yr===1?'خلال سنة':yr===1.5?'خلال سنة ونص':yr===2?'خلال سنتين':yr<=10?`خلال ${yr} سنوات`:`خلال ${yr} سنة`;
+}
+
+function analyzeRxChange(newRx, oldRx, member) {
+  const R = RX_CHANGE_RULES;
+  const years = _yearsBetween(newRx.date, oldRx.date);
+  const age = parseInt(member && member.age);
+  const isChild = !isNaN(age) && age < R.childAge;
+  const eyes = [];
+  [['r','العين اليمنى'],['l','العين اليسرى']].forEach(([k,label]) => {
+    const n=newRx[k]||{}, o=oldRx[k]||{};
+    if(_rxEmpty(n) && _rxEmpty(o)) return;
+    const sphN=_rxNum(n.sph), sphO=_rxNum(o.sph);
+    const cylN=Math.abs(_rxNum(n.cyl)), cylO=Math.abs(_rxNum(o.cyl));
+    const dSph = sphN - sphO, dCyl = cylN - cylO;
+    let dAx = 0;
+    if(Math.max(cylN,cylO) >= R.axis.minCyl && n.ax && o.ax) {
+      const d = Math.abs(_rxNum(n.ax)-_rxNum(o.ax)) % 180; dAx = Math.min(d, 180-d);
+    }
+    const lvOf = (v,t) => Math.abs(v) >= t.big-0.001 ? 2 : Math.abs(v) >= t.mid-0.001 ? 1 : 0;
+    let level = Math.max(lvOf(dSph,R.sph), lvOf(dCyl,R.cyl), lvOf(dAx,R.axis));
+    const mainDelta = Math.max(Math.abs(dSph), Math.abs(dCyl));
+    const perYear = years && years>0.05 ? mainDelta/years : null;
+    let fast = false;
+    if(level===1 && perYear!=null && years<1 && perYear >= R.fastPerYear) { level=2; fast=true; }
+
+    // الجمل بلغة بسيطة
+    const parts = [];
+    if(Math.abs(dSph) >= 0.25) {
+      if(dSph < 0) parts.push(sphN<=0 ? `قصر النظر زاد <b>${_rxAmountAr(dSph)}</b>` : `طول النظر قلّ <b>${_rxAmountAr(dSph)}</b>`);
+      else         parts.push(sphN>=0 ? `طول النظر زاد <b>${_rxAmountAr(dSph)}</b>` : `قصر النظر قلّ <b>${_rxAmountAr(dSph)}</b>`);
+    }
+    if(Math.abs(dCyl) >= 0.25) parts.push(`الاستجماتيزم ${dCyl>0?'زاد':'قلّ'} <b>${_rxAmountAr(dCyl)}</b>`);
+    if(dAx >= R.axis.mid) parts.push(`اتجاه الاستجماتيزم تغيّر <b>${Math.round(dAx)}°</b>`);
+    const text = parts.length ? `${label}: ${parts.join('، و')}` : `${label}: ثابتة تقريباً`;
+    const childMyopiaFast = isChild && dSph<0 && sphN<0 && years && years>0.05 && (Math.abs(dSph)/years) >= R.childMyopiaPerYear;
+    eyes.push({k,label,level,text,dSph,dCyl,dAx,fast,childMyopiaFast});
+  });
+  const level = eyes.length ? Math.max(...eyes.map(e=>e.level)) : 0;
+  const lvs = eyes.map(e=>e.level);
+  const oneEyeOnly = eyes.length===2 && lvs.includes(2) && lvs.includes(0);
+  const urgent = level===2 && ((years!=null && years < R.urgentWithinYears) || oneEyeOnly);
+  const childMyopia = eyes.some(e=>e.childMyopiaFast);
+  return { level, eyes, years, urgent, oneEyeOnly, isChild, childMyopia };
+}
+
+function renderChangeSummary(newE, oldE, type, member) {
+  const newRx = type==='glasses'?newE.grx:newE.crx, oldRx = type==='glasses'?oldE.grx:oldE.crx;
+  if(!newRx || !oldRx) return '';
+  const a = analyzeRxChange(newRx, oldRx, member);
+  if(!a.eyes.length) return '';
+  const L = [
+    {icon:'🟢', title:'نظرك مستقر', sub:'التغيّر بسيط وضمن الطبيعي'},
+    {icon:'🟡', title:'تغيّر متوسط', sub:'تغيّر شائع وطبيعي مع الوقت'},
+    {icon:'🔴', title:'تغيّر كبير', sub:'التغيّر ملحوظ ويستحق المتابعة'}
+  ][a.level];
+  if(a.childMyopia && a.level<2) L.sub = 'يحتاج متابعة لأنه عند طفل';
+  const period = _periodAr(a.years);
+  let html = `<div class="chg-card lv${a.level}">
+    <div class="chg-head">
+      <div class="chg-icon">${L.icon}</div>
+      <div><div class="chg-title">${L.title}</div>
+      <div class="chg-sub">${type==='glasses'?'🕶️ النظارة':'👁️ العدسات'}${period?' · '+period:''} · ${L.sub}</div></div>
+    </div>
+    <div class="chg-meter"><span></span><span></span><span></span></div>
+    ${a.eyes.map(e=>`<div class="chg-eye"><span class="chg-dot lv${e.level}"></span><span>${e.text}${e.fast?' <span style="color:var(--red);font-size:.72rem">(تغيّر سريع)</span>':''}</span></div>`).join('')}`;
+
+  if(a.level===2) {
+    html += `<div class="chg-alert">⚠️ ${a.urgent
+      ? `ننصحك بمراجعة طبيب العيون <u>في أقرب وقت</u> — ${a.oneEyeOnly?'التغيّر في عين واحدة فقط':'التغيّر كبير خلال فترة قصيرة'}، ومن المهم التأكد من سببه بالفحص.`
+      : 'ننصحك بمراجعة طبيب العيون <u>خلال 6 أشهر</u> للفحص والتأكد من استقرار النظر.'}</div>
+    <ul class="chg-tips">
+      <li>قاعدة <b>20-20-20</b>: كل 20 دقيقة على الشاشة، انظر لشيء يبعد 6 أمتار لمدة 20 ثانية.</li>
+      <li>أبعد الجوال مسافة لا تقل عن 30–40 سم، وتجنّب القراءة في إضاءة ضعيفة.</li>
+      <li>استخدم وصفتك الجديدة بانتظام — الوصفة القديمة قد تسبب إجهاداً وصداعاً.</li>
+      ${a.isChild?'<li>للأطفال: ساعتان يومياً على الأقل خارج المنزل تساعد في إبطاء تطوّر قصر النظر.</li>':''}
+    </ul>`;
+  } else if(a.level===1) {
+    html += `<ul class="chg-tips">
+      ${a.childMyopia?'':'<li>حافظ على الفحص الدوري مرة كل سنة.</li>'}
+      <li>إذا لاحظت صداعاً أو إجهاداً أو صعوبة في الرؤية قبل موعدك، راجع الطبيب مبكراً.</li>
+    </ul>`;
+  } else {
+    html += `<ul class="chg-tips"><li>ممتاز 👌 استمر على الفحص الدوري مرة كل سنة إلى سنتين.</li></ul>`;
+  }
+  if(a.childMyopia) {
+    html += `<div class="chg-alert soft">👶 قصر النظر عند ${member.name} يزداد بسرعة (نصف درجة أو أكثر بالسنة). ننصح بمراجعة طبيب العيون <u>خلال 6 أشهر</u>، واسأله عن <b>حلول التحكّم بتطوّر قصر النظر</b> المناسبة للأطفال.</div>`;
+  }
+  if(a.level>=1) html += `<button class="chg-btn" onclick="showPage('specialist')">👨‍⚕️ استشر أخصائي بصريات</button>`;
+  html += `<div class="chg-note">⚕️ هذا الملخص إرشادي مبني على الفرق بين الأرقام، ولا يغني عن الفحص الطبي.</div></div>`;
+  return html;
+}
+
+// إذا كانت المقارنة بين وصفتين لنفس الشخص → يحدد الأحدث والأقدم ونوع الوصفة
+function sameMemberPair(selected) {
+  if(selected.length!==2) return null;
+  const pid = e => e._hist ? String(e._parent) : String(e.id);
+  if(pid(selected[0])!==pid(selected[1])) return null;
+  const type = (selected.find(e=>e._hist)||{})._type;
+  if(!type || selected.some(e=>e._hist && e._type!==type)) return null;
+  const rank = e => e._hist ? parseInt(String(e.id).split('#')[1].slice(1)) : -1; // الأصغر = الأحدث
+  const [newE, oldE] = [...selected].sort((a,b)=>rank(a)-rank(b));
+  const member = getMembers().find(m=>String(m.id)===pid(newE));
+  return { newE, oldE, type, member };
+}
+
 function renderCompareResult() {
   const el = document.getElementById('compareResult');
   if(_selectedForCompare.length < 2) {
     el.innerHTML = `<div class="cmp-empty">
       <div style="font-size:40px;margin-bottom:12px">👁️</div>
       <div>اختر وصفتين على الأقل للمقارنة</div>
-      <div style="font-size:.72rem;color:var(--tx3);margin-top:6px">يمكن مقارنة حتى 4 أفراد</div>
+      <div style="font-size:.72rem;color:var(--tx3);margin-top:6px">قارن وصفتين لنفس الشخص لتحصل على ملخص التغيّر 💡</div>
     </div>`;
     return;
   }
@@ -4174,8 +4336,11 @@ function renderCompareResult() {
   const cols = selected.length;
   const colPct = Math.floor(100/cols);
 
+  const pair = sameMemberPair(selected);
   // Table header
-  let html = `<div class="compare-result">
+  let html = pair ? renderChangeSummary(pair.newE, pair.oldE, pair.type, pair.member) : '';
+  if(pair) html += `<div style="font-size:.75rem;font-weight:800;color:var(--tx2);margin:4px 2px 8px">📋 التفاصيل بالأرقام</div>`;
+  html += `<div class="compare-result">
     <div class="cmp-header-row" style="grid-template-columns:repeat(${cols},1fr)">
       ${selected.map(m => {
         const av = AV_CLASSES[m.colorIdx||0];
@@ -4315,8 +4480,7 @@ function renderCompareResult() {
         <td style="padding:8px 10px;font-size:.72rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr);white-space:nowrap">${field.label}</td>
         ${vals.map(v=>{
           const hasDiff=v!=='—'&&!same;
-          const isMax=hasDiff&&numVals.length>1&&parseFloat(v)===Math.max(...numVals);
-          return `<td class="cmp-cell${hasDiff?(maxDiff>=0.5?' diff':''):''}" style="${isMax?'color:var(--gold);font-weight:700':''}">${v}</td>`;
+          return `<td class="cmp-cell${hasDiff?' diff':''}" style="${hasDiff?'font-weight:700':''}">${v}</td>`;
         }).join('')}
       </tr>`;
     });
@@ -4351,8 +4515,7 @@ function renderCompareResult() {
         <td style="padding:8px 10px;font-size:.72rem;font-weight:800;color:var(--tx3);background:var(--c3);border-bottom:1px solid var(--bdr);white-space:nowrap">${field.label}</td>
         ${vals.map(v=>{
           const hasDiff=v!=='—'&&!same;
-          const isMax=hasDiff&&numVals.length>1&&parseFloat(v)===Math.max(...numVals);
-          return `<td class="cmp-cell${hasDiff?(maxDiff>=0.5?' diff':''):''}" style="${isMax?'color:var(--gold);font-weight:700':''}">${v}</td>`;
+          return `<td class="cmp-cell${hasDiff?' diff':''}" style="${hasDiff?'font-weight:700':''}">${v}</td>`;
         }).join('')}
       </tr>`;
     });
@@ -4367,7 +4530,7 @@ function renderCompareResult() {
   // Legend
   html += `<div style="padding:12px 16px;display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid var(--bdr)">
     <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--tx2)">
-      <div style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></div> قيمة مختلفة (فرق ≥ 0.5)
+      <div style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></div> قيمة تغيّرت
     </div>
     <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--tx2)">
       <div style="width:10px;height:10px;border-radius:2px;background:var(--acc)"></div> متطابق
