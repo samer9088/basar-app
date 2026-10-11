@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="بصر">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>بصر | Basar</title>
 <link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -746,6 +748,19 @@ body {
   cursor:pointer; font-size:18px; padding:0 4px;
   touch-action:manipulation;
 }
+
+#pwaBanner { z-index:1100; }
+.ios-guide { z-index:1200 !important; }
+.ios-steps { padding:4px 18px 18px; }
+.ios-step { display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--bdr); font-size:.88rem; color:var(--tx); line-height:1.6; }
+.ios-step:last-child { border-bottom:none; }
+.ios-num { width:28px; height:28px; border-radius:50%; background:var(--acc); color:#000; font-weight:900;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.85rem; }
+.ios-ico { display:inline-flex; vertical-align:middle; padding:2px 6px; border-radius:6px; background:var(--c3); margin:0 2px; }
+.ios-note { font-size:.74rem; color:var(--tx2); background:var(--c3); border-radius:10px; padding:10px 12px; margin-top:10px; line-height:1.7; }
+.ios-arrow { position:fixed; bottom:calc(10px + var(--safe-bottom)); left:50%; transform:translateX(-50%);
+  font-size:30px; z-index:1201; animation:iosBounce 1s infinite; display:none; }
+@keyframes iosBounce { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,8px)} }
 
 /* Empty state */
 .empty-state {
@@ -1511,8 +1526,20 @@ button:active:not(:disabled), .nav-btn:active, .ma-btn:active, .chip-btn:active,
   <span style="font-size:20px">👁️</span>
   <div class="pwa-txt">ثبّت تطبيق بصر على جهازك</div>
   <button class="pwa-install" onclick="installPWA()">تثبيت</button>
-  <button class="pwa-close" onclick="document.getElementById('pwaBanner').style.display='none'">✕</button>
+  <button class="pwa-close" onclick="dismissInstallBanner()">✕</button>
 </div>
+
+<!-- ══ دليل التثبيت للآيفون / المتصفحات الداخلية ══ -->
+<div class="modal-overlay center ios-guide" id="iosGuideModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="iosGuideTitle">📲 تثبيت بصر على الآيفون</div>
+      <button class="modal-close" onclick="closeIosGuide()">✕</button>
+    </div>
+    <div class="ios-steps" id="iosGuideBody"></div>
+  </div>
+</div>
+<div class="ios-arrow" id="iosArrow">👇</div>
 
 <!-- ══════════════════════════════════════
      AUTH SCREEN
@@ -3424,6 +3451,11 @@ function renderSettings() {
     <div class="sett-section">
       <div class="sett-section-title">الحساب</div>
       <div class="sett-card">
+        ${!IS_STANDALONE ? `<div class="sett-row" onclick="installPWA()">
+          <div class="sett-icon si-grn">📲</div>
+          <div class="sett-text"><div class="sett-label">تثبيت التطبيق على جهازك</div><div class="sett-sub">يفتح من الشاشة الرئيسية مثل أي تطبيق</div></div>
+          <div class="sett-arrow">›</div>
+        </div>` : ''}
         <div class="sett-row" onclick="openEditProfile()">
           <div class="sett-icon si-grn">👤</div>
           <div class="sett-text"><div class="sett-label">تعديل الملف الشخصي</div><div class="sett-sub">${name}</div></div>
@@ -3940,10 +3972,75 @@ function applyLang() {
 // ══════════════════════════════════════
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault(); _deferredInstall=e;
-  document.getElementById('pwaBanner').style.display='flex';
+  if(!_bannerSnoozed()) document.getElementById('pwaBanner').style.display='flex';
 });
+// ── الآيفون لا يدعم زر التثبيت التلقائي، فنعرض دليل خطوات بدلاً منه ──
+const _ua = navigator.userAgent || '';
+const IS_IOS = /iPad|iPhone|iPod/.test(_ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const IS_STANDALONE = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+// متصفحات داخل التطبيقات (انستقرام، سناب، تيك توك، فيسبوك...) لا تسمح بالتثبيت
+const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\/|Twitter|LinkedInApp|GSA\/|Pinterest/i.test(_ua);
+const IS_IOS_SAFARI = IS_IOS && !IN_APP && /Safari/.test(_ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(_ua);
+
+function dismissInstallBanner() {
+  document.getElementById('pwaBanner').style.display='none';
+  try { localStorage.setItem('basarInstallDismissed', Date.now()); } catch(e) {}
+}
+function _bannerSnoozed() {
+  try { const t=+localStorage.getItem('basarInstallDismissed')||0; return Date.now()-t < 7*86400000; } catch(e) { return false; }
+}
+function showIosGuide() {
+  const shareIco = `<span class="ios-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>`;
+  let title, body;
+  if(IN_APP) {
+    title = '🌐 افتح بصر في المتصفح';
+    body = `
+      <div class="ios-step"><div class="ios-num">1</div><div>أنت داخل متصفح تطبيق آخر (مثل انستقرام أو سناب)، وهو لا يسمح بتثبيت بصر.</div></div>
+      <div class="ios-step"><div class="ios-num">2</div><div>اضغط <b>⋯</b> أو <b>⋮</b> في أعلى الشاشة، ثم اختر <b>"فتح في المتصفح"</b> أو <b>"Open in Safari"</b>.</div></div>
+      <div class="ios-step"><div class="ios-num">3</div><div>أو انسخ الرابط والصقه في ${IS_IOS?'<b>Safari</b>':'<b>Chrome</b>'}:</div></div>
+      <button class="btn-primary" style="width:100%;margin-top:6px" onclick="copyAppLink()">📋 نسخ رابط بصر</button>`;
+  } else if(IS_IOS) {
+    title = '📲 تثبيت بصر على الآيفون';
+    body = `
+      ${!IS_IOS_SAFARI ? `<div class="ios-note" style="margin:0 0 6px">💡 للتثبيت الأفضل افتح الرابط في <b>Safari</b>.</div>` : ''}
+      <div class="ios-step"><div class="ios-num">1</div><div>اضغط زر المشاركة ${shareIco} ${IS_IOS_SAFARI?'في أسفل الشاشة':'في شريط المتصفح'}</div></div>
+      <div class="ios-step"><div class="ios-num">2</div><div>انزل في القائمة واختر <b>"إضافة إلى الشاشة الرئيسية"</b> <span class="ios-ico">➕</span></div></div>
+      <div class="ios-step"><div class="ios-num">3</div><div>اضغط <b>"إضافة"</b> — وبيظهر بصر كتطبيق في شاشتك 👁️</div></div>
+      <div class="ios-note">🔐 بعد التثبيت افتح بصر من الأيقونة وسجّل دخولك مرة واحدة. الآيفون يفصل بين Safari والتطبيق المثبّت، فالدخول من Safari لا ينتقل تلقائياً.</div>`;
+  } else {
+    title = '📲 تثبيت بصر';
+    body = `
+      <div class="ios-step"><div class="ios-num">1</div><div>افتح قائمة المتصفح <b>⋮</b></div></div>
+      <div class="ios-step"><div class="ios-num">2</div><div>اختر <b>"تثبيت التطبيق"</b> أو <b>"إضافة إلى الشاشة الرئيسية"</b></div></div>`;
+  }
+  document.getElementById('iosGuideTitle').textContent = title;
+  document.getElementById('iosGuideBody').innerHTML = body;
+  openModal('iosGuideModal');
+  if(IS_IOS_SAFARI) document.getElementById('iosArrow').style.display='block';
+}
+function closeIosGuide() {
+  closeModal('iosGuideModal');
+  document.getElementById('iosArrow').style.display='none';
+}
+function copyAppLink() {
+  const url = location.origin + '/';
+  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+    .then(()=>showToast('✅ تم نسخ الرابط — الصقه في المتصفح'))
+    .catch(()=>prompt('انسخ الرابط:', url));
+}
+// إظهار شريط التثبيت للآيفون والمتصفحات الداخلية (لا يوجد beforeinstallprompt عندهم)
+window.addEventListener('load', () => {
+  if(IS_STANDALONE || _bannerSnoozed()) return;
+  if(IS_IOS || IN_APP) {
+    const b = document.getElementById('pwaBanner');
+    b.querySelector('.pwa-txt').textContent = IN_APP ? 'افتح بصر في المتصفح لتثبيته' : 'ثبّت تطبيق بصر على جهازك';
+    b.querySelector('.pwa-install').textContent = IN_APP ? 'كيف؟' : 'الطريقة';
+    setTimeout(()=>{ b.style.display='flex'; }, 1500);
+  }
+});
+
 function installPWA() {
-  if(!_deferredInstall) return;
+  if(!_deferredInstall) { showIosGuide(); return; }
   _deferredInstall.prompt();
   _deferredInstall.userChoice.then(c=>{
     if(c.outcome==='accepted') showToast('✅ تم تثبيت بصر على جهازك!');
