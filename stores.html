@@ -53,6 +53,10 @@
     text-decoration: none;
   }
 
+  .group-title { max-width:480px; margin:8px auto 2px; font-size:13px; font-weight:700; color:#3C3489; }
+  .group-title.other { color:#777; margin-top:20px; }
+  .group-note { font-size:12px; color:#999; font-weight:500; }
+  .card.local { border-color:#534AB7; box-shadow:0 2px 10px rgba(83,74,183,.08); }
   .state { text-align: center; color: #777; padding: 40px 0; font-size: 14px; max-width: 480px; margin: 0 auto; }
 </style>
 </head>
@@ -75,6 +79,34 @@
     let allMerchants = [];
     let activeCity = "الكل";
 
+    // ── مدينة المستخدم: من الرابط (?city=) أو آخر مدينة محفوظة ──
+    const params = new URLSearchParams(location.search);
+    let userCity = (params.get("city") || "").trim();
+    try {
+      if (userCity) localStorage.setItem("basarUserCity", userCity);
+      else userCity = localStorage.getItem("basarUserCity") || "";
+    } catch (e) {}
+
+    // توحيد كتابة المدن: جدة/جده/Jeddah تُعتبر نفس المدينة
+    const CITY_ALIASES = {
+      "jeddah":"جده","jedda":"جده","jidda":"جده","riyadh":"رياض","makkah":"مكه","mecca":"مكه","makka":"مكه",
+      "madinah":"مدينه","medina":"مدينه","al madinah":"مدينه","dammam":"دمام","khobar":"خبر","al khobar":"خبر",
+      "dhahran":"ظهران","taif":"طايف","abha":"ابها","tabuk":"تبوك","buraidah":"بريده","qassim":"قصيم",
+      "hail":"حايل","jazan":"جازان","jizan":"جازان","najran":"نجران","yanbu":"ينبع","khamis mushait":"خميس مشيط",
+      "al ahsa":"احساء","hofuf":"هفوف","jubail":"جبيل","rabigh":"رابغ","kaust":"رابغ",
+      "المدينة المنورة":"مدينه","مكة المكرمة":"مكه"
+    };
+    function normCity(c) {
+      let s = String(c || "").trim().toLowerCase().replace(/\s+/g, " ");
+      if (CITY_ALIASES[s]) return CITY_ALIASES[s];
+      s = s.replace(/[\u064B-\u0652\u0640]/g, "")       // تشكيل وتطويل
+           .replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي")
+           .replace(/^ال/, "");
+      return CITY_ALIASES[s] || s;
+    }
+    const userKey = normCity(userCity);
+    const isLocal = m => userKey && normCity(m.city) === userKey;
+
     const tierLabels = { trial: "تجريبي", basic: "أساسي", featured: "مميز", professional: "احترافي" };
 
     function waLink(number) {
@@ -86,15 +118,33 @@
       const list = document.getElementById("list");
       const filtered = activeCity === "الكل"
         ? allMerchants
-        : allMerchants.filter(m => m.city === activeCity);
+        : allMerchants.filter(m => normCity(m.city) === normCity(activeCity));
 
       if (!filtered.length) {
         list.innerHTML = '<div class="state">لا توجد متاجر في هذه المدينة حالياً</div>';
         return;
       }
 
-      list.innerHTML = filtered.map(m => `
-        <div class="card">
+      // "الكل" + مدينة المستخدم معروفة → متاجر مدينته أولاً ثم باقي المدن
+      if (activeCity === "الكل" && userKey) {
+        const local = filtered.filter(isLocal), others = filtered.filter(m => !isLocal(m));
+        let html = `<div class="group-title">📍 متاجر في ${userCity}</div>`;
+        html += local.length
+          ? cards(local, true)
+          : `<div class="state" style="padding:16px 0">لا توجد متاجر في مدينتك حالياً — نعمل على إضافتها قريباً</div>`;
+        if (others.length) {
+          html += `<div class="group-title other">🌍 متاجر في مدن أخرى <span class="group-note">(${others.length})</span></div>`;
+          html += cards(others, false);
+        }
+        list.innerHTML = html;
+        return;
+      }
+      list.innerHTML = cards(filtered, false);
+    }
+
+    function cards(arr, local) {
+      return arr.map(m => `
+        <div class="card${local ? " local" : ""}">
           <a class="card-main" href="store.html?id=${m.id}" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-decoration:none;color:inherit">
             <div class="logo">${(m.name || "?").charAt(0)}</div>
             <div class="info">
@@ -112,10 +162,14 @@
     }
 
     function renderCityFilter() {
-      const cities = ["الكل", ...new Set(allMerchants.map(m => m.city))];
+      // مدينة المستخدم أولاً بعد "الكل"
+      const seen = new Set(), list = [];
+      allMerchants.forEach(m => { const k = normCity(m.city); if (!seen.has(k)) { seen.add(k); list.push(m.city); } });
+      list.sort((a, b) => (normCity(b) === userKey) - (normCity(a) === userKey));
+      const cities = ["الكل", ...list];
       const el = document.getElementById("cityFilter");
       el.innerHTML = cities.map(c =>
-        `<button class="city-chip ${c === activeCity ? "active" : ""}" data-city="${c}">${c}</button>`
+        `<button class="city-chip ${c === activeCity ? "active" : ""}" data-city="${c}">${userKey && normCity(c) === userKey ? "📍 " : ""}${c}</button>`
       ).join("");
       el.querySelectorAll(".city-chip").forEach(btn => {
         btn.addEventListener("click", () => {
